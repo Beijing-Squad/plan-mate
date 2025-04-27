@@ -1,2 +1,2 @@
-package org.example.logic.entities
+package logic.entities
 

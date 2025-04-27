@@ -1,2 +1,2 @@
-package org.example.ui.console
+package ui.console
 

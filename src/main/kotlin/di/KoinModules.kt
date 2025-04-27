@@ -1,2 +1,2 @@
-package org.example.di
+package di
 

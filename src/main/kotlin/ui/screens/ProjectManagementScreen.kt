@@ -1,2 +1,2 @@
-package org.example.ui.screens
+package ui.screens
 
