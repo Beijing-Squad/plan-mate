@@ -1,2 +1,2 @@
-package org.example.data.repository
+package logic.repository
 
