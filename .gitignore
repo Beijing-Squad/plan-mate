@@ -44,9 +44,6 @@ bin/
 ### Mac OS ###
 .DS_Store
 
-# Gradle files
-.gradle/
-build/
 # Local configuration file (sdk path, etc)
 local.properties
 # Log/OS Filesa
