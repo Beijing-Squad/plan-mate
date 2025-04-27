@@ -1,0 +1,120 @@
+# JaCoCo Code Coverage for Kotlin Project
+name: Kotlin Coverage
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the "develop" branch
+  push:
+    branches: [ "develop" ]
+  pull_request:
+    branches: [ "develop" ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Important for accurate history tracking
+      
+      # Set up Java for the project
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '22'
+          distribution: 'temurin'
+          cache: gradle
+      
+      # Make gradlew executable
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+      
+      # Build the project
+      - name: Build with Gradle
+        run: ./gradlew build
+      
+      # Run tests and generate coverage report
+      - name: Run tests with coverage
+        run: ./gradlew test jacocoTestReport
+      
+      # Generate coverage badges
+      - name: Generate JaCoCo Badge
+        id: jacoco
+        uses: cicirello/jacoco-badge-generator@v2
+        with:
+          generate-branches-badge: true
+          jacoco-csv-file: build/reports/jacoco/test/jacocoTestReport.csv
+      
+      # Log coverage to the console
+      - name: Log coverage percentage
+        run: |
+          echo "Line coverage: ${{ steps.jacoco.outputs.coverage }}"
+          echo "Branch coverage: ${{ steps.jacoco.outputs.branches }}"
+      
+      # Check if coverage meets the required threshold
+      - name: Verify minimum coverage
+        if: github.event_name == 'pull_request'
+        run: |
+          COVERAGE="${{ steps.jacoco.outputs.coverage }}"
+          THRESHOLD=80
+          
+          if (( $(echo "$COVERAGE < $THRESHOLD" | bc -l) )); then
+            echo "::error::Code coverage is below the minimum required threshold of $THRESHOLD%. Current coverage: $COVERAGE%"
+            exit 1
+          else
+            echo "Coverage is $COVERAGE%, which meets the minimum required threshold of $THRESHOLD%"
+          fi
+      
+      # Add coverage comment to PRs
+      - name: Comment PR with coverage
+        uses: marocchino/sticky-pull-request-comment@v2
+        if: github.event_name == 'pull_request'
+        with:
+          header: coverage
+          message: |
+            ## Coverage Report 📊
+            
+            **Line Coverage:** ${{ steps.jacoco.outputs.coverage }}%
+            **Branch Coverage:** ${{ steps.jacoco.outputs.branches }}%
+            
+            <details>
+            <summary>Coverage Badges</summary>
+            
+            ![Line Coverage](./badges/jacoco.svg)
+            ![Branch Coverage](./badges/branches.svg)
+            </details>
+            
+            ${{ steps.jacoco.outputs.coverage < 80 && '⚠️ **Coverage is below the required 80% threshold**' || '✅ **Coverage meets the required 80% threshold**' }}
+      
+      # Create badges directory
+      - name: Create badges directory
+        run: mkdir -p badges
+        
+      # Move generated badges to the right directory
+      - name: Move badges to badges directory
+        run: mv ./*.svg ./badges/ || true
+      
+      # Commit and push badges when running on develop branch
+      - name: Commit and push badges if coverage has changed
+        if: github.ref == 'refs/heads/develop'
+        uses: EndBug/add-and-commit@v9
+        with:
+          default_author: github_actions
+          message: 'Update JaCoCo coverage badges'
+          add: 'badges/*.svg'
+      
+      # Upload coverage report as an artifact
+      - name: Upload JaCoCo coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-report
+          path: build/reports/jacoco/
