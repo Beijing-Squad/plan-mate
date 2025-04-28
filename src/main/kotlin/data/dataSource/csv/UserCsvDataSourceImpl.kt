@@ -4,7 +4,7 @@ import data.repository.dataSourceAbstraction.UserDataSource
 import logic.entities.User
 import java.io.File
 
-class UserCsvDataSource(
+class UserCsvDataSourceImpl(
     private val file: File
 ): UserDataSource{
 

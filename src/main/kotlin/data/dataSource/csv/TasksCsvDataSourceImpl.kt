@@ -4,7 +4,7 @@ import data.repository.dataSourceAbstraction.TasksDataSource
 import logic.entities.Task
 import java.io.File
 
-class TasksCsvDataSource(
+class TasksCsvDataSourceImpl(
     private val file:File
 ): TasksDataSource {
 

@@ -1,11 +1,11 @@
 package data.dataSource.csv
 
+import data.dataSource.csv.utils.CsvPlanMateParser
 import data.repository.dataSourceAbstraction.ProjectDataSource
 import logic.entities.Project
-import java.io.File
 
-class ProjectCsvDataSource (
-    private val file: File
+class ProjectCsvDataSourceImpl (
+    private val csvPlanMate: CsvPlanMateParser
 ): ProjectDataSource{
 
     override fun getAllProjects(): List<Project> {

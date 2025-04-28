@@ -4,7 +4,7 @@ import data.repository.dataSourceAbstraction.StatesDataSource
 import logic.entities.State
 import java.io.File
 
-class StatesCsvDataSource(
+class StatesCsvDataSourceImpl(
     private val file: File
 ): StatesDataSource{
 
