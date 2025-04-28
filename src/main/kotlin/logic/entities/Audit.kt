@@ -5,7 +5,7 @@ import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
 @OptIn(ExperimentalUuidApi::class)
-data class AuditEntry(
+data class Audit(
     val id: Uuid = Uuid.random(),
     val userRole: UserRole,
     val userName: String,
