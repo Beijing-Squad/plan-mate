@@ -7,10 +7,10 @@ interface ProjectsRepository{
 
     fun getProjectById(projectId: String): Project
 
-    fun addTask(project: Project)
+    fun addProject(project: Project)
 
-    fun deleteTask(projectId: String)
+    fun deleteProject(projectId: String)
 
-    fun updateTask(projectId: String): Project
+    fun updateProject(projectId: String): Project
 
 }
