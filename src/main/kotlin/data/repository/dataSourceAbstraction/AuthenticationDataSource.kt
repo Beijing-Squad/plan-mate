@@ -1,12 +1,9 @@
 package data.repository.dataSourceAbstraction
 
 import logic.entities.User
-import logic.entities.UserRole
 
 interface AuthenticationDataSource{
 
-    fun register(userName: String, password: String, userRole: UserRole): User
-
-    fun save(user: User)
+    fun login(email: String, password: String): User
 
 }
