@@ -12,15 +12,15 @@ class ProjectsRepositoryImpl(): ProjectsRepository{
         TODO("Not yet implemented")
     }
 
-    override fun addTask(project: Project) {
+    override fun addProject(project: Project) {
         TODO("Not yet implemented")
     }
 
-    override fun deleteTask(projectId: String) {
+    override fun deleteProject(projectId: String) {
         TODO("Not yet implemented")
     }
 
-    override fun updateTask(projectId: String): Project {
+    override fun updateProject(projectId: String): Project {
         TODO("Not yet implemented")
     }
 
