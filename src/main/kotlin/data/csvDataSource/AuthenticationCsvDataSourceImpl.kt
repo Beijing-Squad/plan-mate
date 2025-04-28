@@ -1,8 +1,8 @@
-package data.dataSource.csv
+package data.csvDataSource
 
-import data.dataSource.csv.utils.CsvPlanMateParser
-import data.dataSource.csv.utils.CsvPlanMateReader
-import data.repository.dataSourceAbstraction.AuthenticationDataSource
+import data.parser.CsvPlanMateParser
+import data.parser.CsvPlanMateReader
+import data.repository.dataSource.AuthenticationDataSource
 import logic.entities.User
 
 class AuthenticationCsvDataSourceImpl(

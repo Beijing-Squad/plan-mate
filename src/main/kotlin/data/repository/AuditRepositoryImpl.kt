@@ -1,6 +1,6 @@
 package data.repository
 
-import data.repository.dataSourceAbstraction.AuditDataSource
+import data.repository.dataSource.AuditDataSource
 import logic.entities.Audit
 import logic.repository.AuditRepository
 

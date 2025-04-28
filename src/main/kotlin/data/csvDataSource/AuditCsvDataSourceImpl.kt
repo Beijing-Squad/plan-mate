@@ -1,14 +1,14 @@
-package data.dataSource.csv
+package data.csvDataSource
 
-import data.dataSource.csv.utils.CsvPlanMateParser
-import data.dataSource.csv.utils.CsvPlanMateReader
-import data.repository.dataSourceAbstraction.AuditDataSource
+import data.parser.CsvPlanMateParser
+import data.parser.CsvPlanMateReader
+import data.repository.dataSource.AuditDataSource
 import logic.entities.Audit
 
 class AuditCsvDataSourceImpl(
     private val csvPlanMateParser: CsvPlanMateParser,
     private val csvPlanMateReader: CsvPlanMateReader
-):AuditDataSource{
+): AuditDataSource {
 
     override fun getAllAuditLogs(): List<Audit> {
         TODO("Not yet implemented")

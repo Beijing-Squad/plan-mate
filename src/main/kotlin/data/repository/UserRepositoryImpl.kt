@@ -1,6 +1,6 @@
 package data.repository
 
-import data.repository.dataSourceAbstraction.UserDataSource
+import data.repository.dataSource.UserDataSource
 import logic.entities.User
 import logic.repository.UserRepository
 

@@ -1,6 +1,6 @@
 package data.repository
 
-import data.repository.dataSourceAbstraction.AuthenticationDataSource
+import data.repository.dataSource.AuthenticationDataSource
 import logic.repository.AuthenticationRepository
 
 class AuthenticationRepositoryImpl(

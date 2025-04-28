@@ -1,6 +1,6 @@
 package data.repository
 
-import data.repository.dataSourceAbstraction.TasksDataSource
+import data.repository.dataSource.TasksDataSource
 import logic.entities.Task
 import logic.repository.TasksRepository
 

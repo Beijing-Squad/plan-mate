@@ -1,6 +1,6 @@
 package data.repository
 
-import data.repository.dataSourceAbstraction.StatesDataSource
+import data.repository.dataSource.StatesDataSource
 import logic.entities.State
 import logic.repository.StatesRepository
 

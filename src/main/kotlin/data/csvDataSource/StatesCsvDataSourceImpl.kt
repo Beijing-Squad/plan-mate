@@ -1,15 +1,14 @@
-package data.dataSource.csv
+package data.csvDataSource
 
-import data.dataSource.csv.utils.CsvPlanMateParser
-import data.dataSource.csv.utils.CsvPlanMateReader
-import data.repository.dataSourceAbstraction.StatesDataSource
+import data.parser.CsvPlanMateParser
+import data.parser.CsvPlanMateReader
+import data.repository.dataSource.StatesDataSource
 import logic.entities.State
-import java.io.File
 
 class StatesCsvDataSourceImpl(
     private val csvPlanMateParser: CsvPlanMateParser,
     private val csvPlanMateReader: CsvPlanMateReader
-): StatesDataSource{
+): StatesDataSource {
 
     override fun getAllStates(): List<State> {
         TODO("Not yet implemented")

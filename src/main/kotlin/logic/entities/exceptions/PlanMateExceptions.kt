@@ -1,4 +1,4 @@
-package utils
+package logic.entities.exceptions
 
 open class PlanMateException(message: String) : Exception(message)
 

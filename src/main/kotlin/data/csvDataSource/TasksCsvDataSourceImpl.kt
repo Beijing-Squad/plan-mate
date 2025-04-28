@@ -1,10 +1,9 @@
-package data.dataSource.csv
+package data.csvDataSource
 
-import data.dataSource.csv.utils.CsvPlanMateParser
-import data.dataSource.csv.utils.CsvPlanMateReader
-import data.repository.dataSourceAbstraction.TasksDataSource
+import data.parser.CsvPlanMateParser
+import data.parser.CsvPlanMateReader
+import data.repository.dataSource.TasksDataSource
 import logic.entities.Task
-import java.io.File
 
 class TasksCsvDataSourceImpl(
     private val csvPlanMateParser: CsvPlanMateParser,

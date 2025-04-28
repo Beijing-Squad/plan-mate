@@ -1,9 +1,12 @@
 package data.repository
 
+import data.repository.dataSource.ProjectDataSource
 import logic.entities.Project
 import logic.repository.ProjectsRepository
 
-class ProjectsRepositoryImpl(): ProjectsRepository{
+class ProjectsRepositoryImpl(
+    private val projectDataSource: ProjectDataSource
+): ProjectsRepository{
     override fun getAllProjects(): List<Project> {
         TODO("Not yet implemented")
     }
