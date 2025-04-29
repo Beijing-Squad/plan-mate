@@ -187,5 +187,18 @@ class GetAuditLogsByTaskIdUseCaseTest {
         assertThat(result[0].entityType).isEqualTo(EntityType.TASK)
     }
 
+    @Test
+    fun `should return empty list for invalid task ID`() {
+        // Given
+        val invalidTaskId = "invalid-task-999"
+        every { auditRepository.getAuditLogsByTaskId(invalidTaskId) } returns emptyList()
+
+        // When
+        val result = getAuditLogsByTaskIdUseCase.getAuditLogsByTaskId(invalidTaskId)
+
+        // Then
+        assertThat(result).isEmpty()
+    }
+
 
 }
