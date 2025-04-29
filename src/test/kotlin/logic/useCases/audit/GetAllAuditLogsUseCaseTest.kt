@@ -217,4 +217,39 @@ class GetAllAuditLogsUseCaseTest {
         )
     }
 
+    @Test
+    fun `should return audit logs sorted by timestamp`() {
+        // Given
+        every { auditRepository.getAllAuditLogs() } returns listOf(
+            createAudit(
+                userRole = UserRole.MATE,
+                userName = "User1",
+                entityType = EntityType.TASK,
+                timeStamp = LocalDate(2023, 1, 3)
+            ),
+            createAudit(
+                userRole = UserRole.ADMIN,
+                userName = "Admin",
+                entityType = EntityType.PROJECT,
+                timeStamp = LocalDate(2023, 1, 1)
+            ),
+            createAudit(
+                userRole = UserRole.MATE,
+                userName = "User2",
+                entityType = EntityType.TASK,
+                timeStamp = LocalDate(2023, 1, 2)
+            )
+        )
+        // When
+        val result = auditRepository.getAllAuditLogs()
+
+        // Then
+        assertThat(result.size).isEqualTo(3)
+        assertThat(result.map { it.timeStamp }).containsExactly(
+            LocalDate(2023, 1, 3),
+            LocalDate(2023, 1, 1),
+            LocalDate(2023, 1, 2)
+        ).inOrder()
+    }
+
 }
