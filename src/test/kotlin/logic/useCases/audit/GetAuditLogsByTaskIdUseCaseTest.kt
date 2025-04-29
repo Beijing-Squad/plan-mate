@@ -69,5 +69,49 @@ class GetAuditLogsByTaskIdUseCaseTest {
         assertThat(result).isEmpty()
     }
 
+    @Test
+    fun `should return audit logs with different action types for the same task`() {
+        // Given
+        val taskId = "task-789"
+        every { auditRepository.getAuditLogsByTaskId(taskId) } returns listOf(
+            createAudit(
+                userRole = UserRole.ADMIN,
+                userName = "Admin",
+                entityType = EntityType.TASK,
+                entityId = taskId,
+                action = ActionType.CREATE,
+                timeStamp = LocalDate(2023, 1, 1)
+            ),
+            createAudit(
+                userRole = UserRole.MATE,
+                userName = "User1",
+                entityType = EntityType.TASK,
+                entityId = taskId,
+                action = ActionType.UPDATE,
+                timeStamp = LocalDate(2023, 1, 2)
+            ),
+            createAudit(
+                userRole = UserRole.MATE,
+                userName = "User2",
+                entityType = EntityType.TASK,
+                entityId = taskId,
+                action = ActionType.DELETE,
+                timeStamp = LocalDate(2023, 1, 3)
+            )
+        )
+
+        // When
+        val result = getAuditLogsByTaskIdUseCase.getAuditLogsByTaskId(taskId)
+
+        // Then
+        assertThat(result.size).isEqualTo(3)
+        assertThat(result.map { it.action }).containsExactly(
+            ActionType.CREATE,
+            ActionType.UPDATE,
+            ActionType.DELETE
+        )
+        assertThat(result.all { it.entityId == taskId }).isTrue()
+    }
+
 
 }
