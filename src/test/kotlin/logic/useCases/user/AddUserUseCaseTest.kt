@@ -1,11 +1,14 @@
 package logic.useCases.user
 
 import com.google.common.truth.Truth.assertThat
+import data.repository.UserRepositoryImpl
 import fake.createUser
 import io.mockk.mockk
 import logic.entities.exceptions.InvalidPasswordException
 import logic.entities.exceptions.InvalidUserNameException
 import logic.repository.UserRepository
+import logic.useCases.user.cryptography.MD5PasswordEncryption
+import logic.useCases.user.cryptography.PasswordEncryption
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -16,20 +19,22 @@ class AddUserUseCaseTest {
 
     private lateinit var addUser: AddUserUseCase
     private lateinit var userRepository: UserRepository
+    private lateinit var passwordEncryption: PasswordEncryption
 
     @BeforeEach
     fun setUp() {
-        userRepository = mockk(relaxed = true)
-        addUser = AddUserUseCase(userRepository)
+        userRepository = UserRepositoryImpl(mockk(relaxed = true))
+        passwordEncryption = MD5PasswordEncryption()
+        addUser = AddUserUseCase(userRepository,passwordEncryption)
     }
 
     @Test
     fun `should create user when username large than two character`() {
         // Given
-        val mohammed = createUser(userName = "Mohammed")
+        val mohammed = createUser(userName = "Mohammed123")
 
         // When
-        addUser.addUserUseCase(mohammed)
+        addUser.addUser(mohammed)
 
         // Then
         assertThat(true).isTrue()
@@ -41,7 +46,7 @@ class AddUserUseCaseTest {
         val user = createUser(password = "12345678")
 
         // When
-        addUser.addUserUseCase(user)
+        addUser.addUser(user)
 
         // Then
         assertThat(true).isTrue()
@@ -51,14 +56,17 @@ class AddUserUseCaseTest {
     @CsvSource(
         "mohammed akkad",
         "1mohammed",
-        " mohammed",
+        "mohammed 123",
+        "ab",
+        "@mohammed1234",
+        "mohammed@123"
     )
     fun `should throw InvalidUserNameException when username is invalid`(username: String) {
         // Given
         val user = createUser(userName = username)
 
         // When && Given
-        assertThrows<InvalidUserNameException> { addUser.addUserUseCase(user) }
+        assertThrows<InvalidUserNameException> { addUser.addUser(user).getOrThrow() }
 
     }
 
@@ -68,7 +76,7 @@ class AddUserUseCaseTest {
         val user = createUser(password = "1234")
 
         // When && Given
-        assertThrows<InvalidPasswordException> { addUser.addUserUseCase(user) }
+        assertThrows<InvalidPasswordException> { addUser.addUser(user).getOrThrow() }
 
     }
 
