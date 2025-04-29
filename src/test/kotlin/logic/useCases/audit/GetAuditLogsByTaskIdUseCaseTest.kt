@@ -56,4 +56,18 @@ class GetAuditLogsByTaskIdUseCaseTest {
         assertThat(result.all { it.entityType == EntityType.TASK }).isTrue()
     }
 
+    @Test
+    fun `should return empty list when no audit logs exist for task ID`() {
+        // Given
+        val taskId = "task-456"
+        every { auditRepository.getAuditLogsByTaskId(taskId) } returns emptyList()
+
+        // When
+        val result = getAuditLogsByTaskIdUseCase.getAuditLogsByTaskId(taskId)
+
+        // Then
+        assertThat(result).isEmpty()
+    }
+
+
 }
