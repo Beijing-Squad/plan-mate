@@ -22,7 +22,7 @@ class AuditCsvParserTest {
     }
 
     @Test
-    fun `header returns correct CSV header`() {
+    fun `should return correct CSV header`() {
         // When
         val header = parser.header()
 
@@ -31,7 +31,7 @@ class AuditCsvParserTest {
     }
 
     @Test
-    fun `serializer returns correct CSV line`() {
+    fun `should serialize Audit object into correct CSV line`() {
         // Given
         val fixedId = Uuid.parse("123e4567-e89b-12d3-a456-426614174000")
         val audit = createAudit(
@@ -53,7 +53,7 @@ class AuditCsvParserTest {
     }
 
     @Test
-    fun `deserializer returns correct Audit object`() {
+    fun `should deserialize correct CSV line into Audit object`() {
         // Given
         val line = "123e4567-e89b-12d3-a456-426614174000,ADMIN,Ahmed,task-95,TASK,CREATE,,new,2024-04-01"
 
@@ -61,19 +61,21 @@ class AuditCsvParserTest {
         val result = parser.deserializer(line)
 
         // Then
-        assertThat(result.id.toString()).isEqualTo("123e4567-e89b-12d3-a456-426614174000")
-        assertThat(result.userRole).isEqualTo(UserRole.ADMIN)
-        assertThat(result.userName).isEqualTo("Ahmed")
-        assertThat(result.entityId).isEqualTo("task-95")
-        assertThat(result.entityType).isEqualTo(EntityType.TASK)
-        assertThat(result.action).isEqualTo(ActionType.CREATE)
-        assertThat(result.oldState).isNull()
-        assertThat(result.newState).isEqualTo("new")
-        assertThat(result.timeStamp).isEqualTo(LocalDate(2024, 4, 1))
+        with(result) {
+            assertThat(id.toString()).isEqualTo("123e4567-e89b-12d3-a456-426614174000")
+            assertThat(userRole).isEqualTo(UserRole.ADMIN)
+            assertThat(userName).isEqualTo("Ahmed")
+            assertThat(entityId).isEqualTo("task-95")
+            assertThat(entityType).isEqualTo(EntityType.TASK)
+            assertThat(action).isEqualTo(ActionType.CREATE)
+            assertThat(oldState).isNull()
+            assertThat(newState).isEqualTo("new")
+            assertThat(timeStamp).isEqualTo(LocalDate(2024, 4, 1))
+        }
     }
 
     @Test
-    fun `deserializer throws IllegalArgumentException for bad UUID`() {
+    fun `should throw IllegalArgumentException when UUID is invalid`() {
         //Given
         val badLine = "not-a-uuid,Type,ID,ACTION,[user],timestamp"
 
