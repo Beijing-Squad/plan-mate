@@ -15,8 +15,8 @@ import org.junit.jupiter.api.Test
 
 class GetAllAuditLogsUseCaseTest {
 
-    lateinit var getAllAuditLogsUseCase: GetAllAuditLogsUseCase
-    lateinit var auditRepository: AuditRepository
+    private lateinit var getAllAuditLogsUseCase: GetAllAuditLogsUseCase
+    private lateinit var auditRepository: AuditRepository
 
     @BeforeEach
     fun setUp() {
