@@ -99,4 +99,38 @@ class GetAllAuditLogsUseCaseTest {
         )
     }
 
+    @Test
+    fun `should return audit logs with old and new state values`() {
+        // Given
+        every { auditRepository.getAllAuditLogs() } returns listOf(
+            createAudit(
+                userRole = UserRole.MATE,
+                userName = "User1",
+                entityType = EntityType.TASK,
+                action = ActionType.UPDATE,
+                oldState = "In Progress",
+                newState = "Completed",
+                timeStamp = LocalDate(2023, 1, 1)
+            ),
+            createAudit(
+                userRole = UserRole.ADMIN,
+                userName = "Admin",
+                entityType = EntityType.PROJECT,
+                action = ActionType.UPDATE,
+                oldState = "Draft",
+                newState = "Active",
+                timeStamp = LocalDate(2023, 1, 2)
+            )
+        )
+
+        // When
+        val result = auditRepository.getAllAuditLogs()
+        // Then
+        assertThat(result.size).isEqualTo(2)
+        assertThat(result[0].oldState).isEqualTo("In Progress")
+        assertThat(result[0].newState).isEqualTo("Completed")
+        assertThat(result[1].oldState).isEqualTo("Draft")
+        assertThat(result[1].newState).isEqualTo("Active")
+    }
+
 }
