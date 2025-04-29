@@ -33,8 +33,11 @@ class AddAuditLogUseCaseTest {
             timeStamp = LocalDate(2025, 4, 30)
         )
 
-        // When && Then
-        verify { addAuditLogUseCase.addAuditLog(auditLog) }
+        // When
+        addAuditLogUseCase.addAuditLog(auditLog)
+
+        // Then
+        verify { auditRepository.addAuditLog(auditLog) }
     }
 
 }
