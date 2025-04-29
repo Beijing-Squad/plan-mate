@@ -8,7 +8,7 @@ class AuditRepositoryImpl (
     private val auditDataSource: AuditDataSource
 ): AuditRepository{
     override fun getAllAuditLogs(): List<Audit> {
-        TODO("Not yet implemented")
+        return auditDataSource.getAllAuditLogs()
     }
 
     override fun addAuditLog(audit: Audit) {
