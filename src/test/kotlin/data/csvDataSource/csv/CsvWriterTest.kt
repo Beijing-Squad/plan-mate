@@ -28,7 +28,7 @@ class CsvWriterTest {
     }
 
     @Test
-    fun `test CsvWriter throws CsvFileExceptions if file is not CSV on initialization`() {
+    fun `should throw CsvFileExceptions if file is not CSV on initialization`() {
         //Given
         val nonCsvFile = File("test.txt")
 
@@ -42,7 +42,7 @@ class CsvWriterTest {
     }
 
     @Test
-    fun `test appendLine throws CsvFileExceptions if file is not CSV`() {
+    fun `should throw CsvFileExceptions when appending line if file is not CSV`() {
         //Given
         val nonCsvFile = File("test.txt")
 
@@ -57,7 +57,7 @@ class CsvWriterTest {
     }
 
     @Test
-    fun `test overwriteLines throws CsvFileExceptions if file is not CSV`() {
+    fun `should throw CsvFileExceptions when overwriting lines if file is not CSV`() {
         //Given
         val nonCsvFile = File("test.txt")
 
@@ -72,7 +72,7 @@ class CsvWriterTest {
     }
 
     @Test
-    fun `test WriteHeader when file does not exist creates file with header`() {
+    fun `should create file with header when file does not exist`() {
         //Given
         mockFile.delete()
 
@@ -85,7 +85,7 @@ class CsvWriterTest {
     }
 
     @Test
-    fun `test write header when file exists does not overwrite`() {
+    fun `should not overwrite header when file already exists`() {
         //Given
         val existingHeader = "Name, Age, Gender\n"
         mockFile.writeText(existingHeader)
@@ -99,7 +99,7 @@ class CsvWriterTest {
     }
 
     @Test
-    fun `test append line when file exists appends line`() {
+    fun `should append line to file when file exists`() {
         //Given
         csvWriter.appendLine("John, 30, Male")
 
@@ -108,7 +108,7 @@ class CsvWriterTest {
     }
 
     @Test
-    fun `test overwrite lines overwrites content`() {
+    fun `should overwrite lines in file with provided content`() {
         //Given
         csvWriter.updateLines(listOf("Name, Age, Gender", "John, 30, Male"))
 
@@ -117,7 +117,7 @@ class CsvWriterTest {
     }
 
     @Test
-    fun `test overwrite lines when list is empty creates empty file`() {
+    fun `should create empty file when overwriting with empty list`() {
         //Given
         csvWriter.updateLines(emptyList())
 
@@ -127,7 +127,7 @@ class CsvWriterTest {
 
 
     @Test
-    fun `test writeHeader throws EmptyHeaderException if header is empty`() {
+    fun `tshould throw EmptyHeaderException when header is empty`() {
         //Given
         val exception = assertThrows<EmptyHeaderException> {
             csvWriter.writeHeader("")
