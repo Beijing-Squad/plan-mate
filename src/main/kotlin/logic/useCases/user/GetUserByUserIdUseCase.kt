@@ -1,8 +1,15 @@
 package logic.useCases.user
 
+import logic.entities.User
+import logic.entities.exceptions.UserNotFoundException
 import logic.repository.UserRepository
+import kotlin.uuid.ExperimentalUuidApi
 
 class GetUserByUserIdUseCase(
     private val userRepository: UserRepository
 ) {
+    @OptIn(ExperimentalUuidApi::class)
+    fun getUserByUserId(userId: String): User {
+        return userRepository.getUserByUserId(userId = userId)
+    }
 }
