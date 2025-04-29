@@ -8,9 +8,12 @@ import kotlinx.datetime.LocalDate
 import logic.entities.ActionType
 import logic.entities.EntityType
 import logic.entities.UserRole
+import logic.entities.exceptions.InvalidInputException
+import logic.entities.exceptions.ProjectNotFoundException
 import logic.repository.AuditRepository
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 
 class GetAuditLogsByProjectIdUseCaseTest {
 
@@ -19,12 +22,12 @@ class GetAuditLogsByProjectIdUseCaseTest {
 
     @BeforeEach
     fun setUp() {
-        auditRepository = mockk()
+        auditRepository = mockk(relaxed = true)
         getAuditLogsByProjectIdUseCase = GetAuditLogsByProjectIdUseCase(auditRepository)
     }
 
     @Test
-    fun `should return list of audit logs when given project id is valid`() {
+    fun `should return list of audit logs when project id is found`() {
         // Given
         val givenId = "PROJECT-001"
         every { auditRepository.getAllAuditLogs() } returns listOf(
@@ -54,7 +57,7 @@ class GetAuditLogsByProjectIdUseCaseTest {
     }
 
     @Test
-    fun `should return empty list of audit logs when given project id is invalid`() {
+    fun `should throw ProjectNotFoundException of audit logs when project id not found`() {
         // Given
         val givenId = "PROJECT-001"
         every { auditRepository.getAllAuditLogs() } returns listOf(
@@ -76,26 +79,39 @@ class GetAuditLogsByProjectIdUseCaseTest {
             )
         )
 
-        // When
-        val result = getAuditLogsByProjectIdUseCase.getAuditLogsByProjectId(givenId)
-
-        // Then
-        assertThat(result).isEmpty()
+        // When && Then
+        assertThrows<ProjectNotFoundException> {
+            getAuditLogsByProjectIdUseCase.getAuditLogsByProjectId(givenId)
+        }
     }
 
     @Test
-    fun `should return empty list of audit logs when audit repository is empty`() {
+    fun `should throw InvalidInputException when project id is blank`() {
         // Given
-        val givenId = "PROJECT-001"
-        every { auditRepository.getAllAuditLogs() } returns emptyList()
+        val givenId = " "
+        every { auditRepository.getAllAuditLogs() } returns listOf(
+            createAudit(
+                userRole = UserRole.ADMIN,
+                userName = "Adel",
+                action = ActionType.CREATE,
+                entityType = EntityType.PROJECT,
+                entityId = "PROJECT-555",
+                timeStamp = LocalDate(2025, 4, 29)
+            ),
+            createAudit(
+                userRole = UserRole.ADMIN,
+                userName = "Adel",
+                action = ActionType.UPDATE,
+                entityType = EntityType.PROJECT,
+                entityId = "PROJECT-555",
+                timeStamp = LocalDate(2025, 4, 29)
+            )
+        )
 
-        // When
-        val result = getAuditLogsByProjectIdUseCase.getAuditLogsByProjectId(givenId)
-
-        // Then
-        assertThat(result).isEmpty()
+        // When && Then
+        assertThrows<InvalidInputException> {
+            getAuditLogsByProjectIdUseCase.getAuditLogsByProjectId(givenId)
+        }
     }
-
-
 
 }
