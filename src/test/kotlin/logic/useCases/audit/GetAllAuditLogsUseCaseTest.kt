@@ -6,13 +6,11 @@ import fake.createAudit
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.LocalDateTime
 import logic.entities.EntityType
 import logic.entities.UserRole
 import logic.repository.AuditRepository
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import java.util.*
 
 class GetAllAuditLogsUseCaseTest {
 
