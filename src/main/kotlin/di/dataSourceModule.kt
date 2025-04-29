@@ -8,11 +8,41 @@ import org.koin.dsl.module
 
 val dataSourceModule = module {
     // CsvDataSourceImpl
-    single(named("projectDataSource")) { CsvDataSourceImpl<Project>(get(named("projectReader")), get(named("projectWriter")), get()) }
-    single(named("userDataSource")) { CsvDataSourceImpl<User>(get(named("userReader")), get(named("userWriter")), get()) }
-    single(named("taskDataSource")) { CsvDataSourceImpl<Task>(get(named("taskReader")), get(named("taskWriter")), get()) }
-    single(named("stateDataSource")) { CsvDataSourceImpl<State>(get(named("stateReader")), get(named("stateWriter")), get()) }
-    single(named("auditDataSource")) { CsvDataSourceImpl<Audit>(get(named("auditReader")), get(named("auditWriter")), get()) }
+    single(named("projectDataSource")) {
+        CsvDataSourceImpl<Project>(
+            get(named("projectReader")),
+            get(named("projectWriter")),
+            get()
+        )
+    }
+    single(named("userDataSource")) {
+        CsvDataSourceImpl<User>(
+            get(named("userReader")),
+            get(named("userWriter")),
+            get()
+        )
+    }
+    single(named("taskDataSource")) {
+        CsvDataSourceImpl<Task>(
+            get(named("taskReader")),
+            get(named("taskWriter")),
+            get()
+        )
+    }
+    single(named("stateDataSource")) {
+        CsvDataSourceImpl<State>(
+            get(named("stateReader")),
+            get(named("stateWriter")),
+            get()
+        )
+    }
+    single(named("auditDataSource")) {
+        CsvDataSourceImpl<Audit>(
+            get(named("auditReader")),
+            get(named("auditWriter")),
+            get()
+        )
+    }
 
     // Implementations
     single { ProjectCsvDataSourceImpl(get(named("projectDataSource"))) }
