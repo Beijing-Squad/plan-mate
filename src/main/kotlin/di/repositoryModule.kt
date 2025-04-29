@@ -1,12 +1,13 @@
 package di
 
 import data.repository.*
+import logic.repository.*
 import org.koin.dsl.module
 
 val repositoryModule = module {
-    single { ProjectsRepositoryImpl(get()) }
-    single { UserRepositoryImpl(get()) }
-    single { TasksRepositoryImpl(get()) }
-    single { AuditRepositoryImpl(get()) }
-    single { StatesRepositoryImpl(get()) }
+    single<ProjectsRepository> { ProjectsRepositoryImpl(get()) }
+    single<UserRepository> { UserRepositoryImpl(get()) }
+    single<TasksRepository> { TasksRepositoryImpl(get()) }
+    single<AuditRepository> { AuditRepositoryImpl(get()) }
+    single<StatesRepository> { StatesRepositoryImpl(get()) }
 }
