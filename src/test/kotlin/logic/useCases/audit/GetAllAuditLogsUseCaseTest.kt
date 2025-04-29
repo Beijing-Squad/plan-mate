@@ -50,4 +50,15 @@ class GetAllAuditLogsUseCaseTest {
         assertThat(result.size).isEqualTo(2)
     }
 
+    @Test
+    fun `should return empty list when audit repo is empty`() {
+        // Given
+        every { auditRepository.getAllAuditLogs() } returns emptyList()
+
+        // When
+        val result = auditRepository.getAllAuditLogs()
+
+        // Then
+        assertThat(result.size).isEqualTo(0)
+    }
 }
