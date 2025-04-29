@@ -63,7 +63,7 @@ class GetAuditLogsByProjectIdUseCaseTest {
                 userName = "Adel",
                 action = ActionType.CREATE,
                 entityType = EntityType.PROJECT,
-                entityId = givenId,
+                entityId = "PROJECT-555",
                 timeStamp = LocalDate(2025, 4, 29)
             ),
             createAudit(
@@ -71,7 +71,7 @@ class GetAuditLogsByProjectIdUseCaseTest {
                 userName = "Adel",
                 action = ActionType.UPDATE,
                 entityType = EntityType.PROJECT,
-                entityId = givenId,
+                entityId = "PROJECT-555",
                 timeStamp = LocalDate(2025, 4, 29)
             )
         )
@@ -80,7 +80,22 @@ class GetAuditLogsByProjectIdUseCaseTest {
         val result = getAuditLogsByProjectIdUseCase.getAuditLogsByProjectId(givenId)
 
         // Then
-        assertThat(result.size).isEqualTo(2)
+        assertThat(result).isEmpty()
     }
+
+    @Test
+    fun `should return empty list of audit logs when audit repository is empty`() {
+        // Given
+        val givenId = "PROJECT-001"
+        every { auditRepository.getAllAuditLogs() } returns emptyList()
+
+        // When
+        val result = getAuditLogsByProjectIdUseCase.getAuditLogsByProjectId(givenId)
+
+        // Then
+        assertThat(result).isEmpty()
+    }
+
+
 
 }
