@@ -133,4 +133,40 @@ class GetAllAuditLogsUseCaseTest {
         assertThat(result[1].newState).isEqualTo("Active")
     }
 
+    @Test
+    fun `should return audit logs for both project and task entities`() {
+        // Given
+        every { auditRepository.getAllAuditLogs() } returns listOf(
+            createAudit(
+                userRole = UserRole.ADMIN,
+                userName = "Admin",
+                entityType = EntityType.PROJECT,
+                entityId = "project-123",
+                action = ActionType.CREATE,
+                timeStamp = LocalDate(2023, 1, 1)
+            ),
+            createAudit(
+                userRole = UserRole.MATE,
+                userName = "User1",
+                entityType = EntityType.TASK,
+                entityId = "task-456",
+                action = ActionType.CREATE,
+                timeStamp = LocalDate(2023, 1, 2)
+            )
+        )
+
+        // When
+        val result = auditRepository.getAllAuditLogs()
+        // Then
+        assertThat(result.size).isEqualTo(2)
+        assertThat(result.map { it.entityType }).containsExactly(
+            EntityType.PROJECT,
+            EntityType.TASK
+        )
+        assertThat(result.map { it.entityId }).containsExactly(
+            "project-123",
+            "task-456"
+        )
+    }
+
 }
