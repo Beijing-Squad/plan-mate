@@ -6,6 +6,7 @@ import fake.createAudit
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.datetime.LocalDate
+import logic.entities.ActionType
 import logic.entities.EntityType
 import logic.entities.UserRole
 import logic.repository.AuditRepository
@@ -59,4 +60,43 @@ class GetAllAuditLogsUseCaseTest {
         // Then
         assertThat(result.size).isEqualTo(0)
     }
+
+    @Test
+    fun `should return audit logs with different action types`() {
+        // Given
+        every { auditRepository.getAllAuditLogs() } returns listOf(
+            createAudit(
+                userRole = UserRole.ADMIN,
+                userName = "Admin",
+                entityType = EntityType.PROJECT,
+                action = ActionType.CREATE,
+                timeStamp = LocalDate(2023, 1, 1)
+            ),
+            createAudit(
+                userRole = UserRole.MATE,
+                userName = "User1",
+                entityType = EntityType.TASK,
+                action = ActionType.UPDATE,
+                timeStamp = LocalDate(2023, 1, 2)
+            ),
+            createAudit(
+                userRole = UserRole.MATE,
+                userName = "User2",
+                entityType = EntityType.PROJECT,
+                action = ActionType.DELETE,
+                timeStamp = LocalDate(2023, 1, 3)
+            )
+        )
+        // When
+        val result = auditRepository.getAllAuditLogs()
+
+        // Then
+        assertThat(result.size).isEqualTo(3)
+        assertThat(result.map { it.action }).containsExactly(
+            ActionType.CREATE,
+            ActionType.UPDATE,
+            ActionType.DELETE
+        )
+    }
+
 }
