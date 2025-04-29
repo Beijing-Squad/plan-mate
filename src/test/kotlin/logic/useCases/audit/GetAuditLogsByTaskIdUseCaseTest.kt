@@ -3,7 +3,6 @@ package logic.useCases.audit
 import data.repository.AuditRepositoryImpl
 import io.mockk.mockk
 import logic.repository.AuditRepository
-import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 
 class GetAuditLogsByTaskIdUseCaseTest {
