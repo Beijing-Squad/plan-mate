@@ -23,7 +23,7 @@ class CsvReaderTest {
     }
 
     @Test
-    fun `readCsv returns raw lines including header and data`() {
+    fun `should return raw lines including header and data`() {
         //Given
         tempFile.writeText("name,age\nJohn,30\nJane,25")
         val reader = CsvReader(tempFile)
@@ -36,7 +36,7 @@ class CsvReaderTest {
     }
 
     @Test
-    fun `readCsv returns single line when only header present`() {
+    fun `should return single line when only header is present`() {
         //Given
         tempFile.writeText("name,age")
         val reader = CsvReader(tempFile)
@@ -49,7 +49,7 @@ class CsvReaderTest {
     }
 
     @Test
-    fun `readCsv returns empty list when file is empty`() {
+    fun `should return empty list when file is empty`() {
         //Given
         tempFile.writeText("")
         val reader = CsvReader(tempFile)
@@ -62,7 +62,7 @@ class CsvReaderTest {
     }
 
     @Test
-    fun `readCsv creates new file if it does not exist`() {
+    fun `should create new file if it does not exist`() {
         // delete the temp file to simulate "missing" file
         tempFile.delete()
 
@@ -78,7 +78,7 @@ class CsvReaderTest {
     }
 
     @Test
-    fun `readCsv throws IOException when path is a directory`() {
+    fun `should throw IOException when path is a directory`() {
         // make the path a directory
         tempFile.delete()
         tempFile.mkdir()
