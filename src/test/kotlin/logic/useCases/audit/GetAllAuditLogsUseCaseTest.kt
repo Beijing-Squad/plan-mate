@@ -15,13 +15,13 @@ import org.junit.jupiter.api.Test
 
 class GetAllAuditLogsUseCaseTest {
 
-    lateinit var getAllAuditLogs: GetAllAuditLogsUseCase
+    lateinit var getAllAuditLogsUseCase: GetAllAuditLogsUseCase
     lateinit var auditRepository: AuditRepository
 
     @BeforeEach
     fun setUp() {
         auditRepository = AuditRepositoryImpl(mockk(relaxed = true))
-        getAllAuditLogs = GetAllAuditLogsUseCase(auditRepository)
+        getAllAuditLogsUseCase = GetAllAuditLogsUseCase(auditRepository)
     }
 
     @Test
@@ -43,7 +43,7 @@ class GetAllAuditLogsUseCaseTest {
         )
 
         // When
-        val result = auditRepository.getAllAuditLogs()
+        val result = getAllAuditLogsUseCase.getAllAuditLogs()
 
         // Then
         assertThat(result.size).isEqualTo(2)
@@ -55,7 +55,7 @@ class GetAllAuditLogsUseCaseTest {
         every { auditRepository.getAllAuditLogs() } returns emptyList()
 
         // When
-        val result = auditRepository.getAllAuditLogs()
+        val result = getAllAuditLogsUseCase.getAllAuditLogs()
 
         // Then
         assertThat(result.size).isEqualTo(0)
@@ -88,7 +88,7 @@ class GetAllAuditLogsUseCaseTest {
             )
         )
         // When
-        val result = auditRepository.getAllAuditLogs()
+        val result = getAllAuditLogsUseCase.getAllAuditLogs()
 
         // Then
         assertThat(result.size).isEqualTo(3)
@@ -124,7 +124,7 @@ class GetAllAuditLogsUseCaseTest {
         )
 
         // When
-        val result = auditRepository.getAllAuditLogs()
+        val result = getAllAuditLogsUseCase.getAllAuditLogs()
 
         // Then
         assertThat(result.size).isEqualTo(2)
@@ -157,7 +157,7 @@ class GetAllAuditLogsUseCaseTest {
         )
 
         // When
-        val result = auditRepository.getAllAuditLogs()
+        val result = getAllAuditLogsUseCase.getAllAuditLogs()
 
         // Then
         assertThat(result.size).isEqualTo(2)
@@ -203,7 +203,7 @@ class GetAllAuditLogsUseCaseTest {
         )
 
         // When
-        val result = auditRepository.getAllAuditLogs()
+        val result = getAllAuditLogsUseCase.getAllAuditLogs()
 
         // Then
         assertThat(result.size).isEqualTo(3)
@@ -244,7 +244,7 @@ class GetAllAuditLogsUseCaseTest {
         )
 
         // When
-        val result = auditRepository.getAllAuditLogs()
+        val result = getAllAuditLogsUseCase.getAllAuditLogs()
 
         // Then
         assertThat(result.size).isEqualTo(3)
