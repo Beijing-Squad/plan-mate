@@ -5,9 +5,7 @@ import data.repository.UserRepositoryImpl
 import fake.createUser
 import io.mockk.every
 import io.mockk.mockk
-import logic.entities.User
 import logic.repository.UserRepository
-import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
