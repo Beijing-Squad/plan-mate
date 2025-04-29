@@ -200,5 +200,45 @@ class GetAuditLogsByTaskIdUseCaseTest {
         assertThat(result).isEmpty()
     }
 
+    @Test
+    fun `should return audit logs in timestamp order for a task`() {
+        // Given
+        val taskId = "task-202"
+        every { auditRepository.getAuditLogsByTaskId(taskId) } returns listOf(
+            createAudit(
+                userRole = UserRole.MATE,
+                userName = "User1",
+                entityType = EntityType.TASK,
+                entityId = taskId,
+                timeStamp = LocalDate(2023, 1, 3)
+            ),
+            createAudit(
+                userRole = UserRole.ADMIN,
+                userName = "Admin",
+                entityType = EntityType.TASK,
+                entityId = taskId,
+                timeStamp = LocalDate(2023, 1, 1)
+            ),
+            createAudit(
+                userRole = UserRole.MATE,
+                userName = "User2",
+                entityType = EntityType.TASK,
+                entityId = taskId,
+                timeStamp = LocalDate(2023, 1, 2)
+            )
+        )
+
+        // When
+        val result = getAuditLogsByTaskIdUseCase.getAuditLogsByTaskId(taskId)
+
+        // Then
+        assertThat(result.size).isEqualTo(3)
+        assertThat(result.map { it.timeStamp }).containsExactly(
+            LocalDate(2023, 1, 3),
+            LocalDate(2023, 1, 1),
+            LocalDate(2023, 1, 2)
+        ).inOrder()
+        assertThat(result.all { it.entityId == taskId }).isTrue()
+    }
 
 }
