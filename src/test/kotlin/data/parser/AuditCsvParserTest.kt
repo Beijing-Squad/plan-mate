@@ -4,10 +4,8 @@ import com.google.common.truth.Truth.assertThat
 import fake.createAudit
 import kotlinx.datetime.LocalDate
 import logic.entities.ActionType
-import logic.entities.Audit
 import logic.entities.EntityType
 import logic.entities.UserRole
-import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows

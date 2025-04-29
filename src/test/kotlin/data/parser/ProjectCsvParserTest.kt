@@ -1,12 +1,8 @@
 package data.parser
 
 import com.google.common.truth.Truth.assertThat
-import fake.createAudit
 import fake.createProject
 import kotlinx.datetime.LocalDate
-import logic.entities.ActionType
-import logic.entities.EntityType
-import logic.entities.UserRole
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows

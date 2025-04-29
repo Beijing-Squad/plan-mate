@@ -1,9 +1,7 @@
 package data.parser
 
 import com.google.common.truth.Truth.assertThat
-import fake.createTask
 import fake.createUser
-import kotlinx.datetime.LocalDate
 import logic.entities.UserRole
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
