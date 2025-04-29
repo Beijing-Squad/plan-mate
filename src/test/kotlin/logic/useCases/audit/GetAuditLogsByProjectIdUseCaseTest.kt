@@ -46,6 +46,14 @@ class GetAuditLogsByProjectIdUseCaseTest {
                 entityType = EntityType.PROJECT,
                 entityId = givenId,
                 timeStamp = LocalDate(2025, 4, 29)
+            ),
+            createAudit(
+                userRole = UserRole.ADMIN,
+                userName = "Adel",
+                action = ActionType.UPDATE,
+                entityType = EntityType.PROJECT,
+                entityId = "PROJECT-123",
+                timeStamp = LocalDate(2025, 4, 29)
             )
         )
 
@@ -112,6 +120,49 @@ class GetAuditLogsByProjectIdUseCaseTest {
         assertThrows<InvalidInputException> {
             getAuditLogsByProjectIdUseCase.getAuditLogsByProjectId(givenId)
         }
+    }
+
+    @Test
+    fun `should return audit logs in timestamp order for a project`() {
+        // Given
+        val givenId = "PROJECT-001"
+        every { auditRepository.getAllAuditLogs() } returns listOf(
+            createAudit(
+                userRole = UserRole.ADMIN,
+                userName = "Adel",
+                action = ActionType.CREATE,
+                entityType = EntityType.PROJECT,
+                entityId = givenId,
+                timeStamp = LocalDate(2025, 4, 29)
+            ),
+            createAudit(
+                userRole = UserRole.ADMIN,
+                userName = "Adel",
+                action = ActionType.UPDATE,
+                entityType = EntityType.PROJECT,
+                entityId = givenId,
+                timeStamp = LocalDate(2025, 4, 29)
+            ),
+            createAudit(
+                userRole = UserRole.ADMIN,
+                userName = "Adel",
+                action = ActionType.UPDATE,
+                entityType = EntityType.PROJECT,
+                entityId = givenId,
+                timeStamp = LocalDate(2025, 4, 30)
+            )
+        )
+
+        // When
+        val result = getAuditLogsByProjectIdUseCase.getAuditLogsByProjectId(givenId)
+            .map { it.timeStamp }
+
+        // Then
+        assertThat(result).containsExactly(
+            LocalDate(2025, 4, 29),
+            LocalDate(2025, 4, 29),
+            LocalDate(2025, 4, 30)
+        ).inOrder()
     }
 
 }
