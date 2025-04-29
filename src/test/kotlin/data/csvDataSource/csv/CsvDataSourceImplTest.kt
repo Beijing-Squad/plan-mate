@@ -28,7 +28,7 @@ class CsvDataSourceImplTest {
     }
 
     @Test
-    fun `test loadAll when csv is empty returns empty list`(){
+    fun `should return empty list when csv is empty`(){
         //Given
         every { reader.readCsv() } returns emptyList()
 
@@ -40,7 +40,7 @@ class CsvDataSourceImplTest {
     }
 
     @Test
-    fun `test loadAll when csv has data returns parsed data`(){
+    fun `should return parsed data when csv has valid content`(){
         // Given
         val lines = listOf("Header", "John, 25, Male")
         every { reader.readCsv() } returns lines
@@ -57,7 +57,7 @@ class CsvDataSourceImplTest {
     }
 
     @Test
-    fun `append writes header when file is completely empty`() {
+    fun `should write header then item when file is completely empty`() {
         // Given
         val item = MyData("Alice", 30, "Female")
         every { reader.readCsv() } returns emptyList()
@@ -75,7 +75,7 @@ class CsvDataSourceImplTest {
     }
 
     @Test
-    fun `append does not write header when file already contains header`() {
+    fun `should append item only without writing header if file has header already`() {
         // Given
         val item = MyData("Bob", 40, "Male")
         every { reader.readCsv() } returns listOf("Name,Age,Gender")
@@ -91,7 +91,7 @@ class CsvDataSourceImplTest {
     }
 
     @Test
-    fun `test loadAll throws CsvReadException when reader fails`() {
+    fun `should throw CsvReadException when reader fails`() {
         // Given
         every { reader.readCsv() } throws Exception("File read error")
 
@@ -104,7 +104,7 @@ class CsvDataSourceImplTest {
     }
 
     @Test
-    fun `test append successfully appends data`() {
+    fun `should append serialized item successfully`() {
         val item = MyData("John", 25, "Male")
 
         // Given
@@ -118,7 +118,7 @@ class CsvDataSourceImplTest {
     }
 
     @Test
-    fun `test append throws CsvWriteException when writer fails`() {
+    fun `should throw CsvWriteException when writer fails while appending`() {
         val item = MyData("John", 25, "Male")
 
         // Given
@@ -135,7 +135,7 @@ class CsvDataSourceImplTest {
     }
 
     @Test
-    fun `test saveAll successfully saves all items`() {
+    fun `should save all items with header and serialized lines`() {
         val items = listOf(MyData("John", 25, "Male"), MyData("Jane", 30, "Female"))
 
         // Given
@@ -150,7 +150,7 @@ class CsvDataSourceImplTest {
     }
 
     @Test
-    fun `test saveAll throws CsvWriteException when writer fails`() {
+    fun `should throw CsvWriteException when writer fails while saving all`() {
         val items = listOf(MyData("John", 25, "Male"))
         // Given
         every { parser.serializer(any()) } returns "Serialized Data"
