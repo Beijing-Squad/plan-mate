@@ -152,4 +152,40 @@ class GetAuditLogsByTaskIdUseCaseTest {
         assertThat(result.all { it.entityId == taskId }).isTrue()
     }
 
+    @Test
+    fun `should return only audit logs for the specified task ID`() {
+        // Given
+        val taskId = "task-123"
+        val otherTaskId = "task-456"
+        every { auditRepository.getAuditLogsByTaskId(taskId) } returns listOf(
+            createAudit(
+                userRole = UserRole.ADMIN,
+                userName = "Admin",
+                entityType = EntityType.TASK,
+                entityId = taskId,
+                action = ActionType.CREATE,
+                timeStamp = LocalDate(2023, 1, 1)
+            )
+        )
+        every { auditRepository.getAuditLogsByTaskId(otherTaskId) } returns listOf(
+            createAudit(
+                userRole = UserRole.MATE,
+                userName = "User1",
+                entityType = EntityType.TASK,
+                entityId = otherTaskId,
+                action = ActionType.CREATE,
+                timeStamp = LocalDate(2023, 1, 2)
+            )
+        )
+
+        // When
+        val result = getAuditLogsByTaskIdUseCase.getAuditLogsByTaskId(taskId)
+
+        // Then
+        assertThat(result.size).isEqualTo(1)
+        assertThat(result[0].entityId).isEqualTo(taskId)
+        assertThat(result[0].entityType).isEqualTo(EntityType.TASK)
+    }
+
+
 }
