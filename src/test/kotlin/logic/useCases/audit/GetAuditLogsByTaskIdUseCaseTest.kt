@@ -113,5 +113,43 @@ class GetAuditLogsByTaskIdUseCaseTest {
         assertThat(result.all { it.entityId == taskId }).isTrue()
     }
 
+    @Test
+    fun `should return audit logs with old and new state values for a task`() {
+        // Given
+        val taskId = "task-101"
+        every { auditRepository.getAuditLogsByTaskId(taskId) } returns listOf(
+            createAudit(
+                userRole = UserRole.MATE,
+                userName = "User1",
+                entityType = EntityType.TASK,
+                entityId = taskId,
+                action = ActionType.UPDATE,
+                oldState = "In Progress",
+                newState = "Completed",
+                timeStamp = LocalDate(2023, 1, 1)
+            ),
+            createAudit(
+                userRole = UserRole.ADMIN,
+                userName = "Admin",
+                entityType = EntityType.TASK,
+                entityId = taskId,
+                action = ActionType.UPDATE,
+                oldState = "Completed",
+                newState = "Blocked",
+                timeStamp = LocalDate(2023, 1, 2)
+            )
+        )
+
+        // When
+        val result = getAuditLogsByTaskIdUseCase.getAuditLogsByTaskId(taskId)
+
+        // Then
+        assertThat(result.size).isEqualTo(2)
+        assertThat(result[0].oldState).isEqualTo("In Progress")
+        assertThat(result[0].newState).isEqualTo("Completed")
+        assertThat(result[1].oldState).isEqualTo("Completed")
+        assertThat(result[1].newState).isEqualTo("Blocked")
+        assertThat(result.all { it.entityId == taskId }).isTrue()
+    }
 
 }
