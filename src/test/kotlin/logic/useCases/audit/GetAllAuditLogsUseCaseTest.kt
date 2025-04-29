@@ -125,6 +125,7 @@ class GetAllAuditLogsUseCaseTest {
 
         // When
         val result = auditRepository.getAllAuditLogs()
+
         // Then
         assertThat(result.size).isEqualTo(2)
         assertThat(result[0].oldState).isEqualTo("In Progress")
@@ -157,6 +158,7 @@ class GetAllAuditLogsUseCaseTest {
 
         // When
         val result = auditRepository.getAllAuditLogs()
+
         // Then
         assertThat(result.size).isEqualTo(2)
         assertThat(result.map { it.entityType }).containsExactly(
@@ -240,6 +242,7 @@ class GetAllAuditLogsUseCaseTest {
                 timeStamp = LocalDate(2023, 1, 2)
             )
         )
+
         // When
         val result = auditRepository.getAllAuditLogs()
 
@@ -251,5 +254,4 @@ class GetAllAuditLogsUseCaseTest {
             LocalDate(2023, 1, 2)
         ).inOrder()
     }
-
 }
