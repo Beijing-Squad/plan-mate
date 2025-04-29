@@ -46,5 +46,7 @@ coveralls {
 }
 
 kotlin {
-    jvmToolchain(22)
+    jvmToolchain {
+        languageVersion.set(JavaLanguageVersion.of(21))
+    }
 }
