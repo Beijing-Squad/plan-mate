@@ -29,24 +29,14 @@ class AddUserUseCaseTest {
     }
 
     @Test
-    fun `should create user when username large than two character`() {
+    fun `should create user when username and password are valid`() {
         // Given
-        val mohammed = createUser(userName = "Mohammed123")
+        val userName = "mohammed123"
+        val password = "12345678"
+        val mohammed = createUser(userName = userName,password = password)
 
         // When
         addUser.addUser(mohammed)
-
-        // Then
-        assertThat(true).isTrue()
-    }
-
-    @Test
-    fun `should create user when password large than seven character`() {
-        // Given
-        val user = createUser(password = "12345678")
-
-        // When
-        addUser.addUser(user)
 
         // Then
         assertThat(true).isTrue()
