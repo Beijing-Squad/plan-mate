@@ -24,6 +24,7 @@ class GetAuditLogsByTaskIdUseCaseTest {
         auditRepository = AuditRepositoryImpl(mockk(relaxed = true))
         getAuditLogsByTaskIdUseCase = GetAuditLogsByTaskIdUseCase(auditRepository)
     }
+
     @Test
     fun `should return audit logs for a valid task ID`() {
         // Given
