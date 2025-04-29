@@ -15,65 +15,67 @@ class UserCsvParserTest {
     private lateinit var parser: UserCsvParser
 
     @BeforeEach
-    fun setup(){
+    fun setup() {
         parser = UserCsvParser()
     }
 
     @Test
-    fun `header returns correct CSV header`() {
+    fun `should return correct CSV header`() {
         // When
         val header = parser.header()
 
         // Then
-        assertThat(header).isEqualTo("id,userName,password,role")
+        with(header) {
+            assertThat(this).isEqualTo("id,userName,password,role")
+        }
     }
 
     @Test
-    fun `serializer returns correct CSV line`() {
+    fun `should serialize user to correct CSV line`() {
         // Given
         val fixedId = Uuid.parse("123e4567-e89b-12d3-a456-426614174000")
-        val task = createUser(
-        ).copy(id = fixedId)
+        val user = createUser().copy(id = fixedId)
 
         // When
-        val result = parser.serializer(task)
+        val result = parser.serializer(user)
 
         // Then
-        assertThat(result).isEqualTo("123e4567-e89b-12d3-a456-426614174000," +
-                "defaultUser," +
-                "defaultPassword," +
-                "MATE")
+        with(result) {
+            assertThat(this).isEqualTo("123e4567-e89b-12d3-a456-426614174000," +
+                    "defaultUser," +
+                    "defaultPassword," +
+                    "MATE")
+        }
     }
 
     @Test
-    fun `deserializer returns correct Audit object`() {
+    fun `should deserialize line to correct User object`() {
         // Given
         val line = "123e4567-e89b-12d3-a456-426614174000," +
-                   "Youssef," +
-                   "Youssef10125," +
-                   "MATE,"
-
+                "Youssef," +
+                "Youssef10125," +
+                "MATE"
 
         // When
         val result = parser.deserializer(line)
 
         // Then
-        assertThat(result.id.toString()).isEqualTo("123e4567-e89b-12d3-a456-426614174000")
-        assertThat(result.userName).isEqualTo("Youssef")
-        assertThat(result.password).isEqualTo("Youssef10125")
-        assertThat(result.role).isEqualTo(UserRole.MATE)
+        with(result) {
+            assertThat(id.toString()).isEqualTo("123e4567-e89b-12d3-a456-426614174000")
+            assertThat(userName).isEqualTo("Youssef")
+            assertThat(password).isEqualTo("Youssef10125")
+            assertThat(role).isEqualTo(UserRole.MATE)
+        }
     }
 
     @Test
-    fun `deserializer throws IllegalArgumentException for bad UUID`() {
-        //Given
+    fun `should throw IllegalArgumentException for bad UUID in deserialization`() {
+        // Given
         val badLine = "not-a-uuid,Type,ID,ACTION,user,timestamp"
 
-        //When && Then
+        // When && Then
         assertThrows<IllegalArgumentException> {
             parser.deserializer(badLine)
         }
     }
-
-
 }

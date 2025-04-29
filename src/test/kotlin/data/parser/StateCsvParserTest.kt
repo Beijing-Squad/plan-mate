@@ -16,7 +16,7 @@ class StateCsvParserTest {
     }
 
     @Test
-    fun `header returns correct CSV header`() {
+    fun `should return correct CSV header`() {
         // When
         val header = parser.header()
 
@@ -25,7 +25,7 @@ class StateCsvParserTest {
     }
 
     @Test
-    fun `deserializer returns correct Audit object`() {
+    fun `should deserialize line to correct State object`() {
         // Given
         val line = "252,TODO,123e4567-e89b-12d3-a456-426614174000"
 
@@ -33,9 +33,11 @@ class StateCsvParserTest {
         val result = parser.deserializer(line)
 
         // Then
-        assertThat(result.id).isEqualTo("252")
-        assertThat(result.name).isEqualTo("TODO")
-        assertThat(result.projectId).isEqualTo("123e4567-e89b-12d3-a456-426614174000")
+        with(result) {
+            assertThat(id).isEqualTo("252")
+            assertThat(name).isEqualTo("TODO")
+            assertThat(projectId).isEqualTo("123e4567-e89b-12d3-a456-426614174000")
+        }
     }
 
 }

@@ -20,7 +20,7 @@ class ProjectCsvParserTest{
     }
 
     @Test
-    fun `header returns correct CSV header`() {
+    fun `should return correct CSV header`() {
         // When
         val header = parser.header()
 
@@ -30,7 +30,7 @@ class ProjectCsvParserTest{
 
 
     @Test
-    fun `serializer returns correct CSV line`() {
+    fun `should serialize project to correct CSV line`() {
         // Given
         val fixedId = Uuid.parse("123e4567-e89b-12d3-a456-426614174000")
         val project = createProject(
@@ -40,16 +40,21 @@ class ProjectCsvParserTest{
         val result = parser.serializer(project)
 
         // Then
-        assertThat(result).isEqualTo("123e4567-e89b-12d3-a456-426614174000," +
-                "defaultProjectName," +
-                "defaultDescription," +
-                "defaultCreator," +
-                "2023-01-01," +
-                "2023-01-01")
+        with(result) {
+            assertThat(this).isEqualTo(
+                "123e4567-e89b-12d3-a456-426614174000," +
+                        "defaultProjectName," +
+                        "defaultDescription," +
+                        "defaultCreator," +
+                        "2023-01-01," +
+                        "2023-01-01"
+            )
+        }
+
     }
 
     @Test
-    fun `deserializer returns correct Audit object`() {
+    fun `should deserialize line to correct Project object`() {
         // Given
         val line = "123e4567-e89b-12d3-a456-426614174000,Mobile,Application,Mada,2024-04-01,2024-04-01"
 
@@ -57,16 +62,18 @@ class ProjectCsvParserTest{
         val result = parser.deserializer(line)
 
         // Then
-        assertThat(result.id.toString()).isEqualTo("123e4567-e89b-12d3-a456-426614174000")
-        assertThat(result.name).isEqualTo("Mobile")
-        assertThat(result.description).isEqualTo("Application")
-        assertThat(result.createdBy).isEqualTo("Mada")
-        assertThat(result.createdAt).isEqualTo(LocalDate(2024, 4, 1))
-        assertThat(result.updatedAt).isEqualTo(LocalDate(2024, 4, 1))
+        with(result) {
+            assertThat(id.toString()).isEqualTo("123e4567-e89b-12d3-a456-426614174000")
+            assertThat(name).isEqualTo("Mobile")
+            assertThat(description).isEqualTo("Application")
+            assertThat(createdBy).isEqualTo("Mada")
+            assertThat(createdAt).isEqualTo(LocalDate(2024, 4, 1))
+            assertThat(updatedAt).isEqualTo(LocalDate(2024, 4, 1))
+        }
     }
 
     @Test
-    fun `deserializer throws IllegalArgumentException for bad UUID`() {
+    fun `should throw IllegalArgumentException when UUID is invalid`() {
         //Given
         val badLine = "not-a-uuid,Type,ID,ACTION,user,timestamp"
 
