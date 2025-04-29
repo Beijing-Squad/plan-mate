@@ -12,7 +12,6 @@ import logic.entities.UserRole
 import logic.repository.AuditRepository
 import org.junit.jupiter.api.BeforeEach
 import kotlin.test.Test
-import kotlin.uuid.ExperimentalUuidApi
 
 class GetAuditLogsByTaskIdUseCaseTest {
 
