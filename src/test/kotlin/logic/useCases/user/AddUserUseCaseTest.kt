@@ -1,7 +1,75 @@
 package logic.useCases.user
 
-import org.junit.jupiter.api.Assertions.*
+import com.google.common.truth.Truth.assertThat
+import fake.createUser
+import io.mockk.mockk
+import logic.entities.exceptions.InvalidPasswordException
+import logic.entities.exceptions.InvalidUserNameException
+import logic.repository.UserRepository
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.CsvSource
 
 class AddUserUseCaseTest {
+
+    private lateinit var addUser: AddUserUseCase
+    private lateinit var userRepository: UserRepository
+
+    @BeforeEach
+    fun setUp() {
+        userRepository = mockk(relaxed = true)
+        addUser = AddUserUseCase(userRepository)
+    }
+
+    @Test
+    fun `should create user when username large than two character`() {
+        // Given
+        val mohammed = createUser(userName = "Mohammed")
+
+        // When
+        addUser.addUserUseCase(mohammed)
+
+        // Then
+        assertThat(true).isTrue()
+    }
+
+    @Test
+    fun `should create user when password large than seven character`() {
+        // Given
+        val user = createUser(password = "12345678")
+
+        // When
+        addUser.addUserUseCase(user)
+
+        // Then
+        assertThat(true).isTrue()
+    }
+
+    @ParameterizedTest
+    @CsvSource(
+        "mohammed akkad",
+        "1mohammed",
+        " mohammed",
+    )
+    fun `should throw InvalidUserNameException when username is invalid`(username: String) {
+        // Given
+        val user = createUser(userName = username)
+
+        // When && Given
+        assertThrows<InvalidUserNameException> { addUser.addUserUseCase(user) }
+
+    }
+
+    @Test
+    fun `should throw InvalidPasswordException when password is invalid`() {
+        // Given
+        val user = createUser(password = "1234")
+
+        // When && Given
+        assertThrows<InvalidPasswordException> { addUser.addUserUseCase(user) }
+
+    }
 
 }
