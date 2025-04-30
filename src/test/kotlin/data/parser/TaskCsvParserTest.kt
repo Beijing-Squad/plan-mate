@@ -41,14 +41,16 @@ class TaskCsvParserTest {
 
         // Then
         with(result) {
-            assertThat(this).isEqualTo("123e4567-e89b-12d3-a456-426614174000," +
-                    "defaultProjectId," +
-                    "defaultTitle," +
-                    "defaultDescription," +
-                    "defaultCreator," +
-                    "defaultStateId," +
-                    "2023-01-01," +
-                    "2023-01-01")
+            assertThat(this).isEqualTo(
+                "123e4567-e89b-12d3-a456-426614174000," +
+                        "defaultProjectId," +
+                        "defaultTitle," +
+                        "defaultDescription," +
+                        "defaultCreator," +
+                        "defaultStateId," +
+                        "2023-01-01," +
+                        "2023-01-01"
+            )
         }
     }
 
@@ -89,5 +91,18 @@ class TaskCsvParserTest {
         assertThrows<IllegalArgumentException> {
             parser.deserializer(badLine)
         }
+    }
+
+    @Test
+    fun `should return correct id from Audit object`() {
+        // Given
+        val fakeId = Uuid.parse("123e4567-e89b-12d3-a456-426614174000")
+        val task = createTask().copy(id = fakeId)
+
+        // When
+        val result = parser.getId(task)
+
+        // Then
+        assertThat(result).isEqualTo("123e4567-e89b-12d3-a456-426614174000")
     }
 }

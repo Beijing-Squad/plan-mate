@@ -32,4 +32,8 @@ class ProjectCsvParser : CsvParser<Project> {
             updatedAt = LocalDate.parse(parts[5])
         )
     }
+
+    override fun getId(item: Project): String {
+        return item.id.toString()
+    }
 }
