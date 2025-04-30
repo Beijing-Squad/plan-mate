@@ -28,7 +28,6 @@ class UpdateStateUseCaseTest {
             createdBy = "adminUser01"
         )
         val newState = createState(
-            id = "123",
             name = "Done",
             projectId = project.id.toString()
         )

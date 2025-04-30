@@ -28,7 +28,6 @@ class DeleteStateUseCaseTest {
             createdBy = "adminUser01"
         )
         val state = createState(
-            id = "123",
             name = "Done",
             projectId = project.id.toString()
         )

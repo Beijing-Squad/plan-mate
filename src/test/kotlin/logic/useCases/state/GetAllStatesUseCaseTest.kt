@@ -38,12 +38,10 @@ class GetAllStatesUseCaseTest {
         // when
         val states = listOf(
             createState(
-                id = "1",
                 name = "in progress",
                 projectId = projects[0].id.toString()
             ),
             createState(
-                id = "2",
                 name = "Done",
                 projectId = projects[1].id.toString()
             )
