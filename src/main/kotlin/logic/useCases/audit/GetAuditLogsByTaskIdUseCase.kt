@@ -1,7 +1,6 @@
 package logic.useCases.audit
 
 import logic.entities.Audit
-import logic.entities.EntityType
 import logic.entities.exceptions.InvalidInputException
 import logic.repository.AuditRepository
 
