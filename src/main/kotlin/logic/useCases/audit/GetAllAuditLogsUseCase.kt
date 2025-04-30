@@ -8,6 +8,6 @@ class GetAllAuditLogsUseCase(
 ) {
 
     fun getAllAuditLogs(): List<Audit> {
-        return emptyList()
+        return auditRepository.getAllAuditLogs()
     }
 }
