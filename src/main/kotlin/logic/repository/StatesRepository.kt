@@ -11,7 +11,7 @@ interface StatesRepository{
 
     fun addState(state: State): Boolean
 
-    fun updateState(state: State)
+    fun updateState(state: State): Boolean
 
     fun deleteState(state: State)
 
