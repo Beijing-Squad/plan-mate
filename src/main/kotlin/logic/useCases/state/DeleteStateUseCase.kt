@@ -7,6 +7,6 @@ class DeleteStateUseCase(
     private val statesRepository: StatesRepository
 ) {
     fun deleteState(state: State): Boolean {
-        return false
+        return statesRepository.deleteState(state)
     }
 }
