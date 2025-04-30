@@ -58,7 +58,6 @@ class AuditCsvDataSourceImplTest {
         verify { csvDataSource.loadAllDataFromFile() }
     }
 
-    // Test Case 2: getAllAuditLogs with empty CSV
     @Test
     fun `should return empty list when CSV is empty`() {
         // Given
