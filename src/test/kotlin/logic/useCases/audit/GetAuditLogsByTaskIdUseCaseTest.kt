@@ -127,7 +127,6 @@ class GetAuditLogsByTaskIdUseCaseTest {
                 action = ActionType.UPDATE,
                 oldState = "In Progress",
                 newState = "Completed",
-                timeStamp = LocalDate(2023, 1, 1)
             ),
             createAudit(
                 userRole = UserRole.ADMIN,
@@ -137,7 +136,6 @@ class GetAuditLogsByTaskIdUseCaseTest {
                 action = ActionType.UPDATE,
                 oldState = "Completed",
                 newState = "Blocked",
-                timeStamp = LocalDate(2023, 1, 2)
             )
         )
 
@@ -236,14 +234,15 @@ class GetAuditLogsByTaskIdUseCaseTest {
         assertThat(result.size).isEqualTo(3)
         assertThat(result.map { it.timeStamp }).containsExactly(
             LocalDate(2023, 1, 3),
-            LocalDate(2023, 1, 1),
-            LocalDate(2023, 1, 2)
+            LocalDate(2023, 1, 2),
+            LocalDate(2023, 1, 1)
         ).inOrder()
         assertThat(result.all { it.entityId == taskId }).isTrue()
     }
+
     @Test
     fun `should throw InvalidInputException for blank task ID`() {
-        // When/Then
+        // When&&Then
         assertThrows<InvalidInputException> {
             getAuditLogsByTaskIdUseCase.getAuditLogsByTaskId("")
         }.also {
