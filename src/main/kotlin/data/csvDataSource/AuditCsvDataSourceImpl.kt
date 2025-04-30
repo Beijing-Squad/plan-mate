@@ -4,10 +4,11 @@ package data.csvDataSource
 import data.csvDataSource.csv.CsvDataSourceImpl
 import data.repository.dataSource.AuditDataSource
 import logic.entities.Audit
+import logic.entities.EntityType
 
 class AuditCsvDataSourceImpl(
     private val csvDataSource: CsvDataSourceImpl<Audit>
-): AuditDataSource {
+) : AuditDataSource {
 
     override fun getAllAuditLogs(): List<Audit> {
         TODO("Not yet implemented")
@@ -22,7 +23,11 @@ class AuditCsvDataSourceImpl(
     }
 
     override fun getAuditLogsByTaskId(taskId: String): List<Audit> {
-        TODO("Not yet implemented")
+        return csvDataSource.loadAllDataFromFile()
+            .filter { audit: Audit ->
+                audit.entityId == taskId
+                        && audit.entityType == EntityType.TASK
+            }
     }
 
 }
