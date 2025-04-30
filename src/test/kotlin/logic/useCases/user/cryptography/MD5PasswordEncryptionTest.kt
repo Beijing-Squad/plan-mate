@@ -1,7 +1,6 @@
 package logic.useCases.user.cryptography
 
 import com.google.common.truth.Truth.assertThat
-import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
