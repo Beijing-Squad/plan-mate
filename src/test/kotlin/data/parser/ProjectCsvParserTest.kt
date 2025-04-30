@@ -10,12 +10,12 @@ import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
 @OptIn(ExperimentalUuidApi::class)
-class ProjectCsvParserTest{
+class ProjectCsvParserTest {
 
     private lateinit var parser: ProjectCsvParser
 
     @BeforeEach
-    fun setup(){
+    fun setup() {
         parser = ProjectCsvParser()
     }
 
@@ -42,12 +42,7 @@ class ProjectCsvParserTest{
         // Then
         with(result) {
             assertThat(this).isEqualTo(
-                "123e4567-e89b-12d3-a456-426614174000," +
-                        "defaultProjectName," +
-                        "defaultDescription," +
-                        "defaultCreator," +
-                        "2023-01-01," +
-                        "2023-01-01"
+                "123e4567-e89b-12d3-a456-426614174000," + "defaultProjectName," + "defaultDescription," + "defaultCreator," + "2023-01-01," + "2023-01-01"
             )
         }
 
@@ -81,6 +76,19 @@ class ProjectCsvParserTest{
         assertThrows<IllegalArgumentException> {
             parser.deserializer(badLine)
         }
+    }
+
+    @Test
+    fun `should return correct id from Audit object`() {
+        // Given
+        val fakeId = Uuid.parse("123e4567-e89b-12d3-a456-426614174000")
+        val project = createProject().copy(id = fakeId)
+
+        // When
+        val result = parser.getId(project)
+
+        // Then
+        assertThat(result).isEqualTo("123e4567-e89b-12d3-a456-426614174000")
     }
 
 }
