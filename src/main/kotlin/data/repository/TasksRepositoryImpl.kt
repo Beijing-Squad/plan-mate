@@ -15,13 +15,9 @@ class TasksRepositoryImpl (
         TODO("Not yet implemented")
     }
 
-    override fun addTask(task: Task) {
-        TODO("Not yet implemented")
-    }
+    override fun addTask(task: Task) = tasksDataSource.addTask(task)
 
-    override fun deleteTask(taskId: String) {
-        TODO("Not yet implemented")
-    }
+    override fun deleteTask(taskId: String) = tasksDataSource.deleteTask(taskId)
 
     override fun updateTask(taskId: String): Task {
         TODO("Not yet implemented")
