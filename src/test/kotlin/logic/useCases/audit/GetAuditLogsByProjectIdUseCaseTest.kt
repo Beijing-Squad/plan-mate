@@ -159,9 +159,9 @@ class GetAuditLogsByProjectIdUseCaseTest {
 
         // Then
         assertThat(result).containsExactly(
+            LocalDate(2025, 4, 30),
             LocalDate(2025, 4, 29),
-            LocalDate(2025, 4, 29),
-            LocalDate(2025, 4, 30)
+            LocalDate(2025, 4, 29)
         ).inOrder()
     }
 
