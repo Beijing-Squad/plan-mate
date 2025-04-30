@@ -38,4 +38,29 @@ class AddStateUseCaseTest {
         assertThat(result).isTrue()
     }
 
+    @OptIn(ExperimentalUuidApi::class)
+    @Test
+    fun `should return false when add new state with not exist project id`() {
+        //Given
+        val project = listOf(
+            createProject(
+                name = "PlanMate Core Features", createdBy = "adminUser01"
+            ), createProject(
+                name = "PlanMate Core Features 2", createdBy = "adminUser02"
+            )
+        )
+        val newState = createState(
+            name = "Done", projectId = Uuid.random().toString()
+        )
+
+
+        // when
+        every { statesRepository.addState(newState) } returns false
+        addStateUseCase.addState(newState)
+
+        //Then
+        assertThat(newState.projectId).isNotIn(
+            project.map { it.id.toString() }
+        )
+    }
 }
