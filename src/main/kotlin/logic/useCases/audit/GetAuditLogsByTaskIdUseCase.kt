@@ -11,6 +11,7 @@ class GetAuditLogsByTaskIdUseCase(
     fun getAuditLogsByTaskId(taskId: String): List<Audit> {
         validateTaskId(taskId)
         return auditRepository.getAuditLogsByTaskId(taskId)
+            .sortedByDescending { auditLog -> auditLog.timeStamp }
     }
 
     private fun validateTaskId(taskId: String) {
