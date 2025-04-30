@@ -9,7 +9,7 @@ interface StatesRepository{
 
     fun getStateById(stateId: String): State
 
-    fun addState(state: State)
+    fun addState(state: State): Boolean
 
     fun updateState(state: State)
 
