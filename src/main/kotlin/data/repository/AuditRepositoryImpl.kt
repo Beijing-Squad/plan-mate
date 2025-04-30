@@ -20,7 +20,8 @@ class AuditRepositoryImpl (
     }
 
     override fun getAuditLogsByTaskId(taskId: String): List<Audit> {
-        TODO("Not yet implemented")
+        return auditDataSource.getAuditLogsByTaskId(taskId)
+
     }
 
 }

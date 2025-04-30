@@ -8,7 +8,7 @@ import logic.entities.EntityType
 
 class AuditCsvDataSourceImpl(
     private val csvDataSource: CsvDataSourceImpl<Audit>
-): AuditDataSource {
+) : AuditDataSource {
 
     override fun getAllAuditLogs(): List<Audit> {
         return csvDataSource.loadAllDataFromFile()
@@ -23,7 +23,11 @@ class AuditCsvDataSourceImpl(
     }
 
     override fun getAuditLogsByTaskId(taskId: String): List<Audit> {
-        TODO("Not yet implemented")
+        return csvDataSource.loadAllDataFromFile()
+            .filter { audit: Audit ->
+                audit.entityId == taskId
+                        && audit.entityType == EntityType.TASK
+            }
     }
 
     private fun isMatchingProject(audit: Audit, projectId: String): Boolean {
