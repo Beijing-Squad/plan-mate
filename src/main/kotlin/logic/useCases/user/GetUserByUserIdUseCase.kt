@@ -1,7 +1,6 @@
 package logic.useCases.user
 
 import logic.entities.User
-import logic.entities.exceptions.UserNotFoundException
 import logic.repository.UserRepository
 import kotlin.uuid.ExperimentalUuidApi
 
