@@ -104,4 +104,25 @@ class AuditCsvDataSourceImplTest {
         verify { csvDataSource.appendToFile(auditLog) }
     }
 
+    @Test
+    fun `should append audit log with state change to CSV`() {
+        // Given
+        val auditLog = createAudit(
+            userRole = UserRole.MATE,
+            userName = "User1",
+            entityType = EntityType.TASK,
+            entityId = "TASK-123",
+            action = ActionType.UPDATE,
+            oldState = "In Progress",
+            newState = "Completed",
+            timeStamp = LocalDate(2025, 4, 29)
+        )
+
+        // When
+        auditDataSource.addAuditLog(auditLog)
+
+        // Then
+        verify { csvDataSource.appendToFile(auditLog) }
+    }
+
 }
