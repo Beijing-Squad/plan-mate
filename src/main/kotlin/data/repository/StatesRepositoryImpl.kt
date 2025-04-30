@@ -27,7 +27,7 @@ class StatesRepositoryImpl(
         TODO("Not yet implemented")
     }
 
-    override fun deleteState(state: State) {
+    override fun deleteState(state: State): Boolean {
         TODO("Not yet implemented")
     }
 
