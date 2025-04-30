@@ -18,12 +18,12 @@ class PlanMateConsoleUiTest {
         screens = listOf(
             mockk<BaseScreen>().apply {
                 every { id } returns "1"
-                every { name } returns "Suggestion Meal 🤔"
+                every { name } returns "User Management"
                 every { execute() } returns Unit
             },
             mockk<BaseScreen>().apply {
                 every { id } returns "2"
-                every { name } returns "Search Meal 🔎"
+                every { name } returns "Login"
                 every { execute() } returns Unit
             }
         )
