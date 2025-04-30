@@ -19,7 +19,7 @@ class PlanMateConsoleUi(
     }
 
     private fun showWelcome() {
-        consoleIO.show("Welcome to Food Change Mood\uD83E\uDD6A ")
+        consoleIO.show("Welcome to Plan Mate\uD83E\uDD6A ")
     }
 
 
