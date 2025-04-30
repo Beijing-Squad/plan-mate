@@ -40,4 +40,31 @@ class AddAuditLogUseCaseTest {
         verify { auditRepository.addAuditLog(auditLog) }
     }
 
+    @Test
+    fun `should add audit log for task with state change`() {
+        // Given
+        val auditLog = createAudit(
+            userRole = UserRole.MATE,
+            userName = "User1",
+            action = ActionType.UPDATE,
+            entityType = EntityType.TASK,
+            entityId = "TASK-123",
+            oldState = "In Progress",
+            newState = "Completed",
+            timeStamp = LocalDate(2025, 4, 29)
+        )
+
+        // When
+        addAuditLogUseCase.addAuditLog(auditLog)
+
+        // Then
+        verify { auditRepository.addAuditLog(auditLog) }
+    }
+
+
+
+
+
+
+
 }
