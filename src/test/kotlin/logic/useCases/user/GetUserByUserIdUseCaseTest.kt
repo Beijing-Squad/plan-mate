@@ -5,12 +5,9 @@ import data.repository.UserRepositoryImpl
 import fake.createUser
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.verify
-import logic.entities.exceptions.UserNotFoundException
 import logic.repository.UserRepository
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import kotlin.uuid.ExperimentalUuidApi
 
 class GetUserByUserIdUseCaseTest {
