@@ -58,5 +58,19 @@ class AuditCsvDataSourceImplTest {
         verify { csvDataSource.loadAllDataFromFile() }
     }
 
+    // Test Case 2: getAllAuditLogs with empty CSV
+    @Test
+    fun `should return empty list when CSV is empty`() {
+        // Given
+        every { csvDataSource.loadAllDataFromFile() } returns emptyList()
+
+        // When
+        val result = auditDataSource.getAllAuditLogs()
+
+        // Then
+        assertThat(result).isEmpty()
+        verify { csvDataSource.loadAllDataFromFile() }
+    }
+
 
 }
