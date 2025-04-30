@@ -4,40 +4,50 @@ import logic.entities.exceptions.CsvReadException
 import logic.entities.exceptions.CsvWriteException
 
 class CsvDataSourceImpl<T>(
-    private var reader: CsvReader,
-    private var writer: CsvWriter,
-    private val parser: CsvParser<T>,
+    private var csvFileReader: CsvReader,
+    private var csvFileWriter: CsvWriter,
+    private val csvDataParser: CsvParser<T>,
 ) {
-    fun loadAll(): List<T> {
+    fun loadAllDataFromFile(): List<T> {
         return try {
-            val lines = reader.readCsv()
+            val lines = csvFileReader.readCsv()
             if (lines.size <= 1) return emptyList()
 
-            lines.drop(1).map(parser::deserializer)
+            lines.drop(1).map(csvDataParser::deserializer)
         } catch (e: Exception) {
             throw CsvReadException("Error reading CSV file: ${e.message}")
         }
     }
 
-    fun append(item: T) {
+    fun appendToFile(item: T) {
         try {
-            val rawLines = reader.readCsv()
+            val rawLines = csvFileReader.readCsv()
             if (rawLines.isEmpty()) {
-                writer.appendLine(parser.header())
+                csvFileWriter.appendLine(csvDataParser.header())
             }
 
-            writer.appendLine(parser.serializer(item))
+            csvFileWriter.appendLine(csvDataParser.serializer(item))
         } catch (e: Exception) {
             throw CsvWriteException("Error writing to CSV file: ${e.message}")
         }
     }
 
-    fun update(items: List<T>) {
+    fun updateFile(items: List<T>) {
         try {
-            val serializedLines = items.map(parser::serializer)
-            writer.updateLines(listOf(parser.header()) + serializedLines)
+            val serializedLines = items.map(csvDataParser::serializer)
+            csvFileWriter.updateLines(listOf(csvDataParser.header()) + serializedLines)
         } catch (e: Exception) {
             throw CsvWriteException("Error saving to CSV file: ${e.message}")
+        }
+    }
+
+    fun deleteById(id: String) {
+        try {
+            val allItems = loadAllDataFromFile()
+            val updatedItems = allItems.filter { csvDataParser.getId(it) != id }
+            updateFile(updatedItems)
+        } catch (e: Exception) {
+            throw CsvWriteException("Error deleting item from CSV: ${e.message}")
         }
     }
 }

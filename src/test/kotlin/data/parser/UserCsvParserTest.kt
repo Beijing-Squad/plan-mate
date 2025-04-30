@@ -41,20 +41,16 @@ class UserCsvParserTest {
 
         // Then
         with(result) {
-            assertThat(this).isEqualTo("123e4567-e89b-12d3-a456-426614174000," +
-                    "defaultUser," +
-                    "defaultPassword," +
-                    "MATE")
+            assertThat(this).isEqualTo(
+                "123e4567-e89b-12d3-a456-426614174000," + "defaultUser," + "defaultPassword," + "MATE"
+            )
         }
     }
 
     @Test
     fun `should deserialize line to correct User object`() {
         // Given
-        val line = "123e4567-e89b-12d3-a456-426614174000," +
-                "Youssef," +
-                "Youssef10125," +
-                "MATE"
+        val line = "123e4567-e89b-12d3-a456-426614174000," + "Youssef," + "Youssef10125," + "MATE"
 
         // When
         val result = parser.deserializer(line)
@@ -77,5 +73,18 @@ class UserCsvParserTest {
         assertThrows<IllegalArgumentException> {
             parser.deserializer(badLine)
         }
+    }
+
+    @Test
+    fun `should return correct id from Audit object`() {
+        // Given
+        val fakeId = Uuid.parse("123e4567-e89b-12d3-a456-426614174000")
+        val user = createUser().copy(id = fakeId)
+
+        // When
+        val result = parser.getId(user)
+
+        // Then
+        assertThat(result).isEqualTo("123e4567-e89b-12d3-a456-426614174000")
     }
 }

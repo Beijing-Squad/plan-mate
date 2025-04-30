@@ -22,4 +22,8 @@ class StateCsvParser : CsvParser<State> {
             projectId = parts[2]
         )
     }
+
+    override fun getId(item: State): String {
+        return item.id
+    }
 }

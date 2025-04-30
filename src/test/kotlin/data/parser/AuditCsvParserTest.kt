@@ -85,4 +85,17 @@ class AuditCsvParserTest {
         }
     }
 
+    @Test
+    fun `should return correct id from Audit object`() {
+        // Given
+        val fakeId = Uuid.parse("123e4567-e89b-12d3-a456-426614174000")
+        val audit = createAudit().copy(id = fakeId)
+
+        // When
+        val result = parser.getId(audit)
+
+        // Then
+        assertThat(result).isEqualTo("123e4567-e89b-12d3-a456-426614174000")
+    }
+
 }
