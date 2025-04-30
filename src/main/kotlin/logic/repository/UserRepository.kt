@@ -7,7 +7,5 @@ interface UserRepository{
 
     fun getUserByUserId(userId: String): User
 
-    fun addUser(user: User)
-
     fun updateUser(user: User): User
 }

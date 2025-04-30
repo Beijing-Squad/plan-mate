@@ -15,10 +15,6 @@ class UserRepositoryImpl(
         return userDataSource.getUserByUserId(userId)
     }
 
-    override fun addUser(user: User) {
-        TODO("Not yet implemented")
-    }
-
     override fun updateUser(user: User): User {
         return userDataSource.updateUser(user)
     }
