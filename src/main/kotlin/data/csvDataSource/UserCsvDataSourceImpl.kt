@@ -22,7 +22,7 @@ class UserCsvDataSourceImpl(
         TODO("Not yet implemented")
     }
 
-    override fun updateUser(userId: String): User {
+    override fun updateUser(user: User): User {
         TODO("Not yet implemented")
     }
 
