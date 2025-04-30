@@ -50,7 +50,7 @@ class PlanMateConsoleUi(
             feature.execute()
             true
         } else {
-            consoleIO.showWithLine("❌ Invalid input! Please enter a number between 0 and ${screens.size}")
+            consoleIO.showWithLine("❌ Invalid input! Please choose one of the available options.")
             true
         }
     }
