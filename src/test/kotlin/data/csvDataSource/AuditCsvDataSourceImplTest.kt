@@ -188,5 +188,28 @@ class AuditCsvDataSourceImplTest {
         verify { csvDataSource.loadAllDataFromFile() }
     }
 
+    @Test
+    fun `should return empty list when no audit logs match project ID`() {
+        // Given
+        val projectId = "PROJECT-999"
+        val auditLogs = listOf(
+            createAudit(
+                userRole = UserRole.MATE,
+                userName = "User1",
+                entityType = EntityType.TASK,
+                entityId = "TASK-123",
+                action = ActionType.UPDATE,
+                timeStamp = LocalDate(2025, 4, 29)
+            )
+        )
+        every { csvDataSource.loadAllDataFromFile() } returns auditLogs
+
+        // When
+        val result = auditDataSource.getAuditLogsByProjectId(projectId)
+
+        // Then
+        assertThat(result).isEmpty()
+        verify { csvDataSource.loadAllDataFromFile() }
+    }
 
 }
