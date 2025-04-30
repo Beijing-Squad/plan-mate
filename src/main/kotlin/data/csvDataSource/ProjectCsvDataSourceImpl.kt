@@ -24,7 +24,7 @@ class ProjectCsvDataSourceImpl (
         TODO("Not yet implemented")
     }
 
-    override fun updateProject(projectId: String): Project {
+    override fun updateProject(newProject: Project): Boolean {
         TODO("Not yet implemented")
     }
 

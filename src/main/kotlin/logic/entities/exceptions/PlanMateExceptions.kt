@@ -9,6 +9,8 @@ class InvalidLoginException(message: String) : AuthenticationException(message)
 open class ProjectException(message: String) : PlanMateException(message)
 class ProjectAlreadyExistsException(message: String) : ProjectException(message)
 class ProjectNotFoundException(message: String) : ProjectException(message)
+class ProjectNameIsEmptyException(message: String) : ProjectException(message)
+class ProjectUnauthorizedUserException(message: String) : ProjectException(message)
 
 open class TaskException(message: String) : PlanMateException(message)
 class TaskAlreadyExistsException(message: String) : TaskException(message)

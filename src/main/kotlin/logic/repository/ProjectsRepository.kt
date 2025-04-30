@@ -11,6 +11,6 @@ interface ProjectsRepository{
 
     fun deleteProject(projectId: String)
 
-    fun updateProject(projectId: String): Project
+    fun updateProject(newProject: Project): Boolean
 
 }
