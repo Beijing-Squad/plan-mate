@@ -280,4 +280,17 @@ class AuditCsvDataSourceImplTest {
         verify { csvDataSource.loadAllDataFromFile() }
     }
 
+    @Test
+    fun `should throw DataAccessException when CSV read fails for task ID`() {
+        // Given
+        val taskId = "TASK-123"
+        every { csvDataSource.loadAllDataFromFile() } throws DataAccessException("Failed to read audit.csv")
+
+        // When&&Then
+        val exception = assertThrows<DataAccessException> {
+            auditDataSource.getAuditLogsByTaskId(taskId)
+        }
+        assertThat(exception.message).isEqualTo("Failed to read audit.csv")
+        verify { csvDataSource.loadAllDataFromFile() }
+    }
 }
