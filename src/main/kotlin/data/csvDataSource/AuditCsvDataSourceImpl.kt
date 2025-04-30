@@ -1,13 +1,12 @@
 package data.csvDataSource
 
-import data.parser.CsvPlanMateParser
-import data.parser.CsvPlanMateReader
+
+import data.csvDataSource.csv.CsvDataSourceImpl
 import data.repository.dataSource.AuditDataSource
 import logic.entities.Audit
 
 class AuditCsvDataSourceImpl(
-    private val csvPlanMateParser: CsvPlanMateParser,
-    private val csvPlanMateReader: CsvPlanMateReader
+    private val csvDataSource: CsvDataSourceImpl<Audit>
 ): AuditDataSource {
 
     override fun getAllAuditLogs(): List<Audit> {
