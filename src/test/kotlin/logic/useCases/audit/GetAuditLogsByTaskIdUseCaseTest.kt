@@ -1,7 +1,6 @@
 package logic.useCases.audit
 
 import com.google.common.truth.Truth.assertThat
-import data.repository.AuditRepositoryImpl
 import fake.createAudit
 import io.mockk.every
 import io.mockk.mockk
@@ -9,8 +8,10 @@ import kotlinx.datetime.LocalDate
 import logic.entities.ActionType
 import logic.entities.EntityType
 import logic.entities.UserRole
+import logic.entities.exceptions.InvalidInputException
 import logic.repository.AuditRepository
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.assertThrows
 import kotlin.test.Test
 
 class GetAuditLogsByTaskIdUseCaseTest {
@@ -20,7 +21,7 @@ class GetAuditLogsByTaskIdUseCaseTest {
 
     @BeforeEach
     fun setUp() {
-        auditRepository = AuditRepositoryImpl(mockk(relaxed = true))
+        auditRepository = mockk(relaxed = true)
         getAuditLogsByTaskIdUseCase = GetAuditLogsByTaskIdUseCase(auditRepository)
     }
 
@@ -240,5 +241,13 @@ class GetAuditLogsByTaskIdUseCaseTest {
         ).inOrder()
         assertThat(result.all { it.entityId == taskId }).isTrue()
     }
-
+    @Test
+    fun `should throw InvalidInputException for blank task ID`() {
+        // When/Then
+        assertThrows<InvalidInputException> {
+            getAuditLogsByTaskIdUseCase.getAuditLogsByTaskId("")
+        }.also {
+            assertThat(it.message).isEqualTo("Error: ID shouldn't be blank")
+        }
+    }
 }
