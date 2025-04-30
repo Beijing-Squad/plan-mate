@@ -8,7 +8,6 @@ import logic.entities.UserRole
 import logic.entities.exceptions.ProjectNotFoundException
 import logic.entities.exceptions.ProjectUnauthorizedUserException
 import logic.repository.ProjectsRepository
-import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
