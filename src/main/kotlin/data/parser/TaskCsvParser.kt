@@ -38,4 +38,8 @@ class TaskCsvParser : CsvParser<Task> {
             updatedAt = LocalDate.parse(parts[7])
         )
     }
+
+    override fun getId(item: Task): String {
+        return item.id.toString()
+    }
 }

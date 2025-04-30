@@ -28,19 +28,19 @@ class CsvDataSourceImplTest {
     }
 
     @Test
-    fun `should return empty list when csv is empty`(){
+    fun `should return empty list when csv is empty`() {
         //Given
         every { reader.readCsv() } returns emptyList()
 
         //When
-        val result = csvDataSource.loadAll()
+        val result = csvDataSource.loadAllDataFromFile()
 
         //Then
         assertThat(result).isEmpty()
     }
 
     @Test
-    fun `should return parsed data when csv has valid content`(){
+    fun `should return parsed data when csv has valid content`() {
         // Given
         val lines = listOf("Header", "John, 25, Male")
         every { reader.readCsv() } returns lines
@@ -49,7 +49,7 @@ class CsvDataSourceImplTest {
         every { parser.deserializer("John, 25, Male") } returns parsedData
 
         // When
-        val result = csvDataSource.loadAll()
+        val result = csvDataSource.loadAllDataFromFile()
 
         // Then
         assertThat(result).hasSize(1)
@@ -65,7 +65,7 @@ class CsvDataSourceImplTest {
         every { parser.serializer(item) } returns "Alice,30,Female"
 
         // When
-        csvDataSource.append(item)
+        csvDataSource.appendToFile(item)
 
         // Then – header, then record
         verifyOrder {
@@ -83,7 +83,7 @@ class CsvDataSourceImplTest {
 
 
         // When
-        csvDataSource.append(item)
+        csvDataSource.appendToFile(item)
 
         // Then
         verify(exactly = 0) { writer.appendLine(parser.header()) }
@@ -97,7 +97,7 @@ class CsvDataSourceImplTest {
 
         // When & Then
         val exception = assertThrows<CsvReadException> {
-            csvDataSource.loadAll()
+            csvDataSource.loadAllDataFromFile()
         }
         assertThat(exception.message).isEqualTo("Error reading CSV file: File read error")
 
@@ -111,7 +111,7 @@ class CsvDataSourceImplTest {
         every { parser.serializer(item) } returns "John, 25, Male"
 
         // When
-        csvDataSource.append(item)
+        csvDataSource.appendToFile(item)
 
         // Then
         verify { writer.appendLine("John, 25, Male") }
@@ -128,7 +128,7 @@ class CsvDataSourceImplTest {
 
         // When & Then
         val exception = assertThrows<CsvWriteException> {
-            csvDataSource.append(item)
+            csvDataSource.appendToFile(item)
         }
 
         assertThat(exception.message).isEqualTo("Error writing to CSV file: Write error")
@@ -143,7 +143,7 @@ class CsvDataSourceImplTest {
         every { parser.header() } returns "Name, Age, Gender"
 
         // When
-        csvDataSource.update(items)
+        csvDataSource.updateFile(items)
 
         // Then
         verify { writer.updateLines(listOf("Name, Age, Gender", "Serialized Data", "Serialized Data")) }
@@ -160,12 +160,73 @@ class CsvDataSourceImplTest {
 
         // When & Then
         val exception = assertThrows<CsvWriteException> {
-            csvDataSource.update(items)
+            csvDataSource.updateFile(items)
         }
 
         assertThat(exception.message).isEqualTo("Error saving to CSV file: Save error")
     }
 
+    @Test
+    fun `should delete item by id when id exists`() {
+        // Given
+        val lines = listOf("Name,Age,Gender", "Mohamed,25,Male")
+        val item1 = MyData("Mohamed", 25, "Male")
+
+        every { reader.readCsv() } returns lines
+        every { parser.deserializer("Mohamed,25,Male") } returns item1
+        every { parser.getId(item1) } returns "1"
+        every { parser.header() } returns "Name,Age,Gender"
+
+        // When
+        csvDataSource.deleteById("1")
+
+        // Then
+        verify {
+            writer.updateLines(listOf("Name,Age,Gender"))
+        }
+    }
+
+    @Test
+    fun `should don't make thing when id not found`() {
+        // Given
+        val lines = listOf("Name,Age,Gender", "Mohamed,25,Male")
+        val item1 = MyData("Mohamed", 25, "Male")
+
+        every { reader.readCsv() } returns lines
+        every { parser.deserializer("Mohamed,25,Male") } returns item1
+        every { parser.getId(item1) } returns "1"
+        every { parser.header() } returns "Name,Age,Gender"
+        every { parser.serializer(item1) } returns "Mohamed,25,Male"
+
+        // When
+        csvDataSource.deleteById("100")
+
+        // Then
+        verify {
+            writer.updateLines(listOf("Name,Age,Gender", "Mohamed,25,Male"))
+        }
+    }
+
+    @Test
+    fun `should throw CsvWriteException when error occurs during delete`() {
+        // Given
+        val item1 = MyData("Mohamed", 25, "Male")
+
+        every { reader.readCsv() } returns listOf("Name,Age,Gender", "Mohamed,25,Male")
+        every { parser.deserializer("John,25,Male") } returns item1
+        every { parser.getId(item1) } returns "1"
+        every { parser.header() } returns "Name,Age,Gender"
+        every { writer.updateLines(any()) } throws Exception("Delete failed")
+
+        // When & Then
+        val exception = assertThrows<CsvWriteException> {
+            csvDataSource.deleteById("1")
+        }
+        assertThat(exception.message).isEqualTo(
+            "Error deleting item from CSV: Error saving to CSV file: Delete failed"
+        )
+
+    }
 }
 
 // Sample data class for testing purposes
