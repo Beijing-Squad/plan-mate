@@ -125,4 +125,25 @@ class AuditCsvDataSourceImplTest {
         verify { csvDataSource.appendToFile(auditLog) }
     }
 
+    @Test
+    fun `should throw DataAccessException when CSV write fails`() {
+        // Given
+        val auditLog = createAudit(
+            userRole = UserRole.ADMIN,
+            userName = "Admin",
+            entityType = EntityType.PROJECT,
+            entityId = "PROJECT-002",
+            action = ActionType.DELETE,
+            timeStamp = LocalDate(2025, 4, 28)
+        )
+        every { csvDataSource.appendToFile(auditLog) } throws DataAccessException("Failed to write to audit.csv")
+
+        // When&&Then
+        val exception = assertThrows<DataAccessException> {
+            auditDataSource.addAuditLog(auditLog)
+        }
+        assertThat(exception.message).isEqualTo("Failed to write to audit.csv")
+        verify { csvDataSource.appendToFile(auditLog) }
+    }
+
 }
