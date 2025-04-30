@@ -21,23 +21,21 @@ class AddStateUseCaseTest {
 
     @OptIn(ExperimentalUuidApi::class)
     @Test
-    fun `add new state test`() {
+    fun `should return true when add valid new state`() {
         //Given
         val project = createProject(
-            name = "PlanMate Core Features",
-            createdBy = "adminUser01"
+            name = "PlanMate Core Features", createdBy = "adminUser01"
         )
         val newState = createState(
-            id = "123",
-            name = "Done",
-            projectId = project.id.toString()
+            name = "Done", projectId = project.id.toString()
         )
 
         // when
+        every { statesRepository.addState(newState) } returns true
         val result = addStateUseCase.addState(newState)
 
         //Then
-        assertThat(result).isFalse()
+        assertThat(result).isTrue()
     }
 
 }
