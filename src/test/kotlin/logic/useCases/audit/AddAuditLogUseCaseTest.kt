@@ -61,7 +61,24 @@ class AddAuditLogUseCaseTest {
         verify { auditRepository.addAuditLog(auditLog) }
     }
 
+    @Test
+    fun `should add audit log with DELETE action`() {
+        // Given
+        val auditLog = createAudit(
+            userRole = UserRole.ADMIN,
+            userName = "Admin",
+            action = ActionType.DELETE,
+            entityType = EntityType.PROJECT,
+            entityId = "PROJECT-002",
+            timeStamp = LocalDate(2025, 4, 28)
+        )
 
+        // When
+        addAuditLogUseCase.addAuditLog(auditLog)
+
+        // Then
+        verify { auditRepository.addAuditLog(auditLog) }
+    }
 
 
 
