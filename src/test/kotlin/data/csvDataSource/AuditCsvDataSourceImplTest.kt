@@ -146,4 +146,47 @@ class AuditCsvDataSourceImplTest {
         verify { csvDataSource.appendToFile(auditLog) }
     }
 
+    @Test
+    fun `should return audit logs for a specific project ID`() {
+        // Given
+        val projectId = "PROJECT-001"
+        val auditLogs = listOf(
+            createAudit(
+                userRole = UserRole.ADMIN,
+                userName = "Admin",
+                entityType = EntityType.PROJECT,
+                entityId = projectId,
+                action = ActionType.CREATE,
+                timeStamp = LocalDate(2025, 4, 30)
+            ),
+            createAudit(
+                userRole = UserRole.MATE,
+                userName = "User1",
+                entityType = EntityType.TASK,
+                entityId = "TASK-123",
+                action = ActionType.UPDATE,
+                timeStamp = LocalDate(2025, 4, 29)
+            ),
+            createAudit(
+                userRole = UserRole.ADMIN,
+                userName = "Admin",
+                entityType = EntityType.PROJECT,
+                entityId = projectId,
+                action = ActionType.UPDATE,
+                timeStamp = LocalDate(2025, 4, 28)
+            )
+        )
+        every { csvDataSource.loadAllDataFromFile() } returns auditLogs
+
+        // When
+        val result = auditDataSource.getAuditLogsByProjectId(projectId)
+
+        // Then
+        assertThat(result.size).isEqualTo(2)
+        assertThat(result.all { it.entityId == projectId && it.entityType == EntityType.PROJECT }).isTrue()
+        assertThat(result.map { it.action }).containsExactly(ActionType.CREATE, ActionType.UPDATE)
+        verify { csvDataSource.loadAllDataFromFile() }
+    }
+
+
 }
