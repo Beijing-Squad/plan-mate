@@ -85,5 +85,23 @@ class AuditCsvDataSourceImplTest {
         verify { csvDataSource.loadAllDataFromFile() }
     }
 
+    @Test
+    fun `should append audit log to CSV`() {
+        // Given
+        val auditLog = createAudit(
+            userRole = UserRole.ADMIN,
+            userName = "Adel",
+            entityType = EntityType.PROJECT,
+            entityId = "PROJECT-001",
+            action = ActionType.CREATE,
+            timeStamp = LocalDate(2025, 4, 30)
+        )
+
+        // When
+        auditDataSource.addAuditLog(auditLog)
+
+        // Then
+        verify { csvDataSource.appendToFile(auditLog) }
+    }
 
 }
