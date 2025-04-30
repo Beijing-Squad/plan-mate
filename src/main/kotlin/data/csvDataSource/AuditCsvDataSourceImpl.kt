@@ -15,7 +15,7 @@ class AuditCsvDataSourceImpl(
     }
 
     override fun addAuditLog(audit: Audit) {
-        TODO("Not yet implemented")
+        csvDataSource.appendToFile(audit)
     }
 
     override fun getAuditLogsByProjectId(projectId: String): List<Audit> {

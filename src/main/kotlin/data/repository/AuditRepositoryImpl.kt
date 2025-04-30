@@ -12,7 +12,7 @@ class AuditRepositoryImpl (
     }
 
     override fun addAuditLog(audit: Audit) {
-        TODO("Not yet implemented")
+        auditDataSource.addAuditLog(audit)
     }
 
     override fun getAuditLogsByProjectId(projectId: String): List<Audit> {
