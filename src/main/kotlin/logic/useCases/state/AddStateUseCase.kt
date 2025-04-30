@@ -7,6 +7,6 @@ class AddStateUseCase(
     private val statesRepository: StatesRepository
 ) {
     fun addState(state: State): Boolean {
-        return false
+        return statesRepository.addState(state)
     }
 }
