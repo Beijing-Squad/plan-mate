@@ -33,7 +33,7 @@ class CsvDataSourceImplTest {
         every { reader.readCsv() } returns emptyList()
 
         //When
-        val result = csvDataSource.loadAll()
+        val result = csvDataSource.loadAllDataFromFile()
 
         //Then
         assertThat(result).isEmpty()
@@ -49,7 +49,7 @@ class CsvDataSourceImplTest {
         every { parser.deserializer("John, 25, Male") } returns parsedData
 
         // When
-        val result = csvDataSource.loadAll()
+        val result = csvDataSource.loadAllDataFromFile()
 
         // Then
         assertThat(result).hasSize(1)
@@ -65,7 +65,7 @@ class CsvDataSourceImplTest {
         every { parser.serializer(item) } returns "Alice,30,Female"
 
         // When
-        csvDataSource.append(item)
+        csvDataSource.appendToFile(item)
 
         // Then – header, then record
         verifyOrder {
@@ -83,7 +83,7 @@ class CsvDataSourceImplTest {
 
 
         // When
-        csvDataSource.append(item)
+        csvDataSource.appendToFile(item)
 
         // Then
         verify(exactly = 0) { writer.appendLine(parser.header()) }
@@ -97,7 +97,7 @@ class CsvDataSourceImplTest {
 
         // When & Then
         val exception = assertThrows<CsvReadException> {
-            csvDataSource.loadAll()
+            csvDataSource.loadAllDataFromFile()
         }
         assertThat(exception.message).isEqualTo("Error reading CSV file: File read error")
 
@@ -111,7 +111,7 @@ class CsvDataSourceImplTest {
         every { parser.serializer(item) } returns "John, 25, Male"
 
         // When
-        csvDataSource.append(item)
+        csvDataSource.appendToFile(item)
 
         // Then
         verify { writer.appendLine("John, 25, Male") }
@@ -128,7 +128,7 @@ class CsvDataSourceImplTest {
 
         // When & Then
         val exception = assertThrows<CsvWriteException> {
-            csvDataSource.append(item)
+            csvDataSource.appendToFile(item)
         }
 
         assertThat(exception.message).isEqualTo("Error writing to CSV file: Write error")
@@ -143,7 +143,7 @@ class CsvDataSourceImplTest {
         every { parser.header() } returns "Name, Age, Gender"
 
         // When
-        csvDataSource.update(items)
+        csvDataSource.updateFile(items)
 
         // Then
         verify { writer.updateLines(listOf("Name, Age, Gender", "Serialized Data", "Serialized Data")) }
@@ -160,7 +160,7 @@ class CsvDataSourceImplTest {
 
         // When & Then
         val exception = assertThrows<CsvWriteException> {
-            csvDataSource.update(items)
+            csvDataSource.updateFile(items)
         }
 
         assertThat(exception.message).isEqualTo("Error saving to CSV file: Save error")
