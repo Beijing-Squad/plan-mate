@@ -72,5 +72,18 @@ class AuditCsvDataSourceImplTest {
         verify { csvDataSource.loadAllDataFromFile() }
     }
 
+    @Test
+    fun `should throw DataAccessException when CSV read fails`() {
+        // Given
+        every { csvDataSource.loadAllDataFromFile() } throws DataAccessException("Failed to read audit.csv")
+
+        // When&&Then
+        val exception = assertThrows<DataAccessException> {
+            auditDataSource.getAllAuditLogs()
+        }
+        assertThat(exception.message).isEqualTo("Failed to read audit.csv")
+        verify { csvDataSource.loadAllDataFromFile() }
+    }
+
 
 }
