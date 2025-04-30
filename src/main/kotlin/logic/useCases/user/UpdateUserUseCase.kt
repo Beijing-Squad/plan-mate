@@ -1,10 +1,8 @@
 package logic.useCases.user
 
 import logic.entities.User
-import logic.entities.UserRole
 import logic.entities.exceptions.InvalidPasswordException
 import logic.entities.exceptions.InvalidUserNameException
-import logic.entities.exceptions.UserNotFoundException
 import logic.repository.UserRepository
 import logic.useCases.user.cryptography.PasswordEncryption
 import kotlin.uuid.ExperimentalUuidApi
@@ -26,7 +24,7 @@ class UpdateUserUseCase(
                 userName = user.userName,
                 password = passwordEncryption.encryptionPassword(user.password)
             )
-            Result.success(userRepository.updateUser(updatedUser.id.toString()))
+            Result.success(userRepository.updateUser(updatedUser))
         }
 
     }
