@@ -212,4 +212,48 @@ class AuditCsvDataSourceImplTest {
         verify { csvDataSource.loadAllDataFromFile() }
     }
 
+    @Test
+    fun `should return audit logs for a specific task ID`() {
+        // Given
+        val taskId = "TASK-123"
+        val auditLogs = listOf(
+            createAudit(
+                userRole = UserRole.MATE,
+                userName = "User1",
+                entityType = EntityType.TASK,
+                entityId = taskId,
+                action = ActionType.UPDATE,
+                oldState = "In Progress",
+                newState = "Completed",
+                timeStamp = LocalDate(2025, 4, 29)
+            ),
+            createAudit(
+                userRole = UserRole.ADMIN,
+                userName = "Admin",
+                entityType = EntityType.PROJECT,
+                entityId = "PROJECT-001",
+                action = ActionType.CREATE,
+                timeStamp = LocalDate(2025, 4, 30)
+            ),
+            createAudit(
+                userRole = UserRole.MATE,
+                userName = "User2",
+                entityType = EntityType.TASK,
+                entityId = taskId,
+                action = ActionType.DELETE,
+                timeStamp = LocalDate(2025, 4, 28)
+            )
+        )
+        every { csvDataSource.loadAllDataFromFile() } returns auditLogs
+
+        // When
+        val result = auditDataSource.getAuditLogsByTaskId(taskId)
+
+        // Then
+        assertThat(result.size).isEqualTo(2)
+        assertThat(result.all { it.entityId == taskId && it.entityType == EntityType.TASK }).isTrue()
+        assertThat(result.map { it.action }).containsExactly(ActionType.UPDATE, ActionType.DELETE)
+        verify { csvDataSource.loadAllDataFromFile() }
+    }
+
 }
