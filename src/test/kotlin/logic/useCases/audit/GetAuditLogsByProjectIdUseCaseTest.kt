@@ -20,6 +20,30 @@ class GetAuditLogsByProjectIdUseCaseTest {
     private lateinit var auditRepository: AuditRepository
     private lateinit var getAuditLogsByProjectIdUseCase: GetAuditLogsByProjectIdUseCase
 
+    private val allAudit = listOf(
+        createAudit(
+            userRole = UserRole.ADMIN,
+            userName = "Adel",
+            action = ActionType.CREATE,
+            entityType = EntityType.PROJECT,
+            timeStamp = LocalDate(2025, 4, 29)
+        ),
+        createAudit(
+            userRole = UserRole.ADMIN,
+            userName = "Adel",
+            action = ActionType.UPDATE,
+            entityType = EntityType.PROJECT,
+            timeStamp = LocalDate(2025, 4, 29)
+        ),
+        createAudit(
+            userRole = UserRole.ADMIN,
+            userName = "Adel",
+            action = ActionType.UPDATE,
+            entityType = EntityType.PROJECT,
+            timeStamp = LocalDate(2025, 4, 29)
+        )
+    )
+
     @BeforeEach
     fun setUp() {
         auditRepository = mockk(relaxed = true)
@@ -30,7 +54,8 @@ class GetAuditLogsByProjectIdUseCaseTest {
     fun `should return list of audit logs when project id is found`() {
         // Given
         val givenId = "PROJECT-001"
-        every { auditRepository.getAllAuditLogs() } returns listOf(
+        every { auditRepository.getAllAuditLogs() } returns allAudit
+        every { auditRepository.getAuditLogsByProjectId(givenId) } returns listOf(
             createAudit(
                 userRole = UserRole.ADMIN,
                 userName = "Adel",
@@ -45,14 +70,6 @@ class GetAuditLogsByProjectIdUseCaseTest {
                 action = ActionType.UPDATE,
                 entityType = EntityType.PROJECT,
                 entityId = givenId,
-                timeStamp = LocalDate(2025, 4, 29)
-            ),
-            createAudit(
-                userRole = UserRole.ADMIN,
-                userName = "Adel",
-                action = ActionType.UPDATE,
-                entityType = EntityType.PROJECT,
-                entityId = "PROJECT-123",
                 timeStamp = LocalDate(2025, 4, 29)
             )
         )
@@ -68,24 +85,7 @@ class GetAuditLogsByProjectIdUseCaseTest {
     fun `should throw ProjectNotFoundException of audit logs when project id not found`() {
         // Given
         val givenId = "PROJECT-001"
-        every { auditRepository.getAllAuditLogs() } returns listOf(
-            createAudit(
-                userRole = UserRole.ADMIN,
-                userName = "Adel",
-                action = ActionType.CREATE,
-                entityType = EntityType.PROJECT,
-                entityId = "PROJECT-555",
-                timeStamp = LocalDate(2025, 4, 29)
-            ),
-            createAudit(
-                userRole = UserRole.ADMIN,
-                userName = "Adel",
-                action = ActionType.UPDATE,
-                entityType = EntityType.PROJECT,
-                entityId = "PROJECT-555",
-                timeStamp = LocalDate(2025, 4, 29)
-            )
-        )
+        every { auditRepository.getAllAuditLogs() } returns allAudit
 
         // When && Then
         assertThrows<ProjectNotFoundException> {
@@ -97,24 +97,7 @@ class GetAuditLogsByProjectIdUseCaseTest {
     fun `should throw InvalidInputException when project id is blank`() {
         // Given
         val givenId = " "
-        every { auditRepository.getAllAuditLogs() } returns listOf(
-            createAudit(
-                userRole = UserRole.ADMIN,
-                userName = "Adel",
-                action = ActionType.CREATE,
-                entityType = EntityType.PROJECT,
-                entityId = "PROJECT-555",
-                timeStamp = LocalDate(2025, 4, 29)
-            ),
-            createAudit(
-                userRole = UserRole.ADMIN,
-                userName = "Adel",
-                action = ActionType.UPDATE,
-                entityType = EntityType.PROJECT,
-                entityId = "PROJECT-555",
-                timeStamp = LocalDate(2025, 4, 29)
-            )
-        )
+        every { auditRepository.getAllAuditLogs() } returns allAudit
 
         // When && Then
         assertThrows<InvalidInputException> {
@@ -126,32 +109,25 @@ class GetAuditLogsByProjectIdUseCaseTest {
     fun `should return audit logs in timestamp order for a project`() {
         // Given
         val givenId = "PROJECT-001"
-        every { auditRepository.getAllAuditLogs() } returns listOf(
+        every { auditRepository.getAllAuditLogs() } returns allAudit
+        every { auditRepository.getAuditLogsByProjectId(givenId) } returns listOf(
             createAudit(
-                userRole = UserRole.ADMIN,
-                userName = "Adel",
-                action = ActionType.CREATE,
                 entityType = EntityType.PROJECT,
                 entityId = givenId,
                 timeStamp = LocalDate(2025, 4, 29)
             ),
             createAudit(
-                userRole = UserRole.ADMIN,
-                userName = "Adel",
-                action = ActionType.UPDATE,
                 entityType = EntityType.PROJECT,
                 entityId = givenId,
                 timeStamp = LocalDate(2025, 4, 29)
             ),
             createAudit(
-                userRole = UserRole.ADMIN,
-                userName = "Adel",
-                action = ActionType.UPDATE,
                 entityType = EntityType.PROJECT,
                 entityId = givenId,
                 timeStamp = LocalDate(2025, 4, 30)
+            ),
+
             )
-        )
 
         // When
         val result = getAuditLogsByProjectIdUseCase.getAuditLogsByProjectId(givenId)

@@ -11,18 +11,13 @@ class GetAuditLogsByProjectIdUseCase(
 ) {
     fun getAuditLogsByProjectId(projectId: String): List<Audit> {
         validateProjectId(projectId)
-        return auditRepository.getAllAuditLogs()
-            .filter { auditLog -> isMatchingProject(auditLog, projectId) }
+        return auditRepository.getAuditLogsByProjectId(projectId)
             .ifEmpty { throw ProjectNotFoundException(PROJECT_NOT_FOUND_ERROR) }
             .sortedByDescending { auditLog -> auditLog.timeStamp }
     }
 
     private fun validateProjectId(projectId: String) {
         if (projectId.isBlank()) throw InvalidInputException(INVALID_ID_ERROR)
-    }
-
-    private fun isMatchingProject(audit: Audit, projectId: String): Boolean {
-        return audit.entityId == projectId && audit.entityType == EntityType.PROJECT
     }
 
     companion object {

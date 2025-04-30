@@ -11,7 +11,7 @@ class AuditCsvDataSourceImpl(
 ) : AuditDataSource {
 
     override fun getAllAuditLogs(): List<Audit> {
-        TODO("Not yet implemented")
+        return csvDataSource.loadAllDataFromFile()
     }
 
     override fun addAuditLog(audit: Audit) {
@@ -19,7 +19,7 @@ class AuditCsvDataSourceImpl(
     }
 
     override fun getAuditLogsByProjectId(projectId: String): List<Audit> {
-        TODO("Not yet implemented")
+        return getAllAuditLogs().filter { auditLog -> isMatchingProject(auditLog, projectId) }
     }
 
     override fun getAuditLogsByTaskId(taskId: String): List<Audit> {
@@ -30,4 +30,7 @@ class AuditCsvDataSourceImpl(
             }
     }
 
+    private fun isMatchingProject(audit: Audit, projectId: String): Boolean {
+        return audit.entityId == projectId && audit.entityType == EntityType.PROJECT
+    }
 }
