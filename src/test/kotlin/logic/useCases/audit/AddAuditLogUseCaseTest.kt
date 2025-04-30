@@ -113,6 +113,25 @@ class AddAuditLogUseCaseTest {
         }
     }
 
+    @Test
+    fun `should add audit log with minimal fields`() {
+        // Given
+        val auditLog = createAudit(
+            userRole = UserRole.MATE,
+            userName = "User3",
+            action = ActionType.CREATE,
+            entityType = EntityType.TASK,
+            entityId = "TASK-789",
+            oldState = null,
+            newState = null,
+            timeStamp = LocalDate(2025, 4, 25)
+        )
 
+        // When
+        addAuditLogUseCase.addAuditLog(auditLog)
+
+        // Then
+        verify { auditRepository.addAuditLog(auditLog) }
+    }
 
 }
