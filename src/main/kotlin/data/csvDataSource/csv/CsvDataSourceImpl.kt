@@ -40,4 +40,14 @@ class CsvDataSourceImpl<T>(
             throw CsvWriteException("Error saving to CSV file: ${e.message}")
         }
     }
+
+    fun deleteById(id: String) {
+        try {
+            val allItems = loadAll()
+            val updatedItems = allItems.filter { parser.getId(it) != id }
+            update(updatedItems)
+        } catch (e: Exception) {
+            throw CsvWriteException("Error deleting item from CSV: ${e.message}")
+        }
+    }
 }
