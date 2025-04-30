@@ -1,5 +1,7 @@
 package ui.main
 
+import ui.main.consoleIO.ConsoleIO
+
 class PlanMateConsoleUi(
     private val screens: List<BaseScreen>,
     private val consoleIO: ConsoleIO

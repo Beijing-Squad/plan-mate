@@ -1,4 +1,4 @@
-package ui.main
+package ui.main.consoleIO
 
 interface ConsoleIO {
     fun show(message: String)

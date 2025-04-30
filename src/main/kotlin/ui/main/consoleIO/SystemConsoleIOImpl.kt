@@ -1,12 +1,12 @@
-package ui.main
+package ui.main.consoleIO
 
 class SystemConsoleIOImpl: ConsoleIO {
     override fun show(message: String) {
-        show(message)
+        print(message)
     }
 
     override fun showWithLine(message: String) {
-        showWithLine(message)
+        println(message)
     }
 
     override fun read(): String? {

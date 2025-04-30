@@ -1,5 +1,7 @@
 package ui.main
 
+import ui.main.consoleIO.ConsoleIO
+
 abstract class BaseScreen(
     private val consoleIO: ConsoleIO
 )  {
