@@ -19,7 +19,7 @@ class StatesRepositoryImpl(
         TODO("Not yet implemented")
     }
 
-    override fun addState(state: State) {
+    override fun addState(state: State): Boolean {
         TODO("Not yet implemented")
     }
 
