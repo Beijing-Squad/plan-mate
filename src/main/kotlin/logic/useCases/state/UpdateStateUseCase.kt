@@ -7,6 +7,6 @@ class UpdateStateUseCase(
     private val statesRepository: StatesRepository
 ) {
     fun updateState(state: State): Boolean{
-        return false
+        return statesRepository.updateState(state)
     }
 }
