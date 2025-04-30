@@ -8,23 +8,23 @@ class ProjectsRepositoryImpl(
     private val projectDataSource: ProjectDataSource
 ): ProjectsRepository{
     override fun getAllProjects(): List<Project> {
-        TODO("Not yet implemented")
+        return projectDataSource.getAllProjects()
     }
 
     override fun getProjectById(projectId: String): Project {
-        TODO("Not yet implemented")
+        return projectDataSource.getProjectById(projectId)
     }
 
     override fun addProject(project: Project) {
-        TODO("Not yet implemented")
+        return projectDataSource.addProject(project)
     }
 
     override fun deleteProject(projectId: String) {
-        TODO("Not yet implemented")
+        return deleteProject(projectId)
     }
 
-    override fun updateProject(projectId: String): Project {
-        TODO("Not yet implemented")
+    override fun updateProject(newProject: Project): Boolean {
+        return projectDataSource.updateProject(newProject)
     }
 
 }
