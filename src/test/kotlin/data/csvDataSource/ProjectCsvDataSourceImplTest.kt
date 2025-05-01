@@ -2,13 +2,14 @@ package data.csvDataSource
 
 
 import com.google.common.truth.Truth.assertThat
+import data.csvDataSource.csv.CsvDataSourceImpl
 import fake.createProject
 import io.mockk.*
-import kotlinx.datetime.LocalDate
-import logic.entities.exceptions.ProjectNotFoundException
+import logic.entities.Project
+import logic.entities.exceptions.CsvWriteException
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import kotlin.test.BeforeTest
-import kotlin.test.assertFailsWith
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -16,10 +17,12 @@ import kotlin.uuid.Uuid
 class ProjectCsvDataSourceImplTest {
 
     private lateinit var projectCsvDataSource: ProjectCsvDataSourceImpl
+    private lateinit var csvDataSource: CsvDataSourceImpl<Project>
 
     @BeforeTest
     fun setup() {
-        projectCsvDataSource = mockk()
+        csvDataSource= mockk(relaxed = true)
+        projectCsvDataSource = ProjectCsvDataSourceImpl(csvDataSource)
 
     }
 
@@ -28,7 +31,7 @@ class ProjectCsvDataSourceImplTest {
         // Given
         val project = createProject(name = "Project1")
         val expectedProjects = listOf(project)
-        every { projectCsvDataSource.getAllProjects() } returns expectedProjects
+        every { csvDataSource.loadAllDataFromFile() } returns expectedProjects
 
         // When
         val result = projectCsvDataSource.getAllProjects()
@@ -37,86 +40,58 @@ class ProjectCsvDataSourceImplTest {
         assertThat(result).isEqualTo(expectedProjects)
     }
 
-    @Test
-    fun `should return project by ID when it exists`() {
-        //Given
-        val project = createProject(name = "Project1")
-        val projectId = project.id.toString()
-        every { projectCsvDataSource.getProjectById(projectId) } returns project
-
-        //When
-        val result = projectCsvDataSource.getProjectById(projectId)
-
-        //Then
-        assertThat(result).isEqualTo(project)
-    }
-
-    @Test
-    fun `should throw exception when getting project by ID that does not exist`() {
-        // Given
-        val projectId = Uuid.random().toString()
-        every {
-            projectCsvDataSource.getProjectById(projectId)
-        } throws ProjectNotFoundException("Project with ID $projectId not found")
-
-        // When & Then
-        val exception = assertFailsWith<ProjectNotFoundException> {
-            projectCsvDataSource.getProjectById(projectId)
-        }
-        assertThat(exception.message).isEqualTo("Project with ID $projectId not found")
-    }
 
     @Test
     fun `should add a new project to the data source`() {
         // Given
         val project = createProject(name = "NewProject")
-        every { projectCsvDataSource.addProject(project) } just Runs
+        every { csvDataSource.appendToFile(project) } just Runs
 
         // When
         projectCsvDataSource.addProject(project)
 
         // Then
-        verify { projectCsvDataSource.addProject(project) }
+        verify { csvDataSource.appendToFile(project) }
     }
 
     @Test
     fun `should delete a project by ID`() {
         // Given
         val projectId = Uuid.random().toString()
-        every { projectCsvDataSource.deleteProject(projectId) } just Runs
+        every { csvDataSource.deleteById(projectId) } just Runs
 
         // When
         projectCsvDataSource.deleteProject(projectId)
 
         // Then
-        verify { projectCsvDataSource.deleteProject(projectId) }
+        verify { csvDataSource.deleteById(projectId) }
     }
 
     @Test
-    fun `should return true when project is updated successfully`() {
+    fun `should update a project by ID when it exists`() {
         // Given
-        val originalProject = createProject(name = "Original")
-        every { projectCsvDataSource.updateProject(originalProject) } returns true
+        val newProjects=listOf(createProject(),createProject())
 
         // When
-        val result = projectCsvDataSource.updateProject(originalProject)
+        projectCsvDataSource.updateProject(newProjects)
 
         // Then
-        assertThat(result).isTrue()
+        verify {
+            csvDataSource.updateFile(newProjects)
+        }
     }
 
     @Test
     fun `should throw exception when updating project that does not exist`() {
         // Given
-        val nonExistentProject = createProject(name = "Project")
+        val newProjects = listOf(createProject(), createProject())
         every {
-            projectCsvDataSource.updateProject(nonExistentProject)
-        } throws ProjectNotFoundException("Project with ID ${nonExistentProject.id} not found")
+            csvDataSource.updateFile (newProjects)
+        } throws CsvWriteException("Error saving to CSV file")
 
         // When & Then
-        val exception = assertFailsWith<ProjectNotFoundException> {
-            projectCsvDataSource.updateProject(nonExistentProject)
+        assertThrows<CsvWriteException> {
+            projectCsvDataSource.updateProject(newProjects)
         }
-        assertThat(exception.message).isEqualTo("Project with ID ${nonExistentProject.id} not found")
     }
 }
