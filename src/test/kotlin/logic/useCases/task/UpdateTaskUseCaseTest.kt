@@ -34,9 +34,11 @@ class UpdateTaskUseCaseTest {
 
         // When/Then
         val exception = assertFailsWith<TaskNotFoundException> {
-            updateTaskUseCase.updateTask(taskId, title = "Updated Title",
+            updateTaskUseCase.updateTask(
+                taskId, title = "Updated Title",
                 description = "updated Description",
-                currentDate = LocalDate(2023, 1, 2))
+                currentDate = LocalDate(2023, 1, 2)
+            )
         }
 
         assertThat(exception.message).isEqualTo("Task with ID $taskId not found")
@@ -162,4 +164,23 @@ class UpdateTaskUseCaseTest {
         verify(exactly = 0) { tasksRepository.updateTask(any(), any()) }
     }
 
+    @Test
+    fun `should keep original description when new description is null`() {
+        // Given
+        val originalTask = createTask(description = "Original description")
+        val taskId = originalTask.id.toString()
+        every { tasksRepository.getTaskById(taskId) } returns originalTask
+        every { tasksRepository.updateTask(any(), any()) } answers { secondArg() }
+
+        // When
+        val updated = updateTaskUseCase.updateTask(
+            taskId = taskId,
+            title = "updated title",
+            description = null,
+            currentDate = originalTask.updatedAt
+        )
+
+        // Then
+        assertThat(updated.description).isEqualTo("Original description")
+    }
 }
