@@ -95,35 +95,32 @@ class ProjectsRepositoryImplTest {
     }
 
     @Test
-    fun `should update a project by ID when it exists`() {
+    fun `should return true when updating a project that exists`() {
         // Given
-        val originalProject = createProject(name = "Original")
-        val updatedProject = originalProject.copy(
+        val project = createProject(name = "Original")
+        val updatedProject = project.copy(
             name = "Updated", updatedAt = LocalDate.parse("2025-05-20")
         )
-        val projectId = originalProject.id.toString()
-        every { projectDataSource.updateProject(projectId) } returns updatedProject
+        every { projectDataSource.updateProject(updatedProject) } returns true
 
         // When
-        val result = projectsRepository.updateProject(projectId)
+        val result = projectsRepository.updateProject(updatedProject)
 
         // Then
-        assertThat(result).isEqualTo(updatedProject)
+        assertThat(result).isTrue()
     }
 
     @Test
-    fun `should throw exception when updating project that does not exist`() {
+    fun `should return false when updating a project that does not exist`() {
         // Given
-        val projectId = Uuid.random().toString()
-        every {
-            projectDataSource.updateProject(projectId)
-        } throws ProjectNotFoundException("Project with ID $projectId not found")
+        val project = createProject(name = "NonExistent")
+        every { projectDataSource.updateProject(project) } returns false
 
-        // When & Then
-        val exception = assertFailsWith<ProjectNotFoundException> {
-            projectsRepository.updateProject(projectId)
-        }
-        assertThat(exception.message).isEqualTo("Project with ID $projectId not found")
+        // When
+        val result = projectsRepository.updateProject(project)
+
+        // Then
+        assertThat(result).isFalse()
     }
 
 }
