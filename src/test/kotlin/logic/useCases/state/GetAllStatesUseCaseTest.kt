@@ -11,48 +11,80 @@ import kotlin.test.Test
 import kotlin.uuid.ExperimentalUuidApi
 
 class GetAllStatesUseCaseTest {
+
     private lateinit var statesRepository: StatesRepository
-    private lateinit var getAllState: GetAllStatesUseCase
+    private lateinit var getAllStatesUseCase: GetAllStatesUseCase
 
     @BeforeEach
     fun setup() {
         statesRepository = mockk(relaxed = true)
-        getAllState = GetAllStatesUseCase(statesRepository)
+        getAllStatesUseCase = GetAllStatesUseCase(statesRepository)
     }
 
     @OptIn(ExperimentalUuidApi::class)
     @Test
-    fun `get all states test`() {
-        //Given
+    fun shouldReturnAllStatesSuccessfully() {
+        // Given
+        val createdBy = "adminUser01"
+
         val projects = listOf(
-            createProject(
-                name = "PlanMate Core Features",
-                createdBy = "adminUser01"
-            ),
-            createProject(
-                name = "PlanMate Core Features",
-                createdBy = "adminUser01"
-            )
+            createProject(name = "PlanMate Core Features", createdBy = createdBy),
+            createProject(name = "PlanMate Extended", createdBy = createdBy)
         )
 
-        // when
         val states = listOf(
-            createState(
-                id = "1",
-                name = "in progress",
-                projectId = projects[0].id.toString()
-            ),
-            createState(
-                id = "2",
-                name = "Done",
-                projectId = projects[1].id.toString()
-            )
+            createState(id = "1", name = "In Progress", projectId = projects[0].id.toString()),
+            createState(id = "2", name = "Done", projectId = projects[1].id.toString())
         )
 
         every { statesRepository.getAllStates() } returns states
 
-        //Then
-        assertThat(getAllState.getAllStates()).isEqualTo(states)
+        // When
+        val actualStates = getAllStatesUseCase.getAllStates()
+
+        // Then
+        assertThat(actualStates).isEqualTo(states)
     }
 
+    @Test
+    fun shouldReturnEmptyListWhenNoStatesExist() {
+        // Given
+        every { statesRepository.getAllStates() } returns emptyList()
+
+        // When
+        val actualStates = getAllStatesUseCase.getAllStates()
+
+        // Then
+        assertThat(actualStates).isEmpty()
+    }
+
+    @Test
+    fun shouldReturnCorrectNumberOfStates() {
+        // Given
+        val states = listOf(
+            createState(id = "1", name = "In Progress", projectId = "1"),
+            createState(id = "2", name = "Done", projectId = "2"),
+            createState(id = "3", name = "Blocked", projectId = "3")
+        )
+
+        every { statesRepository.getAllStates() } returns states
+
+        // When
+        val actualStates = getAllStatesUseCase.getAllStates()
+
+        // Then
+        assertThat(actualStates.size).isEqualTo(3)
+    }
+
+    @Test
+    fun shouldNotReturnNullWhenRepositoryReturnsEmptyList() {
+        // Given
+        every { statesRepository.getAllStates() } returns emptyList()
+
+        // When
+        val actualStates = getAllStatesUseCase.getAllStates()
+
+        // Then
+        assertThat(actualStates).isNotNull()
+    }
 }
