@@ -5,9 +5,12 @@ import fake.createProject
 import fake.createState
 import io.mockk.every
 import io.mockk.mockk
+import logic.entities.exceptions.StateNotFoundException
+import logic.entities.exceptions.StateUnauthorizedUserException
 import logic.repository.StatesRepository
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import kotlin.uuid.ExperimentalUuidApi
 
 class UpdateStateUseCaseTest {
@@ -29,7 +32,6 @@ class UpdateStateUseCaseTest {
             name = "in progress",
             projectId = project.id.toString()
         )
-        val states = listOf(state, state)
         val newState = createState(
             id = state.id,
             name = "done",
