@@ -6,7 +6,7 @@ import kotlin.uuid.Uuid
 
 @OptIn(ExperimentalUuidApi::class)
 fun createState(
-    id: Uuid = Uuid.random(),
+    id: String = "DefaultStateId",
     name: String = "defaultStateName",
     projectId: String = "defaultProjectId"
 ): State {

@@ -5,6 +5,7 @@ import fake.createProject
 import fake.createState
 import io.mockk.every
 import io.mockk.mockk
+import logic.entities.UserRole
 import logic.entities.exceptions.StateNotFoundException
 import logic.entities.exceptions.StateUnauthorizedUserException
 import logic.repository.StatesRepository
@@ -19,7 +20,7 @@ class UpdateStateUseCaseTest {
 
     @BeforeEach
     fun setup() {
-        statesRepository = mockk()
+        statesRepository = mockk(relaxed = true)
         updateStateUseCase = UpdateStateUseCase(statesRepository)
     }
 
@@ -27,6 +28,7 @@ class UpdateStateUseCaseTest {
     @Test
     fun `should update state when state is exist`() {
         //Given
+        val adminRole = UserRole.ADMIN
         val project = createProject()
         val state = createState(
             name = "in progress",
@@ -39,28 +41,28 @@ class UpdateStateUseCaseTest {
         )
 
         every { statesRepository.getStateById(newState.id.toString()) } returns state
-        every { statesRepository.updateState(newState) } returns true
+        every { statesRepository.updateState(newState) } returns newState
 
         // when
-        val result = updateStateUseCase.updateState(newState)
+        val result = updateStateUseCase.updateState(newState, adminRole)
 
         //Then
-        assertThat(result).isTrue()
+        assertThat(result).isEqualTo(newState)
     }
 
     @OptIn(ExperimentalUuidApi::class)
     @Test
     fun `should throw exception when not found state with this state id`() {
         // Given
-        val errorMessage = "Not found state with this id to update"
+        val errorMessage = "not found this state"
+        val adminRole = UserRole.ADMIN
         val newState = createState()
 
-        every { statesRepository.getStateById(newState.id.toString()) } throws StateNotFoundException(errorMessage)
-        every { statesRepository.updateState(newState) } throws StateNotFoundException(errorMessage)
+        every { statesRepository.getStateById(newState.id) } throws StateNotFoundException(errorMessage)
 
         // When & Then
         assertThrows<StateNotFoundException> {
-            updateStateUseCase.updateState(newState)
+            updateStateUseCase.updateState(newState, adminRole)
         }
     }
 
@@ -68,7 +70,7 @@ class UpdateStateUseCaseTest {
     @Test
     fun `should throw exception when user is not admin`() {
         // Given
-        val errorMessage = "Sorry the user should be admin"
+        val mateRole = UserRole.MATE
         val project = createProject()
         val state = createState(
             name = "in progress",
@@ -80,13 +82,9 @@ class UpdateStateUseCaseTest {
             projectId = state.projectId
         )
 
-        every { statesRepository.getStateById(state.id.toString()) } returns state
-        every { statesRepository.updateState(newState) } throws StateUnauthorizedUserException(errorMessage)
-
         // When && Then
         assertThrows<StateUnauthorizedUserException> {
-            updateStateUseCase.updateState(newState)
+            updateStateUseCase.updateState(newState, mateRole)
         }
-
     }
 }
