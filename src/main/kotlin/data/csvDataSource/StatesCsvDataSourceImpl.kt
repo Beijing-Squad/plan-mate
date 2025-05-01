@@ -27,9 +27,6 @@ class StatesCsvDataSourceImpl(
 
     @OptIn(ExperimentalUuidApi::class)
     override fun addState(state: State): Boolean {
-        if (states.any { it.id == state.id }) {
-            throw StateAlreadyExistException("State with id ${state.id} already exists")
-        }
         return states.add(state).also { isAdded ->
             if (isAdded) {
                 csvDataSource.updateFile(states)
