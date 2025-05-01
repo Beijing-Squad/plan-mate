@@ -1,18 +1,13 @@
 package data.repository
 
 import com.google.common.truth.Truth.assertThat
-import data.csvDataSource.ProjectCsvDataSourceImpl
 import data.repository.dataSource.ProjectDataSource
 import fake.createProject
 import io.mockk.*
-import kotlinx.datetime.LocalDate
-import logic.entities.UserRole
 import logic.entities.exceptions.CsvWriteException
-import logic.entities.exceptions.ProjectNotFoundException
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import kotlin.test.assertFailsWith
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
