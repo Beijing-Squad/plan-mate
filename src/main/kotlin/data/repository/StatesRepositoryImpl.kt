@@ -7,28 +7,29 @@ import logic.repository.StatesRepository
 class StatesRepositoryImpl(
     private val stateDataSource: StatesDataSource
 ) : StatesRepository{
+
     override fun getAllStates(): List<State> {
-        TODO("Not yet implemented")
+        return stateDataSource.getAllStates()
     }
 
     override fun getStatesByProjectId(projectId: String): List<State> {
-        TODO("Not yet implemented")
+        return stateDataSource.getStatesByProjectId(projectId)
     }
 
     override fun getStateById(stateId: String): State {
-        TODO("Not yet implemented")
+        return stateDataSource.getStateById(stateId)
     }
 
     override fun addState(state: State): Boolean {
-        TODO("Not yet implemented")
+        return stateDataSource.addState(state)
     }
 
-    override fun updateState(state: State): Boolean {
-        TODO("Not yet implemented")
+    override fun updateState(state: State): State {
+        return stateDataSource.updateState(state)
     }
 
     override fun deleteState(state: State): Boolean {
-        TODO("Not yet implemented")
+        return stateDataSource.deleteState(state)
     }
 
 }
