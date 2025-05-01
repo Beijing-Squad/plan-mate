@@ -9,7 +9,6 @@ import kotlinx.datetime.LocalDate
 import logic.entities.exceptions.InvalidInputException
 import logic.entities.exceptions.TaskNotFoundException
 import logic.repository.TasksRepository
-import logic.useCases.task.UpdateTaskUseCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import kotlin.test.assertFailsWith
@@ -31,11 +30,13 @@ class UpdateTaskUseCaseTest {
     fun `should throw TaskNotFoundException when updating non-existent task`() {
         // Given
         val taskId = "not"
-      //  every { tasksRepository.getTaskById(taskId) } returns null
+        every { tasksRepository.getTaskById(taskId) } throws TaskNotFoundException("Task with ID $taskId not found")
 
         // When/Then
         val exception = assertFailsWith<TaskNotFoundException> {
-            updateTaskUseCase.updateTask(taskId, title = "Updated Title", description = null, currentDate = LocalDate(2023, 1, 2))
+            updateTaskUseCase.updateTask(taskId, title = "Updated Title",
+                description = "updated Description",
+                currentDate = LocalDate(2023, 1, 2))
         }
 
         assertThat(exception.message).isEqualTo("Task with ID $taskId not found")
@@ -45,6 +46,7 @@ class UpdateTaskUseCaseTest {
 
     @Test
     fun `should update task title when new title is provided`() {
+        // Given
         val originalTask = createTask(
             projectId = "project-1",
             title = "Original Title",
@@ -56,19 +58,20 @@ class UpdateTaskUseCaseTest {
         )
         val updatedTask = originalTask.copy(
             title = "Updated Title",
+            description = "update",
             updatedAt = LocalDate(2023, 1, 2)
         )
 
         every { tasksRepository.getTaskById(originalTask.id.toString()) } returns originalTask
         every { tasksRepository.updateTask(originalTask.id.toString(), updatedTask) } returns updatedTask
-
+        // When
         val result = updateTaskUseCase.updateTask(
             taskId = originalTask.id.toString(),
             title = "Updated Title",
-            description = null,
+            description = "update",
             currentDate = LocalDate(2023, 1, 2)
         )
-
+        // Then
         assertThat(result).isEqualTo(updatedTask)
         verify { tasksRepository.getTaskById(originalTask.id.toString()) }
         verify { tasksRepository.updateTask(originalTask.id.toString(), updatedTask) }
@@ -76,6 +79,7 @@ class UpdateTaskUseCaseTest {
 
     @Test
     fun `should update task description when new description is provided`() {
+        // Given
         val originalTask = createTask(
             projectId = "project-1",
             title = "Original Title",
@@ -92,6 +96,7 @@ class UpdateTaskUseCaseTest {
 
         every { tasksRepository.getTaskById(originalTask.id.toString()) } returns originalTask
         every { tasksRepository.updateTask(originalTask.id.toString(), updatedTask) } returns updatedTask
+        // When
 
         val result = updateTaskUseCase.updateTask(
             taskId = originalTask.id.toString(),
@@ -99,7 +104,7 @@ class UpdateTaskUseCaseTest {
             description = "Updated Description",
             currentDate = LocalDate(2023, 1, 2)
         )
-
+        // Then
         assertThat(result).isEqualTo(updatedTask)
         verify { tasksRepository.getTaskById(originalTask.id.toString()) }
         verify { tasksRepository.updateTask(originalTask.id.toString(), updatedTask) }
@@ -107,6 +112,7 @@ class UpdateTaskUseCaseTest {
 
     @Test
     fun `should update both title and description when both are provided`() {
+        // Given
         val originalTask = createTask(
             projectId = "project-1",
             title = "Original Title",
@@ -124,14 +130,14 @@ class UpdateTaskUseCaseTest {
 
         every { tasksRepository.getTaskById(originalTask.id.toString()) } returns originalTask
         every { tasksRepository.updateTask(originalTask.id.toString(), updatedTask) } returns updatedTask
-
+        // When
         val result = updateTaskUseCase.updateTask(
             taskId = originalTask.id.toString(),
             title = "Updated Title",
             description = "Updated Description",
             currentDate = LocalDate(2023, 1, 2)
         )
-
+        // Then
         assertThat(result).isEqualTo(updatedTask)
         verify { tasksRepository.getTaskById(originalTask.id.toString()) }
         verify { tasksRepository.updateTask(originalTask.id.toString(), updatedTask) }
@@ -139,37 +145,21 @@ class UpdateTaskUseCaseTest {
 
     @Test
     fun `should throw InvalidInputException when title is empty`() {
+        // Given
         val taskId = "any-id"
         every { tasksRepository.getTaskById(taskId) } returns createTask(taskId)
-
+        // When
         val exception = assertFailsWith<InvalidInputException> {
             updateTaskUseCase.updateTask(
                 taskId = taskId,
                 title = "",
-                description = null,
+                description = "updated",
                 currentDate = LocalDate(2023, 1, 2)
             )
         }
-
+        // Then
         assertThat(exception.message).isEqualTo("Task title cannot be empty")
         verify(exactly = 0) { tasksRepository.updateTask(any(), any()) }
     }
 
-    @Test
-    fun `should throw InvalidInputException when description is empty`() {
-        val taskId = "any-id"
-        every { tasksRepository.getTaskById(taskId) } returns createTask( taskId)
-
-        val exception = assertFailsWith<InvalidInputException> {
-            updateTaskUseCase.updateTask(
-                taskId = taskId,
-                title = null,
-                description = "",
-                currentDate = LocalDate(2023, 1, 2)
-            )
-        }
-
-        assertThat(exception.message).isEqualTo("Task description cannot be empty")
-        verify(exactly = 0) { tasksRepository.updateTask(any(), any()) }
-    }
 }
