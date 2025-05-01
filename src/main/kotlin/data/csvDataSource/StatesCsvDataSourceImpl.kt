@@ -14,7 +14,8 @@ class StatesCsvDataSourceImpl(
     }
 
     override fun getStatesByProjectId(projectId: String): List<State> {
-        TODO("Not yet implemented")
+        return getAllStates()
+            .filter { it.projectId == projectId }
     }
 
     override fun getStateById(stateId: String): State {
