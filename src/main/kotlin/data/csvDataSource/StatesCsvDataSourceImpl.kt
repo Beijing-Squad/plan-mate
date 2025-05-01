@@ -33,8 +33,15 @@ class StatesCsvDataSourceImpl(
         return states.add(state)
     }
 
-    override fun updateState(state: State) {
-        TODO("Not yet implemented")
+    @OptIn(ExperimentalUuidApi::class)
+    override fun updateState(state: State): State {
+        val currentState = getStateById(state.id.toString())
+        val updatedState = currentState.copy(
+            name = state.name,
+            projectId = state.projectId
+        )
+        states[states.indexOf(currentState)] = updatedState
+        return updatedState
     }
 
     override fun deleteState(state: State) {
