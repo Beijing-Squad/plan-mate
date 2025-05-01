@@ -5,8 +5,10 @@ import fake.createProject
 import fake.createState
 import io.mockk.every
 import io.mockk.mockk
+import logic.entities.exceptions.InvalidStateNameException
 import logic.repository.StatesRepository
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.assertThrows
 import kotlin.test.Test
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
@@ -42,8 +44,9 @@ class AddStateUseCaseTest {
 
     @OptIn(ExperimentalUuidApi::class)
     @Test
-    fun `should return false when add invalid new state with empty name`() {
+    fun `should throw exception when add invalid new state with empty name`() {
         // Given
+        val errorMessage = "the name of the new state is empty"
         val project = createProject(
             name = "PlanMate Core Features", createdBy = "adminUser01"
         )
@@ -51,12 +54,12 @@ class AddStateUseCaseTest {
             name = "", projectId = project.id.toString()
         )
 
-        // when
-        every { statesRepository.addState(newState) } returns false
-        val result = addStateUseCase.addState(newState)
+        every { statesRepository.addState(newState) } throws InvalidStateNameException(errorMessage)
 
-        // Then
-        assertThat(result).isFalse()
+        // When&Then
+        assertThrows<InvalidStateNameException> {
+            addStateUseCase.addState(newState)
+        }
     }
 
     @OptIn(ExperimentalUuidApi::class)
