@@ -62,7 +62,7 @@ class GetAllAuditLogsUseCaseTest {
     }
 
     @Test
-    fun `should return audit logs with different action types`() {
+    fun `should return audit logs when different action types is provided`() {
         // Given
         every { auditRepository.getAllAuditLogs() } returns listOf(
             createAudit(
@@ -100,7 +100,7 @@ class GetAllAuditLogsUseCaseTest {
     }
 
     @Test
-    fun `should return audit logs with old and new state values`() {
+    fun `should return audit logs with old and new state values when provided`() {
         // Given
         every { auditRepository.getAllAuditLogs() } returns listOf(
             createAudit(
@@ -135,7 +135,7 @@ class GetAllAuditLogsUseCaseTest {
     }
 
     @Test
-    fun `should return audit logs for both project and task entities`() {
+    fun `should return audit logs for both project and task entities when they exist`() {
         // Given
         every { auditRepository.getAllAuditLogs() } returns listOf(
             createAudit(
@@ -172,7 +172,7 @@ class GetAllAuditLogsUseCaseTest {
     }
 
     @Test
-    fun `should return audit logs sorted by timestamp`() {
+    fun `should return audit logs sorted by timestamp when provided`() {
         // Given
         every { auditRepository.getAllAuditLogs() } returns listOf(
             createAudit(
