@@ -6,7 +6,8 @@ import logic.entities.State
 
 class StatesCsvDataSourceImpl(
     private val csvDataSource: CsvDataSourceImpl<State>
-): StatesDataSource {
+) : StatesDataSource {
+    private val states = csvDataSource.loadAllDataFromFile().toMutableList()
 
     override fun getAllStates(): List<State> {
         TODO("Not yet implemented")
