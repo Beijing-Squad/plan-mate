@@ -93,34 +93,30 @@ class ProjectCsvDataSourceImplTest {
     }
 
     @Test
-    fun `should update a project by ID when it exists`() {
+    fun `should return true when project is updated successfully`() {
         // Given
         val originalProject = createProject(name = "Original")
-        val updatedProject = originalProject.copy(
-            name = "Updated", updatedAt = LocalDate.parse("2025-05-20")
-        )
-        val projectId = originalProject.id.toString()
-        every { projectCsvDataSource.updateProject(projectId) } returns updatedProject
+        every { projectCsvDataSource.updateProject(originalProject) } returns true
 
         // When
-        val result = projectCsvDataSource.updateProject(projectId)
+        val result = projectCsvDataSource.updateProject(originalProject)
 
         // Then
-        assertThat(result).isEqualTo(updatedProject)
+        assertThat(result).isTrue()
     }
 
     @Test
     fun `should throw exception when updating project that does not exist`() {
         // Given
-        val projectId = Uuid.random().toString()
+        val nonExistentProject = createProject(name = "Project")
         every {
-            projectCsvDataSource.updateProject(projectId)
-        } throws ProjectNotFoundException("Project with ID $projectId not found")
+            projectCsvDataSource.updateProject(nonExistentProject)
+        } throws ProjectNotFoundException("Project with ID ${nonExistentProject.id} not found")
 
         // When & Then
         val exception = assertFailsWith<ProjectNotFoundException> {
-            projectCsvDataSource.updateProject(projectId)
+            projectCsvDataSource.updateProject(nonExistentProject)
         }
-        assertThat(exception.message).isEqualTo("Project with ID $projectId not found")
+        assertThat(exception.message).isEqualTo("Project with ID ${nonExistentProject.id} not found")
     }
 }
