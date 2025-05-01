@@ -9,7 +9,7 @@ import logic.useCases.hashPassword
 class LoginUserAuthenticationUseCase(
     private val repository: AuthenticationRepository
 ) {
-    fun execute(username: String, password: String): Pair<Boolean, User> {
+    fun execute(username: String, password: String): User {
         require(username.isNotBlank()) { throw InvalidUserNameException(USERNAME_ERROR) }
         require(password.isNotBlank()) { throw InvalidPasswordException(PASSWORD_ERROR) }
 
@@ -20,7 +20,7 @@ class LoginUserAuthenticationUseCase(
         if (user.password != hashedInputPassword) {
             throw InvalidPasswordException(PASSWORD_ERROR)
         }
-        return true to user
+        return user
     }
 
     private companion object {

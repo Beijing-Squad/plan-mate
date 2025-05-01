@@ -12,7 +12,6 @@ import logic.repository.UserRepository
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import java.security.MessageDigest
 
 class RegisterUserAuthenticationUseCaseTest() {
     private lateinit var repository: AuthenticationRepository
@@ -55,5 +54,4 @@ class RegisterUserAuthenticationUseCaseTest() {
     private fun createTestUser(): User {
         return createUser(userName = "mohamed", password = "pass123", role = UserRole.MATE)
     }
-
 }

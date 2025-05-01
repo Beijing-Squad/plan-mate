@@ -1,5 +1,6 @@
 package ui.screens
 
+import logic.entities.User
 import logic.entities.UserRole
 import logic.useCases.authentication.LoginUserAuthenticationUseCase
 import logic.useCases.authentication.RegisterUserAuthenticationUseCase
@@ -21,10 +22,11 @@ class AuthenticationScreen(
 
             when (scanner.nextLine()) {
                 "1" -> {
-                    val username = login() ?: continue
-                    return AuthResult.Success(username)
+                    val user = login()
+                    if (user != null) {
+                        return AuthResult.Success(user)
+                    }
                 }
-
                 "2" -> register()
                 "0" -> return AuthResult.Exit
                 else -> println("❌ Invalid option. Please try again.")
@@ -32,7 +34,7 @@ class AuthenticationScreen(
         }
     }
 
-    private fun login(): String? {
+    private fun login(): User? {
         println("\n--- Login ---")
         print("Username: ")
         val username = scanner.nextLine().trim()
@@ -40,14 +42,9 @@ class AuthenticationScreen(
         val password = scanner.nextLine().trim()
 
         return try {
-            val success = loginUseCase.execute(username, password)
-            if (success) {
-                println("✅ Login successful. Welcome, $username!")
-                username
-            } else {
-                println("❌ Login failed.")
-                null
-            }
+            val user = loginUseCase.execute(username, password)
+            println("✅ Login successful. Welcome, ${user.userName}!")
+            user
         } catch (e: Exception) {
             println("❌ ${e.message}")
             null
@@ -89,7 +86,7 @@ class AuthenticationScreen(
     }
 
     sealed class AuthResult {
-        data class Success(val username: String) : AuthResult()
+        data class Success(val user: User) : AuthResult()
         data object Exit : AuthResult()
     }
 }
