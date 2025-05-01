@@ -8,7 +8,6 @@ import logic.entities.UserRole
 import logic.repository.AuthenticationRepository
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import java.security.MessageDigest
 
 class LoginUserAuthenticationUseCaseTest() {
     private lateinit var repository: AuthenticationRepository
@@ -48,7 +47,7 @@ class LoginUserAuthenticationUseCaseTest() {
     @Test
     fun `should login with correct credentials`() {
         //Given
-        val user = createUser("admin", hashPassword("123"), UserRole.ADMIN)
+        val user = createUser("admin", "123", UserRole.ADMIN)
         every { repository.loginUser("admin", any()) } returns user
 
         //When
@@ -70,9 +69,4 @@ class LoginUserAuthenticationUseCaseTest() {
         assertThat(result).isFalse()
     }
 
-    private fun hashPassword(password: String): String {
-        return MessageDigest.getInstance("MD5")
-            .digest(password.toByteArray())
-            .joinToString("") { "%02x".format(it) }
-    }
 }

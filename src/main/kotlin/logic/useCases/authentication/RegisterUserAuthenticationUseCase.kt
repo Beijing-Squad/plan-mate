@@ -5,7 +5,7 @@ import logic.entities.UserRole
 import logic.entities.exceptions.UserExistsException
 import logic.repository.AuthenticationRepository
 import logic.repository.UserRepository
-import java.security.MessageDigest
+import logic.useCases.hashPassword
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -25,11 +25,5 @@ class RegisterUserAuthenticationUseCase(
         } else {
             throw UserExistsException("User already exists")
         }
-    }
-
-    private fun hashPassword(password: String): String {
-        return MessageDigest.getInstance("MD5")
-            .digest(password.toByteArray())
-            .joinToString("") { "%02x".format(it) }
     }
 }

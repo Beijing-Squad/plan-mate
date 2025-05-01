@@ -53,12 +53,7 @@ class RegisterUserAuthenticationUseCaseTest() {
     }
 
     private fun createTestUser(): User {
-        return createUser(userName = "mohamed", password = hashPassword("pass123"), role = UserRole.MATE)
+        return createUser(userName = "mohamed", password = "pass123", role = UserRole.MATE)
     }
 
-    private fun hashPassword(password: String): String {
-        return MessageDigest.getInstance("MD5")
-            .digest(password.toByteArray())
-            .joinToString("") { "%02x".format(it) }
-    }
 }
