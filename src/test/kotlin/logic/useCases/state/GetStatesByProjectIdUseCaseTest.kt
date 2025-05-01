@@ -60,7 +60,7 @@ class GetStatesByProjectIdUseCaseTest {
             createState()
         )
 
-        every { stateRepository.getAllStates() } returns  states
+        every { stateRepository.getAllStates() } returns states
         every { stateRepository.getStatesByProjectId(projectId) } throws StateNotFoundException(errorMessage)
 
         // When & Then
