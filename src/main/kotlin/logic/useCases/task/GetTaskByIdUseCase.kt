@@ -10,6 +10,6 @@ class GetTaskByIdUseCase(
     private val tasksRepository: TasksRepository
 ) {
     fun getTaskById(taskId: String): Task {
-        return tasksRepository.getTaskById(taskId) ?: throw TaskNotFoundException("Task with ID $taskId not found")
+        return tasksRepository.getTaskById(taskId)
     }
 }
