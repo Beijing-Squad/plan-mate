@@ -12,15 +12,18 @@ class AuthenticationCsvDataSourceImpl(
 ) : AuthenticationDataSource {
 
     override fun saveUser(user: User): Boolean {
-        csvDataSource.appendToFile(user)
-        return true
+        return try {
+            csvDataSource.appendToFile(user)
+            true
+        } catch (e: Exception) {
+            false
+        }
     }
 
     override fun getUserByUsername(username: String): User {
         return userDataSource
             .getAllUsers()
             .find { it.userName == username }
-            ?: throw  UserNotFoundException("invalid username or password")
+            ?: throw UserNotFoundException("invalid username or password")
     }
-
 }
