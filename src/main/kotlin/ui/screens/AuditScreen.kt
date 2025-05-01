@@ -30,8 +30,8 @@ class AuditScreen(
         ┌─── Available Options ───────────────────┐
         │                                         │
         │  1. 📋 List All Audit Logs              │
-        │  2. 🔍 Find Audit Logs By Project ID    │
-        │  3. 🔍️ Find Audit Logs By Task ID       │
+        │  2. 🔍 Get Audit Logs For Project       │
+        │  3. 🔍️ Get Audit Logs For Task          │
         │  0. 🔙 Exit to Main Menu                │
         │                                         │
         └─────────────────────────────────────────┘
@@ -46,8 +46,8 @@ class AuditScreen(
     override fun handleFeatureChoice() {
         when (getInput()) {
             "1" -> onClickGetAllAuditLogs()
-            "2" -> onClickGetAllAuditLogsByProjectID()
-            "3" -> onClickGetAllAuditLogsByTaskID()
+            "2" -> onClickGetAuditLogsForProject()
+            "3" -> onClickGetAuditLogsForTask()
             "0" -> return
             else -> consoleIO.showWithLine("❌ Invalid Option")
         }
@@ -65,7 +65,7 @@ class AuditScreen(
         }
     }
 
-    private fun onClickGetAllAuditLogsByProjectID() {
+    private fun onClickGetAuditLogsForProject() {
         val projectId = getIdInput()
         val auditLogs = try {
             getAuditLogsByProjectId.getAuditLogsByProjectId(projectId)
@@ -80,7 +80,7 @@ class AuditScreen(
         }
     }
 
-    private fun onClickGetAllAuditLogsByTaskID() {
+    private fun onClickGetAuditLogsForTask() {
         val taskId = getIdInput()
         val auditLogs = try {
             getAuditLogsByTaskId.getAuditLogsByTaskId(taskId)
