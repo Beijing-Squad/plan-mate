@@ -9,5 +9,6 @@ class GetAllAuditLogsUseCase(
 
     fun getAllAuditLogs(): List<Audit> {
         return auditRepository.getAllAuditLogs()
+            .sortedByDescending { auditLog -> auditLog.timeStamp }
     }
 }
