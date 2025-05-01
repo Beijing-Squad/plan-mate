@@ -34,7 +34,7 @@ class LoginUserAuthenticationUseCaseTest {
         val exception = assertThrows<InvalidUserNameException> {
             loginUserAuthenticationUseCase.execute(blankUsername, testPassword)
         }
-        assertThat(exception.message).isEqualTo("Invalid username")
+        assertThat(exception.message).isEqualTo(USERNAME_ERROR)
     }
 
     @Test
@@ -46,7 +46,7 @@ class LoginUserAuthenticationUseCaseTest {
         val exception = assertThrows<InvalidPasswordException> {
             loginUserAuthenticationUseCase.execute(testUsername, blankPassword)
         }
-        assertThat(exception.message).isEqualTo("Invalid password")
+        assertThat(exception.message).isEqualTo(PASSWORD_ERROR)
     }
 
     @Test
@@ -58,7 +58,7 @@ class LoginUserAuthenticationUseCaseTest {
         val exception = assertThrows<InvalidUserNameException> {
             loginUserAuthenticationUseCase.execute(testUsername, testPassword)
         }
-        assertThat(exception.message).isEqualTo("Invalid username")
+        assertThat(exception.message).isEqualTo(USERNAME_ERROR)
     }
 
     @Test
@@ -72,6 +72,11 @@ class LoginUserAuthenticationUseCaseTest {
         val exception = assertThrows<InvalidPasswordException> {
             loginUserAuthenticationUseCase.execute(testUsername, wrongPassword)
         }
-        assertThat(exception.message).isEqualTo("Invalid password")
+        assertThat(exception.message).isEqualTo(PASSWORD_ERROR)
+    }
+
+    private companion object {
+        const val USERNAME_ERROR = "Invalid username"
+        const val PASSWORD_ERROR = "Invalid password"
     }
 }
