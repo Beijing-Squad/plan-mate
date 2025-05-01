@@ -5,6 +5,8 @@ import fake.createProject
 import io.mockk.every
 import io.mockk.mockk
 import logic.entities.UserRole
+import logic.entities.exceptions.CsvReadException
+import logic.entities.exceptions.CsvWriteException
 import logic.entities.exceptions.ProjectNotFoundException
 import logic.entities.exceptions.ProjectUnauthorizedUserException
 import logic.repository.ProjectsRepository
@@ -29,9 +31,12 @@ class DeleteProjectUseCaseTest {
     @Test
     fun `should delete project when project is exist`() {
         // Given
-        val projectId = createProject().id.toString()
+        val desiredProject=createProject()
+        val allProjects=listOf(desiredProject,createProject())
+
+        every { projectRepository.getAllProjects()} returns allProjects
         // When
-        val result = deleteProject.deleteProject(projectId, UserRole.ADMIN).getOrThrow()
+        val result = deleteProject.deleteProject(desiredProject.id.toString(), UserRole.ADMIN).getOrThrow()
         // Then
         assertThat(result).isEqualTo(true)
     }
@@ -54,6 +59,20 @@ class DeleteProjectUseCaseTest {
 
         // When && Then
         assertThrows<ProjectUnauthorizedUserException> { deleteProject.deleteProject(projectId, UserRole.MATE).getOrThrow() }
+
+    }
+    @OptIn(ExperimentalUuidApi::class)
+    @Test
+    fun `should throw exception when there is error in csv file`() {
+        // Given
+        val desiredProject=createProject()
+        val allProjects=listOf(desiredProject,createProject())
+
+        every { projectRepository.deleteProject(desiredProject.id.toString()) } throws CsvWriteException("")
+        every { projectRepository.getAllProjects() } returns allProjects
+
+        // When && Then
+        assertThrows<CsvWriteException> { deleteProject.deleteProject(desiredProject.id.toString(),UserRole.ADMIN).getOrThrow() }
 
     }
 
