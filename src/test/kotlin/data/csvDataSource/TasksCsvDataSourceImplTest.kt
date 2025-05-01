@@ -1,5 +1,153 @@
 package data.csvDataSource
 
+import com.google.common.truth.Truth.assertThat
+import data.csvDataSource.csv.CsvDataSourceImpl
+import fake.createTask
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
+import kotlinx.datetime.LocalDate
+import logic.entities.Task
+import logic.entities.exceptions.TaskNotFoundException
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import kotlin.test.assertFailsWith
+import kotlin.uuid.ExperimentalUuidApi
+
+@OptIn(ExperimentalUuidApi::class)
 class TasksCsvDataSourceImplTest {
+
+    private lateinit var csvDataSource: CsvDataSourceImpl<Task>
+    private lateinit var tasksCsvDataSource: TasksCsvDataSourceImpl
+
+    @BeforeEach
+    fun setUp() {
+        csvDataSource = mockk(relaxed = true)
+        tasksCsvDataSource = TasksCsvDataSourceImpl(csvDataSource)
+    }
+
+    @Test
+    fun `should return all tasks when getAllTasks is called`() {
+        // Given
+        val task1 = createTask(
+            projectId = "project-1",
+            title = "Task 1",
+            description = "Description 1",
+            createdBy = "user-1",
+            stateId = "state-1",
+            createdAt = LocalDate(2023, 1, 1),
+            updatedAt = LocalDate(2023, 1, 1)
+        )
+        val task2 = createTask(
+            projectId = "project-2",
+            title = "Task 2",
+            description = "Description 2",
+            createdBy = "user-2",
+            stateId = "state-2",
+            createdAt = LocalDate(2023, 1, 2),
+            updatedAt = LocalDate(2023, 1, 2)
+        )
+        val tasks = listOf(task1, task2)
+        every { csvDataSource.loadAllDataFromFile() } returns tasks
+
+        // When
+        val result = tasksCsvDataSource.getAllTasks()
+
+        // Then
+        assertThat(result).containsExactly(task1, task2).inOrder()
+        verify { csvDataSource.loadAllDataFromFile() }
+    }
+
+    @Test
+    fun `should return empty list when no tasks exist`() {
+        // Given
+        every { csvDataSource.loadAllDataFromFile() } returns emptyList()
+
+        // When
+        val result = tasksCsvDataSource.getAllTasks()
+
+        // Then
+        assertThat(result).isEmpty()
+        verify { csvDataSource.loadAllDataFromFile() }
+    }
+
+    @Test
+    fun `should return task when getTaskById is called with valid ID`() {
+        // Given
+        val task = createTask(
+            projectId = "project-1",
+            title = "Test Task",
+            description = "Test Description",
+            createdBy = "user-1",
+            stateId = "state-1",
+            createdAt = LocalDate(2023, 1, 1),
+            updatedAt = LocalDate(2023, 1, 1)
+        )
+        every { csvDataSource.loadAllDataFromFile() } returns listOf(task)
+
+        // When
+        val result = tasksCsvDataSource.getTaskById(task.id.toString())
+
+        // Then
+        assertThat(result).isEqualTo(task)
+        verify { csvDataSource.loadAllDataFromFile() }
+    }
+
+    @Test
+    fun `should throw TaskNotFoundException when getTaskById is called with invalid ID`() {
+        // Given
+        every { csvDataSource.loadAllDataFromFile() } returns emptyList()
+        val invalidTaskId = kotlin.uuid.Uuid.random().toString()
+
+        // When / Then
+        assertFailsWith<TaskNotFoundException> {
+            tasksCsvDataSource.getTaskById(invalidTaskId)
+        }
+
+        verify { csvDataSource.loadAllDataFromFile() }
+    }
+
+    @Test
+    fun `should update task and call updateFile when updateTask is called with valid ID`() {
+        // Given
+        val originalTask = createTask( title = "Original Task")
+        val updatedTask = originalTask.copy(title = "Updated Task")
+        every { csvDataSource.loadAllDataFromFile() } returns listOf(originalTask)
+        every { csvDataSource.updateFile(any()) } returns Unit
+
+        // When
+        val result = tasksCsvDataSource.updateTask(originalTask.id.toString(), updatedTask)
+
+        // Then
+        assertThat(result).isEqualTo(updatedTask)
+        verify { csvDataSource.loadAllDataFromFile() }
+        verify { csvDataSource.updateFile(listOf(updatedTask)) }
+    }
+
+    @Test
+    fun `should throw TaskNotFoundException when updateTask is called with invalid ID`() {
+        // Given
+        val invalidId = "invalid-id"
+        val updatedTask = createTask(
+            projectId = "project-1",
+            title = "Updated Task",
+            description = "Updated Description",
+            createdBy = "user-1",
+            stateId = "state-1",
+            createdAt = LocalDate(2023, 1, 1),
+            updatedAt = LocalDate(2023, 1, 2)
+        )
+        every { csvDataSource.loadAllDataFromFile() } returns emptyList()
+
+        // When
+        val exception = assertFailsWith<TaskNotFoundException> {
+            tasksCsvDataSource.updateTask(invalidId, updatedTask)
+        }
+
+        // Then
+        assertThat(exception.message).isEqualTo("Task with ID $invalidId not found")
+        verify { csvDataSource.loadAllDataFromFile() }
+        verify(exactly = 0) { csvDataSource.updateFile(any()) }
+    }
 
 }

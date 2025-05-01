@@ -9,15 +9,14 @@ import kotlin.uuid.ExperimentalUuidApi
 class TasksCsvDataSourceImpl(
     private val csvDataSource: CsvDataSourceImpl<Task>
 ) : TasksDataSource {
-    private val tasks = csvDataSource.loadAllDataFromFile().toMutableList()
 
     override fun getAllTasks(): List<Task> {
-        return tasks.toList()
+        return csvDataSource.loadAllDataFromFile()
     }
 
     @OptIn(ExperimentalUuidApi::class)
     override fun getTaskById(taskId: String): Task {
-
+        val tasks = csvDataSource.loadAllDataFromFile()
         return tasks.find { it.id.toString() == taskId }
             ?: throw TaskNotFoundException("Task with ID $taskId not found")
     }
@@ -32,6 +31,7 @@ class TasksCsvDataSourceImpl(
 
     @OptIn(ExperimentalUuidApi::class)
     override fun updateTask(taskId: String, updatedTask: Task): Task {
+        val tasks = csvDataSource.loadAllDataFromFile().toMutableList()
         val taskIndex = tasks.indexOfFirst { it.id.toString() == taskId }
         if (taskIndex == -1) throw TaskNotFoundException("Task with ID $taskId not found")
 
@@ -39,5 +39,4 @@ class TasksCsvDataSourceImpl(
         csvDataSource.updateFile(tasks)
         return updatedTask
     }
-
 }
