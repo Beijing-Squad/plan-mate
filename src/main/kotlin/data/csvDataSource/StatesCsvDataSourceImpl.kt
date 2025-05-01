@@ -33,7 +33,11 @@ class StatesCsvDataSourceImpl(
         if (states.any { it.id == state.id }) {
             throw StateAlreadyExistException("State with id ${state.id} already exists")
         }
-        return states.add(state)
+        return states.add(state).also { isAdded ->
+            if (isAdded) {
+                csvDataSource.updateFile(states)
+            }
+        }
     }
 
     @OptIn(ExperimentalUuidApi::class)
