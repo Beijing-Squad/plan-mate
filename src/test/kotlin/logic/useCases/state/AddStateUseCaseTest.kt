@@ -24,7 +24,7 @@ class AddStateUseCaseTest {
     @OptIn(ExperimentalUuidApi::class)
     @Test
     fun `should return true when add valid new state`() {
-        //Given
+        // Given
         val project = createProject(
             name = "PlanMate Core Features", createdBy = "adminUser01"
         )
@@ -38,6 +38,25 @@ class AddStateUseCaseTest {
 
         //Then
         assertThat(result).isTrue()
+    }
+
+    @OptIn(ExperimentalUuidApi::class)
+    @Test
+    fun `should return false when add invalid new state with empty name`() {
+        // Given
+        val project = createProject(
+            name = "PlanMate Core Features", createdBy = "adminUser01"
+        )
+        val newState = createState(
+            name = "", projectId = project.id.toString()
+        )
+
+        // when
+        every { statesRepository.addState(newState) } returns false
+        val result = addStateUseCase.addState(newState)
+
+        // Then
+        assertThat(result).isFalse()
     }
 
     @OptIn(ExperimentalUuidApi::class)
