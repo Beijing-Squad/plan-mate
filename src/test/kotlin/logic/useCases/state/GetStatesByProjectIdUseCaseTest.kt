@@ -37,4 +37,24 @@ class GetStatesByProjectIdUseCaseTest {
             assertThat(state.projectId).isEqualTo(projectId)
         }
     }
+
+    @OptIn(ExperimentalUuidApi::class)
+    @Test
+    fun `should throw exception when not found states with the project id`() {
+        // Given
+        val errorMessage = "Not found states with this project id"
+        val projectId = createProject().id.toString()
+        val states = listOf(
+            createState(),
+            createState()
+        )
+
+        every { stateRepository.getAllStates() } returns  states
+        every { stateRepository.getStatesByProjectId(projectId) } throws StateNotFoundException(errorMessage)
+
+        // When & Then
+        assertThrows<StateNotFoundException> {
+            getStatesByProjectIdUseCase.getStatesByProjectId(projectId)
+            }
+        }
 }
