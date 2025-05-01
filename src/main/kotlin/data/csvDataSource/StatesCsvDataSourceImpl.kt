@@ -50,7 +50,6 @@ class StatesCsvDataSourceImpl(
 
     @OptIn(ExperimentalUuidApi::class)
     override fun deleteState(state: State): Boolean {
-        val currentState = getStateById(state.id.toString())
-        return states.remove(currentState)
+        return states.remove(state)
     }
 }
