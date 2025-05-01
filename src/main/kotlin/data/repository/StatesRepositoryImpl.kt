@@ -16,7 +16,7 @@ class StatesRepositoryImpl(
         return stateDataSource.getStatesByProjectId(projectId)
     }
 
-    override fun getStateById(stateId: String): State {
+    override fun getStateById(stateId: String): State? {
         return stateDataSource.getStateById(stateId)
     }
 
