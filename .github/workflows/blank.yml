@@ -98,7 +98,7 @@ jobs:
           apply plugin: 'jacoco'
           
           task jacocoPRReport(type: JacocoReport) {
-              dependsOn test
+              dependsOn 'test'
               
               reports {
                   xml.required = true
@@ -117,7 +117,7 @@ jobs:
               }
               
               sourceDirectories.setFrom(files(sourceSets.main.allSource.srcDirs))
-              executionData.setFrom(files("${buildDir}/jacoco/test.exec"))
+              executionData.setFrom(files("${project.buildDir}/jacoco/test.exec"))
           }
           EOF
           
@@ -183,14 +183,26 @@ jobs:
             
             ${{ steps.jacoco.outputs.coverage < 80 && '⚠️ **Coverage is below the required 80% threshold**' || '✅ **Coverage meets the required 80% threshold**' }}
       
-      # Fallback message if no relevant files were changed
-      - name: No relevant files changed
-        if: steps.changed-files.outputs.any_changed != 'true'
-        uses: marocchino/sticky-pull-request-comment@v2
+      # Create badges directory
+      - name: Create badges directory
+        run: mkdir -p badges
+        
+      # Move generated badges to the right directory
+      - name: Move badges to badges directory
+        run: mv ./*.svg ./badges/ || true
+      
+      # Commit and push badges when running on develop branch
+      - name: Commit and push badges if coverage has changed
+        if: github.ref == 'refs/heads/develop'
+        uses: EndBug/add-and-commit@v9
         with:
-          header: pr-coverage
-          message: |
-            ## PR Coverage Report 📊
-            
-            No source code files were changed in this PR, or only test files were modified.
-            Coverage analysis was skipped.
+          default_author: github_actions
+          message: 'Update JaCoCo coverage badges'
+          add: 'badges/*.svg'
+      
+      # Upload coverage report as an artifact
+      - name: Upload JaCoCo coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-report
+          path: build/reports/jacoco/
