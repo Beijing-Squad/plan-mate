@@ -24,10 +24,7 @@ class UpdateStateUseCaseTest {
     @Test
     fun `should update state when state is exist`() {
         //Given
-        val project = createProject(
-            name = "PlanMate Core Features",
-            createdBy = "adminUser01"
-        )
+        val project = createProject()
         val state = createState(
             name = "in progress",
             projectId = project.id.toString()
@@ -39,6 +36,7 @@ class UpdateStateUseCaseTest {
             projectId = state.projectId
         )
 
+        every { statesRepository.getStateById(newState.id.toString()) } returns state
         every { statesRepository.updateState(newState) } returns true
 
         // when
