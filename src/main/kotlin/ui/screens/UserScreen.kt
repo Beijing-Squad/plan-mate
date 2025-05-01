@@ -27,14 +27,14 @@ class UserScreen(
         ║          User Management System        ║
         ╚════════════════════════════════════════╝
 
-        ┌─── Available Options ───────────────────┐
-        │                                         │
-        │  1. List All Users                   │
-        │  2. Find User by ID                  │
-        │  3. Update User                     │
-        │  0. Exit to Main Menu                │
-        │                                         │
-        └─────────────────────────────────────────┘
+        ┌─── Available Options ────────────────────┐
+        │                                          │
+        │  1. List All Users                       │
+        │  2. Find User by ID                      │
+        │  3. Update User                          │
+        │  0. Exit to Main Menu                    │
+        │                                          │
+        └──────────────────────────────────────────┘
 
         """
                 .trimIndent()
@@ -95,7 +95,7 @@ class UserScreen(
     private fun showCurrentUserDetails(user: User) {
         consoleIO.showWithLine(
             """
-            ╭─── Current User Details ────────────╮
+            ╭─── Current User Details ─────────────╮
             │ ID: ${user.id}
             │ Username: ${user.userName}
             ╰──────────────────────────────────────╯
@@ -107,13 +107,13 @@ class UserScreen(
         while (true) {
             consoleIO.showWithLine(
                 """
-                ┌─── Update Options ─────────────────┐
-                │                                    │
-                │  1. Update Username             │
-                │  2. Update Password             │
-                │  0. Back                        │
-                │                                    │
-                └────────────────────────────────────┘
+                ┌─── Update Options ──────────────────┐
+                │                                     │
+                │  1. Update Username                 │
+                │  2. Update Password                 │
+                │  0. Back                            │
+                │                                     │
+                └─────────────────────────────────────┘
                 
                  """
                     .trimIndent()
