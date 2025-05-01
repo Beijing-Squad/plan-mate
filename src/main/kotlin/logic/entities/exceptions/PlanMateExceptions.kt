@@ -14,7 +14,8 @@ open class TaskException(message: String) : PlanMateException(message)
 class TaskAlreadyExistsException(message: String) : TaskException(message)
 class TaskNotFoundException(message: String) : TaskException(message)
 
-class StateException(message: String) : PlanMateException(message)
+open class StateException(message: String) : PlanMateException(message)
+class InvalidStateNameException(message: String): StateException(message)
 
 open class ValidationException(message: String) : PlanMateException(message)
 class InvalidInputException(message: String) : ValidationException(message)
