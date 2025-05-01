@@ -7,11 +7,7 @@ import data.parser.ProjectCsvParser
 import data.parser.StateCsvParser
 import data.parser.TaskCsvParser
 import data.parser.UserCsvParser
-import data.repository.dataSource.AuditDataSource
-import data.repository.dataSource.ProjectDataSource
-import data.repository.dataSource.StatesDataSource
-import data.repository.dataSource.TasksDataSource
-import data.repository.dataSource.UserDataSource
+import data.repository.dataSource.*
 import logic.entities.*
 import org.koin.core.qualifier.named
 import org.koin.dsl.bind
@@ -54,6 +50,13 @@ val dataSourceModule = module {
             get<AuditCsvParser>()
         )
     }
+    single (named("authenticationDataSource")){
+        CsvDataSourceImpl(
+            get(named("authenticationReader")),
+            get(named("authenticationWriter")),
+            get<UserCsvParser>()
+        )
+    }
 
     // Implementations
     single { ProjectCsvDataSourceImpl(get(named("projectDataSource"))) } bind ProjectDataSource::class
@@ -61,4 +64,6 @@ val dataSourceModule = module {
     single { TasksCsvDataSourceImpl(get(named("taskDataSource"))) } bind TasksDataSource::class
     single { StatesCsvDataSourceImpl(get(named("stateDataSource"))) } bind StatesDataSource::class
     single { AuditCsvDataSourceImpl(get(named("auditDataSource"))) } bind AuditDataSource::class
+    single { AuthenticationCsvDataSourceImpl(get(named("authenticationDataSource")),get())
+    }bind AuthenticationDataSource::class
 }

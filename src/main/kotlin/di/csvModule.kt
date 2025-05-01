@@ -12,6 +12,7 @@ val csvModule = module {
     single(named("taskReader")) { CsvReader(get(named("taskFile"))) }
     single(named("stateReader")) { CsvReader(get(named("stateFile"))) }
     single(named("auditReader")) { CsvReader(get(named("auditFile"))) }
+    single(named("authenticationReader")) {CsvReader(get(named("userFile")))}
 
     // Writers
     single(named("projectWriter")) { CsvWriter(get(named("projectFile"))) }
@@ -19,4 +20,5 @@ val csvModule = module {
     single(named("taskWriter")) { CsvWriter(get(named("taskFile"))) }
     single(named("stateWriter")) { CsvWriter(get(named("stateFile"))) }
     single(named("auditWriter")) { CsvWriter(get(named("auditFile"))) }
+    single(named("authenticationWriter")) {CsvWriter(get(named("userFile")))}
 }
