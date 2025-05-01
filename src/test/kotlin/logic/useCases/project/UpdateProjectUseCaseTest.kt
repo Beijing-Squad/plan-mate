@@ -8,6 +8,7 @@ import logic.entities.UserRole
 import logic.entities.exceptions.ProjectUnauthorizedUserException
 import logic.repository.ProjectsRepository
 import com.google.common.truth.Truth.assertThat
+import logic.entities.exceptions.CsvWriteException
 import logic.entities.exceptions.ProjectNotFoundException
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -70,6 +71,22 @@ class UpdateProjectUseCaseTest {
             updateProjectUseCase.updateProject(newProject, UserRole.MATE).getOrThrow()
         }
 
+    }
+    @OptIn(ExperimentalUuidApi::class)
+    @Test
+    fun `should throw exception when there is error in csv file`() {
+        // Given
+        val updatedProject=createProject().copy(name = "Project2")
+        val allProjects=listOf(updatedProject,createProject())
+        every { projectRepository.updateProject(any()) } throws CsvWriteException("")
+        every { projectRepository.getAllProjects() } returns allProjects
+
+        // When && Then
+        assertThrows<CsvWriteException> { updateProjectUseCase.updateProject(updatedProject,UserRole.ADMIN).getOrThrow() }
 
     }
+
+
+
+
 }
