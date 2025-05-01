@@ -62,4 +62,29 @@ class UpdateStateUseCaseTest {
         }
     }
 
+    @OptIn(ExperimentalUuidApi::class)
+    @Test
+    fun `should throw exception when user is not admin`() {
+        // Given
+        val errorMessage = "Sorry the user should be admin"
+        val project = createProject()
+        val state = createState(
+            name = "in progress",
+            projectId = project.id.toString()
+        )
+        val newState = createState(
+            id = state.id,
+            name = "done",
+            projectId = state.projectId
+        )
+
+        every { statesRepository.getStateById(state.id.toString()) } returns state
+        every { statesRepository.updateState(newState) } throws StateUnauthorizedUserException(errorMessage)
+
+        // When && Then
+        assertThrows<StateUnauthorizedUserException> {
+            updateStateUseCase.updateState(newState)
+        }
+
+    }
 }
