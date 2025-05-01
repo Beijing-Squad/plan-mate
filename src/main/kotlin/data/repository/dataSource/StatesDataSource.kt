@@ -12,7 +12,7 @@ interface StatesDataSource{
 
     fun addState(state: State): State
 
-    fun updateState(state: State): Boolean
+    fun updateState(state: State): State
 
     fun deleteState(state: State): Boolean
 
