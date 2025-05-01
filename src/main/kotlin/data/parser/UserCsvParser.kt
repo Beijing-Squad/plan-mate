@@ -28,4 +28,8 @@ class UserCsvParser : CsvParser<User> {
             role = UserRole.valueOf(parts[3])
         )
     }
+
+    override fun getId(item: User): String {
+        return item.id.toString()
+    }
 }

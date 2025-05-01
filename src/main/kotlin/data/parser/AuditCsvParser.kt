@@ -42,4 +42,8 @@ class AuditCsvParser : CsvParser<Audit> {
             timeStamp = LocalDate.parse(parts[8])
         )
     }
+
+    override fun getId(item: Audit): String {
+        return item.id.toString()
+    }
 }
