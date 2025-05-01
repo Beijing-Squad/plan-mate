@@ -29,10 +29,10 @@ class UserScreen(
 
         ┌─── Available Options ───────────────────┐
         │                                         │
-        │  1. 📋 List All Users                   │
-        │  2. 🔍 Find User by ID                  │
-        │  3. ✏️ Update User                     │
-        │  0. 🔙 Exit to Main Menu                │
+        │  1. List All Users                   │
+        │  2. Find User by ID                  │
+        │  3. Update User                     │
+        │  0. Exit to Main Menu                │
         │                                         │
         └─────────────────────────────────────────┘
 
@@ -45,16 +45,16 @@ class UserScreen(
 
     override fun handleFeatureChoice() {
         when (getInput()) {
-            "1" -> getAllUsers()
-            "2" -> getUserByID()
-            "3" -> updateUser()
+            "1" -> onClickGetAllUsers()
+            "2" -> onClickGetUserByID()
+            "3" -> onClickUpdateUser()
             "0" -> return
             else -> consoleIO.showWithLine("\u001B[31m❌ Invalid Option\u001B[0m")
         }
     }
 
     @OptIn(ExperimentalUuidApi::class)
-    private fun getAllUsers() {
+    private fun onClickGetAllUsers() {
         consoleIO.showWithLine("\n\u001B[36m📋 All Users:\u001B[0m")
         val users = getAllUsers.getAllUsers()
 
@@ -77,7 +77,7 @@ class UserScreen(
     }
 
     @OptIn(ExperimentalUuidApi::class)
-    private fun updateUser() {
+    private fun onClickUpdateUser() {
         consoleIO.showWithLine("\n\u001B[36m✏️ Update User\u001B[0m")
         consoleIO.show("\u001B[32mEnter user ID: \u001B[0m")
         val userId = getInput()
@@ -109,9 +109,9 @@ class UserScreen(
                 """
                 ┌─── Update Options ─────────────────┐
                 │                                    │
-                │  1. 📝 Update Username             │
-                │  2. 🔑 Update Password             │
-                │  0. 🔙 Back                        │
+                │  1. Update Username             │
+                │  2. Update Password             │
+                │  0. Back                        │
                 │                                    │
                 └────────────────────────────────────┘
                 
@@ -189,7 +189,7 @@ class UserScreen(
     }
 
     @OptIn(ExperimentalUuidApi::class)
-    private fun getUserByID() {
+    private fun onClickGetUserByID() {
         consoleIO.showWithLine("\n\u001B[36m🔍 Find User by ID\u001B[0m")
         consoleIO.show("\u001B[32mEnter user ID: \u001B[0m")
         val userId = getInput()

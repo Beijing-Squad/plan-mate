@@ -1,5 +1,6 @@
 package ui.screens
 
+import fake.createUser
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -52,9 +53,9 @@ class UserScreenTest {
     }
 
     @Test
-    fun `should call getAllUsers when input is 1`() {
+    fun `should call onClickGetAllUsers when input is 1`() {
         // Given
-        every { consoleIO.read() } returns "1"
+        every { consoleIO.read() } returns GET_ALL_USER_OPTION
         every { getAllUsersUseCase.getAllUsers() } returns emptyList()
 
         // When
@@ -67,9 +68,9 @@ class UserScreenTest {
     }
 
     @Test
-    fun `should call getUserByID when input is 2`() {
+    fun `should call onClickGetUserByID when input is 2`() {
         // Given
-        every { consoleIO.read() } returns "2"
+        every { consoleIO.read() } returns GET_USER_BY_USER_ID
 
         // When
         userScreen.handleFeatureChoice()
@@ -80,7 +81,6 @@ class UserScreenTest {
             consoleIO.show(any())
         }
     }
-
 
     @Test
     fun `should return when input is 0`() {
@@ -97,9 +97,8 @@ class UserScreenTest {
         }
     }
 
-
     @Test
-    fun `should show error message for invalid input`() {
+    fun `should show error message when inter invalid input`() {
         // Given
         every { consoleIO.read() } returns "999"
 
@@ -111,15 +110,31 @@ class UserScreenTest {
     }
 
     @Test
-    fun `should handle empty input`() {
+    fun `should show error message when input is empty`() {
         // Given
-        every { consoleIO.read() } returns ""
+        every { consoleIO.read() } returns EMPTY_STRING
 
         // When
         userScreen.handleFeatureChoice()
 
         // Then
         verify { consoleIO.showWithLine(any()) }
+    }
+
+    @Test
+    fun `should show all users when have users in data`() {
+        // Given
+        every { getAllUsersUseCase.getAllUsers() } returns listOf(createUser(FAKE_USERNAME))
+        every { consoleIO.read() } returnsMany listOf(
+            GET_ALL_USER_OPTION,
+            EXIT_CHOICE
+        )
+        // When
+        userScreen.handleFeatureChoice()
+
+        // Then
+        verify { consoleIO.showWithLine(any()) }
+
     }
 
     @OptIn(ExperimentalUuidApi::class)
@@ -135,8 +150,8 @@ class UserScreenTest {
         every { consoleIO.read() } returnsMany listOf(
             UPDATE_USER_OPTION,
             FAKE_ID,
-            "1",
-            "newUsername",
+            UPDATE_USERNAME_OPTION,
+            FAKE_USERNAME,
             EXIT_CHOICE
         )
 
@@ -219,8 +234,10 @@ class UserScreenTest {
     @Test
     fun `should handle user not found during update when enter invalid id`() {
         // Given
-        every { consoleIO.read() } returns UPDATE_USER_OPTION andThen "invalid-id"
-        every { getUserByUserIdUseCase.getUserByUserId("invalid-id") } throws Exception("User not found")
+        every { consoleIO.read() } returns UPDATE_USER_OPTION andThen INVALID_FAKE_ID
+        every {
+            getUserByUserIdUseCase.getUserByUserId(INVALID_FAKE_ID)
+        } throws Exception("User not found")
 
         // When
         userScreen.handleFeatureChoice()
@@ -233,10 +250,15 @@ class UserScreenTest {
 
     private companion object {
         const val FAKE_ID = "117ae359-8dac-443f-a132-35b015b4a812"
+        const val INVALID_FAKE_ID = "invalid-id"
         const val FAKE_USERNAME = "testUser"
-        const val UPDATE_USER_OPTION = "3"
-        const val UPDATE_PASSWORD_OPTION = "2"
         const val EXIT_CHOICE = "0"
+        const val EMPTY_STRING = ""
+        const val GET_ALL_USER_OPTION = "1"
+        const val UPDATE_USERNAME_OPTION = "1"
+        const val UPDATE_PASSWORD_OPTION = "2"
+        const val GET_USER_BY_USER_ID = "2"
+        const val UPDATE_USER_OPTION = "3"
         const val FAKE_PASSWORD = "12345678"
     }
 
