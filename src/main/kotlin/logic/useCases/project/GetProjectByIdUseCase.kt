@@ -3,7 +3,6 @@ package logic.useCases.project
 import logic.entities.Project
 import logic.entities.UserRole
 import logic.entities.exceptions.CsvReadException
-import logic.entities.exceptions.CsvWriteException
 import logic.entities.exceptions.ProjectNotFoundException
 import logic.entities.exceptions.ProjectUnauthorizedUserException
 import logic.repository.ProjectsRepository

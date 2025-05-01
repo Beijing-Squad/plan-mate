@@ -5,7 +5,6 @@ import fake.createProject
 import io.mockk.every
 import io.mockk.mockk
 import logic.entities.UserRole
-import logic.entities.exceptions.CsvReadException
 import logic.entities.exceptions.CsvWriteException
 import logic.entities.exceptions.ProjectNotFoundException
 import logic.entities.exceptions.ProjectUnauthorizedUserException
