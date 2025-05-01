@@ -14,6 +14,7 @@ class AuditScreen(
     private val getAuditLogsByTaskId: GetAuditLogsByTaskIdUseCase,
     private val consoleIO: ConsoleIO
 ) : BaseScreen(consoleIO) {
+
     override val id: String
         get() = "2"
     override val name: String
@@ -64,7 +65,6 @@ class AuditScreen(
         }
     }
 
-
     private fun onClickGetAllAuditLogsByProjectID() {
         val projectId = getIdInput()
         val auditLogs = try {
@@ -81,7 +81,18 @@ class AuditScreen(
     }
 
     private fun onClickGetAllAuditLogsByTaskID() {
-        TODO("Not yet implemented")
+        val taskId = getIdInput()
+        val auditLogs = try {
+            getAuditLogsByTaskId.getAuditLogsByTaskId(taskId)
+        } catch (exception: Exception) {
+            consoleIO.showWithLine("❌ ${exception.message}")
+            return
+        }
+
+        consoleIO.showWithLine("\n🔍 Audit Logs For Task ID: $taskId\n")
+        auditLogs.forEach { audit ->
+            consoleIO.showWithLine(formatAuditLog(audit))
+        }
     }
 
     private fun formatAuditLog(audit: Audit): String {
@@ -102,7 +113,7 @@ class AuditScreen(
     }
 
     private fun getIdInput(): String {
-        consoleIO.show("Enter Project ID: ")
+        consoleIO.show("Enter ID: ")
         return consoleIO.read()?.trim() ?: ""
     }
 
