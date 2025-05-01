@@ -19,7 +19,9 @@ class StatesCsvDataSourceImpl(
     }
 
     override fun getStateById(stateId: String): State {
-        TODO("Not yet implemented")
+        return getAllStates()
+            .find { it.id.toString() == stateId }
+            ?: throw StateNotFoundException("state not found")
     }
 
     override fun addState(state: State) {
