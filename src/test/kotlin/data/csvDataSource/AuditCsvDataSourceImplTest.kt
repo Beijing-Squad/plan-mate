@@ -146,7 +146,7 @@ class AuditCsvDataSourceImplTest {
     }
 
     @Test
-    fun `should return audit logs for a specific project ID`() {
+    fun `should return audit logs for a specific project ID when provided`() {
         // Given
         val projectId = "PROJECT-001"
         val auditLogs = listOf(
@@ -212,7 +212,7 @@ class AuditCsvDataSourceImplTest {
     }
 
     @Test
-    fun `should return audit logs for a specific task ID`() {
+    fun `should return audit logs for a specific task ID when provided`() {
         // Given
         val taskId = "TASK-123"
         val auditLogs = listOf(
