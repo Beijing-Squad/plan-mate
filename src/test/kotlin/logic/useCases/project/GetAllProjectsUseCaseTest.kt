@@ -6,6 +6,7 @@ import io.mockk.every
 import io.mockk.mockk
 import logic.entities.Project
 import logic.entities.UserRole
+import logic.entities.exceptions.CsvReadException
 import logic.entities.exceptions.ProjectUnauthorizedUserException
 import logic.repository.ProjectsRepository
 import org.junit.jupiter.api.BeforeEach
@@ -43,6 +44,7 @@ class GetAllProjectsUseCaseTest {
         // Then
         assertThat(result.getOrThrow()).containsExactlyElementsIn(listOf<Project>())
     }
+
     @OptIn(ExperimentalUuidApi::class)
     @Test
     fun `should throw exception when user is not admin`() {
@@ -54,6 +56,17 @@ class GetAllProjectsUseCaseTest {
         assertThrows<ProjectUnauthorizedUserException> {
             getAllProjectsUseCase.getAllProjects( UserRole.MATE).getOrThrow()
         }
+
+    }
+
+    @OptIn(ExperimentalUuidApi::class)
+    @Test
+    fun `should throw exception when there is error in csv file`() {
+        // Given
+        every { projectRepository.getAllProjects() } throws CsvReadException("")
+
+        // When && Then
+        assertThrows<CsvReadException> { getAllProjectsUseCase.getAllProjects(UserRole.ADMIN).getOrThrow() }
 
     }
 
