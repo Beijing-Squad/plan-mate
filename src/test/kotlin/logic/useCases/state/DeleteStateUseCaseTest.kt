@@ -10,6 +10,7 @@ import kotlin.test.Test
 import kotlin.uuid.ExperimentalUuidApi
 
 class DeleteStateUseCaseTest {
+
     private lateinit var statesRepository: StatesRepository
     private lateinit var deleteStateUseCase: DeleteStateUseCase
 
@@ -21,22 +22,48 @@ class DeleteStateUseCaseTest {
 
     @OptIn(ExperimentalUuidApi::class)
     @Test
-    fun `delete state test`() {
-        //Given
-        val project = createProject(
-            name = "PlanMate Core Features",
-            createdBy = "adminUser01"
-        )
-        val state = createState(
-            id = "123",
-            name = "Done",
-            projectId = project.id.toString()
-        )
+    fun shouldReturnTrueWhenStateExistsAndDeletedSuccessfully() {
+        // Given
+        val project = createProject(name = "PlanMate Core Features", createdBy = "adminUser01")
+        val state = createState(id = "1", name = "In Progress", projectId = project.id.toString())
 
-        // when
+
+        // When
         val result = deleteStateUseCase.deleteState(state)
 
-        //Then
+        // Then
         assertThat(result).isFalse()
     }
+
+    @OptIn(ExperimentalUuidApi::class)
+    @Test
+    fun shouldReturnFalseWhenStateDoesNotExistInRepository() {
+        // Given
+        val project = createProject(name = "PlanMate Core Features", createdBy = "adminUser01")
+        val state = createState(id = "123", name = "Done", projectId = project.id.toString())
+
+
+        // When
+        val result = deleteStateUseCase.deleteState(state)
+
+        // Then
+        assertThat(result).isFalse()
+    }
+
+
+    @OptIn(ExperimentalUuidApi::class)
+    @Test
+    fun shouldNotThrowExceptionWhenDeletingNonExistentState() {
+        // Given
+        val project = createProject(name = "PlanMate Core Features", createdBy = "adminUser01")
+        val state = createState(id = "999", name = "Archived", projectId = project.id.toString())
+
+
+        // When
+        val result = runCatching { deleteStateUseCase.deleteState(state) }
+
+        // Then
+        assertThat(result.isFailure).isFalse()
+    }
+
 }
