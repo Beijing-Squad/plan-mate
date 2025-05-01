@@ -2,6 +2,7 @@ package logic.useCases.project
 
 import logic.entities.Project
 import logic.entities.UserRole
+import logic.entities.exceptions.CsvWriteException
 import logic.entities.exceptions.ProjectAlreadyExistsException
 import logic.entities.exceptions.ProjectNameIsEmptyException
 import logic.entities.exceptions.ProjectUnauthorizedUserException
@@ -12,18 +13,25 @@ class AddProjectUseCase(
     private val projectsRepository: ProjectsRepository
 ) {
 
-    fun addProject(project: Project,role: UserRole):Result<Boolean> {
+    fun addProject(project: Project, role: UserRole): Result<Boolean> {
+
         return if (CheckDuplicateProject(project))
-             Result.failure(ProjectAlreadyExistsException("Project is already exists"))
+            Result.failure(ProjectAlreadyExistsException("Project is already exists"))
         else if (project.name.isEmpty())
             Result.failure(ProjectNameIsEmptyException("Project Have No Name"))
-        else if(role != UserRole.ADMIN)
+        else if (role != UserRole.ADMIN)
             Result.failure(ProjectUnauthorizedUserException("User Not Authorized"))
-        else{
-            projectsRepository.addProject(project)
-            Result.success(true)
+        else {
+            try {
+                projectsRepository.addProject(project)
+                Result.success(true)
+            } catch (e: CsvWriteException) {
+                Result.failure(e)
+            }
+
         }
     }
 
-    private fun CheckDuplicateProject(project: Project) = projectsRepository.getAllProjects().any { it.name == project.name }
+    private fun CheckDuplicateProject(project: Project) =
+        projectsRepository.getAllProjects().any { it.name == project.name }
 }

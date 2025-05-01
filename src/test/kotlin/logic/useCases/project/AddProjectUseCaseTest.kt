@@ -5,6 +5,7 @@ import fake.createProject
 import io.mockk.every
 import io.mockk.mockk
 import logic.entities.UserRole
+import logic.entities.exceptions.CsvWriteException
 import logic.entities.exceptions.ProjectAlreadyExistsException
 import logic.entities.exceptions.ProjectNameIsEmptyException
 import logic.entities.exceptions.ProjectUnauthorizedUserException
@@ -61,6 +62,16 @@ class AddProjectUseCaseTest {
 
         // When && Then
         assertThrows<ProjectUnauthorizedUserException> { addProject.addProject(project,UserRole.MATE).getOrThrow() }
+
+    }
+    @Test
+    fun `should throw exception when there is error in csv file`() {
+        // Given
+        val project = createProject()
+        every { projectRepository.addProject(project) } throws CsvWriteException("")
+
+        // When && Then
+        assertThrows<CsvWriteException> { addProject.addProject(project,UserRole.ADMIN).getOrThrow() }
 
     }
 
