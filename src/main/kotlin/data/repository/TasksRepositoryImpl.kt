@@ -25,7 +25,7 @@ class TasksRepositoryImpl(
     }
 
     override fun updateTask(taskId: String, updatedTask: Task): Task {
-        return tasksDataSource.updateTask(taskId)
+        return tasksDataSource.updateTask(taskId,updatedTask)
 
     }
 }

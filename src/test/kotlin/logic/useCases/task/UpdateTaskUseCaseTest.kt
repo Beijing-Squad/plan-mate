@@ -89,7 +89,7 @@ class UpdateTaskUseCaseTest {
             createdBy = "user-1",
             stateId = "state-1",
             createdAt = LocalDate(2023, 1, 1),
-            updatedAt = LocalDate(2023, 1, 1)
+            updatedAt = LocalDate(2023, 2, 1)
         )
         val updatedTask = originalTask.copy(
             description = "Updated Description",
@@ -122,7 +122,7 @@ class UpdateTaskUseCaseTest {
             createdBy = "user-1",
             stateId = "state-1",
             createdAt = LocalDate(2023, 1, 1),
-            updatedAt = LocalDate(2023, 1, 1)
+            updatedAt = LocalDate(2023, 2, 1)
         )
         val updatedTask = originalTask.copy(
             title = "Updated Title",
