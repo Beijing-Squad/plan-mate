@@ -6,10 +6,11 @@ import fake.createState
 import io.mockk.every
 import io.mockk.mockk
 import logic.entities.exceptions.InvalidStateNameException
+import logic.entities.exceptions.StateUnauthorizedUserException
 import logic.repository.StatesRepository
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import kotlin.test.Test
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -86,5 +87,19 @@ class AddStateUseCaseTest {
         assertThat(newState.projectId).isNotIn(
             project.map { it.id.toString() }
         )
+    }
+
+    @OptIn(ExperimentalUuidApi::class)
+    @Test
+    fun `should throw exception when user is not admin`() {
+        // Given
+        val errorMessage = "Sorry the user should be admin"
+        val state = createState()
+
+        every { statesRepository.addState(state) } throws StateUnauthorizedUserException(errorMessage)
+
+        // When && Then
+        assertThrows<StateUnauthorizedUserException> { addStateUseCase.addState(state) }
+
     }
 }
