@@ -40,7 +40,7 @@ class UpdateStateUseCaseTest {
             projectId = state.projectId
         )
 
-        every { statesRepository.getStateById(newState.id.toString()) } returns state
+        every { statesRepository.getStateById(newState.id) } returns state
         every { statesRepository.updateState(newState) } returns newState
 
         // when

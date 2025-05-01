@@ -17,7 +17,7 @@ class DeleteStateUseCase(
             throw StateUnauthorizedUserException("user should be Admin")
         }
 
-        if (!isStateExist(state.id.toString())) {
+        if (!isStateExist(state.id)) {
             throw StateNotFoundException("the state with this id not found")
         }
 

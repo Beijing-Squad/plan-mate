@@ -16,7 +16,7 @@ class UpdateStateUseCase(
             throw StateUnauthorizedUserException("user should be Admin")
         }
 
-        val currentState = statesRepository.getStateById(state.id.toString())
+        val currentState = statesRepository.getStateById(state.id)
             ?: throw StateNotFoundException("State with this id not found")
 
         val newState = currentState.copy(

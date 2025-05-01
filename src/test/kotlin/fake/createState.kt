@@ -2,7 +2,6 @@ package fake
 
 import logic.entities.State
 import kotlin.uuid.ExperimentalUuidApi
-import kotlin.uuid.Uuid
 
 @OptIn(ExperimentalUuidApi::class)
 fun createState(
