@@ -18,14 +18,19 @@ class StatesCsvDataSourceImpl(
             .filter { it.projectId == projectId }
     }
 
+    @OptIn(ExperimentalUuidApi::class)
     override fun getStateById(stateId: String): State {
         return getAllStates()
             .find { it.id.toString() == stateId }
             ?: throw StateNotFoundException("state not found")
     }
 
-    override fun addState(state: State) {
-        TODO("Not yet implemented")
+    @OptIn(ExperimentalUuidApi::class)
+    override fun addState(state: State): Boolean {
+        if (states.any { it.id == state.id }) {
+            throw StateAlreadyExistException("State with id ${state.id} already exists")
+        }
+        return states.add(state)
     }
 
     override fun updateState(state: State) {
