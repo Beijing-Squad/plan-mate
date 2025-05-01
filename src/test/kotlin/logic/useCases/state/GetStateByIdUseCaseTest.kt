@@ -19,7 +19,7 @@ class GetStateByIdUseCaseTest {
     }
 
     @Test
-    fun shouldReturnStateWhenIdExists() {
+    fun `should return state when id exists`() {
         // Given
         val expectedState = createState(id = "456", name = "Review", projectId = "project-2")
 
@@ -33,7 +33,7 @@ class GetStateByIdUseCaseTest {
     }
 
     @Test
-    fun shouldReturnNullWhenStateIdDoesNotExist() {
+    fun `should return null when state id does not exist`() {
         // Given
         every { statesRepository.getStateById("999") } returns null
 

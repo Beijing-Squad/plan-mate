@@ -23,7 +23,7 @@ class GetAllStatesUseCaseTest {
 
     @OptIn(ExperimentalUuidApi::class)
     @Test
-    fun shouldReturnAllStatesSuccessfully() {
+    fun `should return all states successfully`() {
         // Given
         val createdBy = "adminUser01"
 
@@ -47,7 +47,7 @@ class GetAllStatesUseCaseTest {
     }
 
     @Test
-    fun shouldReturnEmptyListWhenNoStatesExist() {
+    fun `should return empty list when no states exist`() {
         // Given
         every { statesRepository.getAllStates() } returns emptyList()
 
@@ -59,7 +59,7 @@ class GetAllStatesUseCaseTest {
     }
 
     @Test
-    fun shouldReturnCorrectNumberOfStates() {
+    fun `should return correct number of states`() {
         // Given
         val states = listOf(
             createState(id = "1", name = "In Progress", projectId = "1"),
@@ -77,7 +77,7 @@ class GetAllStatesUseCaseTest {
     }
 
     @Test
-    fun shouldNotReturnNullWhenRepositoryReturnsEmptyList() {
+    fun `should not return null when repository returns empty list`() {
         // Given
         every { statesRepository.getAllStates() } returns emptyList()
 

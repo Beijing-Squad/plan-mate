@@ -22,7 +22,7 @@ class DeleteStateUseCaseTest {
 
     @OptIn(ExperimentalUuidApi::class)
     @Test
-    fun shouldReturnTrueWhenStateExistsAndDeletedSuccessfully() {
+    fun `should return true when state exists and deleted successfully`() {
         // Given
         val project = createProject(name = "PlanMate Core Features", createdBy = "adminUser01")
         val state = createState(id = "1", name = "In Progress", projectId = project.id.toString())
@@ -37,7 +37,7 @@ class DeleteStateUseCaseTest {
 
     @OptIn(ExperimentalUuidApi::class)
     @Test
-    fun shouldReturnFalseWhenStateDoesNotExistInRepository() {
+    fun `should return false when state does not exist in repository`() {
         // Given
         val project = createProject(name = "PlanMate Core Features", createdBy = "adminUser01")
         val state = createState(id = "123", name = "Done", projectId = project.id.toString())
@@ -53,7 +53,7 @@ class DeleteStateUseCaseTest {
 
     @OptIn(ExperimentalUuidApi::class)
     @Test
-    fun shouldNotThrowExceptionWhenDeletingNonExistentState() {
+    fun `should not throw exception when deleting non existent state`() {
         // Given
         val project = createProject(name = "PlanMate Core Features", createdBy = "adminUser01")
         val state = createState(id = "999", name = "Archived", projectId = project.id.toString())
