@@ -5,6 +5,7 @@ import fake.createProject
 import fake.createState
 import io.mockk.every
 import io.mockk.mockk
+import logic.entities.UserRole
 import logic.entities.exceptions.InvalidStateNameException
 import logic.entities.exceptions.StateUnauthorizedUserException
 import logic.repository.StatesRepository
@@ -28,6 +29,7 @@ class AddStateUseCaseTest {
     @Test
     fun `should return true when add valid new state`() {
         // Given
+        val adminRole = UserRole.ADMIN
         val project = createProject(
             name = "PlanMate Core Features", createdBy = "adminUser01"
         )
@@ -36,8 +38,9 @@ class AddStateUseCaseTest {
         )
 
         // when
+        every { statesRepository.getAllStates() } returns listOf()
         every { statesRepository.addState(newState) } returns true
-        val result = addStateUseCase.addState(newState)
+        val result = addStateUseCase.addState(newState, adminRole)
 
         //Then
         assertThat(result).isTrue()
@@ -47,6 +50,7 @@ class AddStateUseCaseTest {
     @Test
     fun `should throw exception when add invalid new state with empty name`() {
         // Given
+        val adminRole = UserRole.ADMIN
         val errorMessage = "the name of the new state is empty"
         val project = createProject(
             name = "PlanMate Core Features", createdBy = "adminUser01"
@@ -54,12 +58,12 @@ class AddStateUseCaseTest {
         val newState = createState(
             name = "", projectId = project.id.toString()
         )
-
+        every { statesRepository.getAllStates() } returns listOf()
         every { statesRepository.addState(newState) } throws InvalidStateNameException(errorMessage)
 
         // When&Then
         assertThrows<InvalidStateNameException> {
-            addStateUseCase.addState(newState)
+            addStateUseCase.addState(newState, adminRole)
         }
     }
 
@@ -67,6 +71,7 @@ class AddStateUseCaseTest {
     @Test
     fun `should return false when add new state with not exist project id`() {
         //Given
+        val adminRole = UserRole.ADMIN
         val project = listOf(
             createProject(
                 name = "PlanMate Core Features", createdBy = "adminUser01"
@@ -80,8 +85,10 @@ class AddStateUseCaseTest {
 
 
         // when
+        every { statesRepository.getAllStates() } returns listOf()
         every { statesRepository.addState(newState) } returns false
-        addStateUseCase.addState(newState)
+
+        addStateUseCase.addState(newState, adminRole)
 
         //Then
         assertThat(newState.projectId).isNotIn(
@@ -93,13 +100,14 @@ class AddStateUseCaseTest {
     @Test
     fun `should throw exception when user is not admin`() {
         // Given
+        val mateRole = UserRole.MATE
         val errorMessage = "Sorry the user should be admin"
         val state = createState()
 
         every { statesRepository.addState(state) } throws StateUnauthorizedUserException(errorMessage)
 
         // When && Then
-        assertThrows<StateUnauthorizedUserException> { addStateUseCase.addState(state) }
+        assertThrows<StateUnauthorizedUserException> { addStateUseCase.addState(state, mateRole) }
 
     }
 }
