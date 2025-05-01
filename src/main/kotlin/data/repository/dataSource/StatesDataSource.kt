@@ -10,9 +10,9 @@ interface StatesDataSource{
 
     fun getStateById(stateId: String): State
 
-    fun addState(state: State): State
+    fun addState(state: State): Boolean
 
-    fun updateState(state: State): State
+    fun updateState(state: State): Boolean
 
     fun deleteState(state: State): Boolean
 
