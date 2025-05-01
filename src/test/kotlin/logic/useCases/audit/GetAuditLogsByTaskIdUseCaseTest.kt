@@ -26,7 +26,7 @@ class GetAuditLogsByTaskIdUseCaseTest {
     }
 
     @Test
-    fun `should return audit logs for a valid task ID`() {
+    fun `should return audit logs when a valid task ID is provided`() {
         // Given
         val taskId = "task-123"
         every { auditRepository.getAuditLogsByTaskId(taskId) } returns listOf(
@@ -71,7 +71,7 @@ class GetAuditLogsByTaskIdUseCaseTest {
     }
 
     @Test
-    fun `should return audit logs with different action types for the same task`() {
+    fun `should return audit logs with different action types for the same task when provided`() {
         // Given
         val taskId = "task-789"
         every { auditRepository.getAuditLogsByTaskId(taskId) } returns listOf(
@@ -115,7 +115,7 @@ class GetAuditLogsByTaskIdUseCaseTest {
     }
 
     @Test
-    fun `should return audit logs with old and new state values for a task`() {
+    fun `should return audit logs with old and new state values for a task when provided`() {
         // Given
         val taskId = "task-101"
         every { auditRepository.getAuditLogsByTaskId(taskId) } returns listOf(
@@ -152,7 +152,7 @@ class GetAuditLogsByTaskIdUseCaseTest {
     }
 
     @Test
-    fun `should return only audit logs for the specified task ID`() {
+    fun `should return only audit logs for the specified task ID when provided`() {
         // Given
         val taskId = "task-123"
         val otherTaskId = "task-456"
@@ -187,7 +187,7 @@ class GetAuditLogsByTaskIdUseCaseTest {
     }
 
     @Test
-    fun `should return empty list for invalid task ID`() {
+    fun `should return empty list when task ID is invalid`() {
         // Given
         val invalidTaskId = "invalid-task-999"
         every { auditRepository.getAuditLogsByTaskId(invalidTaskId) } returns emptyList()
@@ -200,7 +200,7 @@ class GetAuditLogsByTaskIdUseCaseTest {
     }
 
     @Test
-    fun `should return audit logs in timestamp order for a task`() {
+    fun `should return audit logs in timestamp order when a task Id is valid`() {
         // Given
         val taskId = "task-202"
         every { auditRepository.getAuditLogsByTaskId(taskId) } returns listOf(
@@ -241,7 +241,7 @@ class GetAuditLogsByTaskIdUseCaseTest {
     }
 
     @Test
-    fun `should throw InvalidInputException for blank task ID`() {
+    fun `should throw InvalidInputException when task ID is blank`() {
         // When&&Then
         assertThrows<InvalidInputException> {
             getAuditLogsByTaskIdUseCase.getAuditLogsByTaskId("")
