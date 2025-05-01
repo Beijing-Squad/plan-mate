@@ -44,6 +44,7 @@ class StatesCsvDataSourceImpl(
             projectId = state.projectId
         )
         states[states.indexOf(currentState)] = updatedState
+        csvDataSource.updateFile(states)
         return updatedState
     }
 
