@@ -17,7 +17,7 @@ class RegisterUserAuthenticationUseCase(
     fun execute(username: String, password: String, role: UserRole): Boolean {
         require(username.isNotBlank()) { "Username cannot be blank" }
         val hashedPassword = hashPassword(password)
-        val user = User(Uuid.random(),username, hashedPassword, role)
+        val user = User(Uuid.random(), username, hashedPassword, role)
         val existingUser = userRepository.getAllUsers().find { it.userName == username }
 
         return if (existingUser == null) {
