@@ -128,10 +128,10 @@ class GetAllAuditLogsUseCaseTest {
 
         // Then
         assertThat(result.size).isEqualTo(2)
-        assertThat(result[0].oldState).isEqualTo("In Progress")
-        assertThat(result[0].newState).isEqualTo("Completed")
-        assertThat(result[1].oldState).isEqualTo("Draft")
-        assertThat(result[1].newState).isEqualTo("Active")
+        assertThat(result[0].oldState).isEqualTo("Draft")
+        assertThat(result[0].newState).isEqualTo("Active")
+        assertThat(result[1].oldState).isEqualTo("In Progress")
+        assertThat(result[1].newState).isEqualTo("Completed")
     }
 
     @Test
@@ -202,8 +202,8 @@ class GetAllAuditLogsUseCaseTest {
         assertThat(result.size).isEqualTo(3)
         assertThat(result.map { it.timeStamp }).containsExactly(
             LocalDate(2023, 1, 3),
-            LocalDate(2023, 1, 1),
-            LocalDate(2023, 1, 2)
+            LocalDate(2023, 1, 2),
+            LocalDate(2023, 1, 1)
         ).inOrder()
     }
 }
