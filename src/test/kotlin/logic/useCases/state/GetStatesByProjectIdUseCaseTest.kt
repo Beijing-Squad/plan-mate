@@ -1,6 +1,17 @@
 package logic.useCases.state
 
-import org.junit.jupiter.api.Assertions.*
+import com.google.common.truth.Truth.assertThat
+import fake.createProject
+import fake.createState
+import io.mockk.every
+import io.mockk.mockk
+import logic.entities.exceptions.StateNotFoundException
+import logic.entities.exceptions.StateUnauthorizedUserException
+import logic.repository.StatesRepository
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
+import kotlin.uuid.ExperimentalUuidApi
 
 class GetStatesByProjectIdUseCaseTest {
 
@@ -55,6 +66,22 @@ class GetStatesByProjectIdUseCaseTest {
         // When & Then
         assertThrows<StateNotFoundException> {
             getStatesByProjectIdUseCase.getStatesByProjectId(projectId)
-            }
         }
+    }
+
+    @OptIn(ExperimentalUuidApi::class)
+    @Test
+    fun `should throw exception when user is not admin`() {
+        // Given
+        val errorMessage = "Sorry the user should be admin"
+        val projectId = createProject().id.toString()
+
+        every { stateRepository.getStatesByProjectId(projectId) } throws StateUnauthorizedUserException(errorMessage)
+
+        // When && Then
+        assertThrows<StateUnauthorizedUserException> {
+            getStatesByProjectIdUseCase.getStatesByProjectId(projectId)
+        }
+
+    }
 }
