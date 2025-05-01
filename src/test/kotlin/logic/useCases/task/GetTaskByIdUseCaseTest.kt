@@ -6,14 +6,12 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.datetime.LocalDate
-import logic.entities.Task
 import logic.entities.exceptions.TaskNotFoundException
 import logic.repository.TasksRepository
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import kotlin.test.assertFailsWith
 import kotlin.uuid.ExperimentalUuidApi
-import kotlin.uuid.Uuid
 
 @OptIn(ExperimentalUuidApi::class)
 class GetTaskByIdUseCaseTest {
@@ -53,9 +51,9 @@ class GetTaskByIdUseCaseTest {
     fun `should throw TaskNotFoundException when task id does not exist`() {
         // Given
         val taskId = "no"
-        every { tasksRepository.getTaskById(taskId) } returns null
+        every { tasksRepository.getTaskById(taskId) } throws TaskNotFoundException("Task with ID $taskId not found")
 
-        // When/Then
+        // When
         val exception = assertFailsWith<TaskNotFoundException> {
             getTaskByIdUseCase.getTaskById(taskId)
         }
@@ -64,4 +62,5 @@ class GetTaskByIdUseCaseTest {
         assertThat(exception.message).isEqualTo("Task with ID $taskId not found")
         verify { tasksRepository.getTaskById(taskId) }
     }
+
 }
