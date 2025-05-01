@@ -45,4 +45,21 @@ class UpdateStateUseCaseTest {
         //Then
         assertThat(result).isTrue()
     }
+
+    @OptIn(ExperimentalUuidApi::class)
+    @Test
+    fun `should throw exception when not found state with this state id`() {
+        // Given
+        val errorMessage = "Not found state with this id to update"
+        val newState = createState()
+
+        every { statesRepository.getStateById(newState.id.toString()) } throws StateNotFoundException(errorMessage)
+        every { statesRepository.updateState(newState) } throws StateNotFoundException(errorMessage)
+
+        // When & Then
+        assertThrows<StateNotFoundException> {
+            updateStateUseCase.updateState(newState)
+        }
+    }
+
 }
