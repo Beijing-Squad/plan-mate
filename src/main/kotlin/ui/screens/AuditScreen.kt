@@ -1,5 +1,7 @@
 package ui.screens
 
+import logic.entities.Audit
+import logic.entities.EntityType
 import logic.useCases.audit.GetAllAuditLogsUseCase
 import logic.useCases.audit.GetAuditLogsByProjectIdUseCase
 import logic.useCases.audit.GetAuditLogsByTaskIdUseCase
@@ -51,8 +53,17 @@ class AuditScreen(
     }
 
     private fun onClickGetAllAuditLogs() {
-        TODO("Not yet implemented")
+        val allAudits = getAllAudits.getAllAuditLogs()
+        if (allAudits.isEmpty()) {
+            consoleIO.showWithLine("❌ No Audit Logs Found")
+        } else {
+            consoleIO.showWithLine("\n📋 All Audit Logs:\n")
+            allAudits.forEach { audit ->
+                consoleIO.showWithLine(formatAuditLog(audit))
+            }
+        }
     }
+
 
     private fun onClickGetAllAuditLogsByProjectID() {
         TODO("Not yet implemented")
@@ -61,5 +72,23 @@ class AuditScreen(
     private fun onClickGetAllAuditLogsByTaskID() {
         TODO("Not yet implemented")
     }
+
+    private fun formatAuditLog(audit: Audit): String {
+        val role = audit.userRole.name.padEnd(7)
+        val userName = audit.userName.padEnd(12)
+        val action = audit.action.name.padEnd(8)
+        val entity = audit.entityType.name.padEnd(8)
+        val entityId = audit.entityId.take(13).padEnd(12)
+        val date = audit.timeStamp.toString()
+
+        return if (audit.entityType == EntityType.TASK) {
+            val oldState = audit.oldState ?: "N/A"
+            val newState = audit.newState ?: "N/A"
+            "$role| $userName| $action| $entity| $entityId| $oldState| $newState| $date"
+        } else {
+            "$role| $userName| $action| $entity| $entityId| $date"
+        }
+    }
+
 
 }
