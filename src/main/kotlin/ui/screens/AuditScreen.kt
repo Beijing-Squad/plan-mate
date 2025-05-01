@@ -66,7 +66,18 @@ class AuditScreen(
 
 
     private fun onClickGetAllAuditLogsByProjectID() {
-        TODO("Not yet implemented")
+        val projectId = getIdInput()
+        val auditLogs = try {
+            getAuditLogsByProjectId.getAuditLogsByProjectId(projectId)
+        } catch (exception: Exception) {
+            consoleIO.showWithLine("❌ ${exception.message}")
+            return
+        }
+
+        consoleIO.showWithLine("\n🔍 Audit Logs For Project ID: $projectId\n")
+        auditLogs.forEach { audit ->
+            consoleIO.showWithLine(formatAuditLog(audit))
+        }
     }
 
     private fun onClickGetAllAuditLogsByTaskID() {
@@ -90,5 +101,9 @@ class AuditScreen(
         }
     }
 
+    private fun getIdInput(): String {
+        consoleIO.show("Enter Project ID: ")
+        return consoleIO.read()?.trim() ?: ""
+    }
 
 }
