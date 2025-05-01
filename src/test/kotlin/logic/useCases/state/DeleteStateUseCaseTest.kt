@@ -4,6 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import fake.createProject
 import fake.createState
 import io.mockk.mockk
+import logic.entities.UserRole
 import logic.repository.StatesRepository
 import org.junit.jupiter.api.BeforeEach
 import kotlin.test.Test

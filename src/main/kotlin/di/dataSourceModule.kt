@@ -2,8 +2,19 @@ package di
 
 import data.csvDataSource.*
 import data.csvDataSource.csv.CsvDataSourceImpl
+import data.parser.AuditCsvParser
+import data.parser.ProjectCsvParser
+import data.parser.StateCsvParser
+import data.parser.TaskCsvParser
+import data.parser.UserCsvParser
+import data.repository.dataSource.AuditDataSource
+import data.repository.dataSource.ProjectDataSource
+import data.repository.dataSource.StatesDataSource
+import data.repository.dataSource.TasksDataSource
+import data.repository.dataSource.UserDataSource
 import logic.entities.*
 import org.koin.core.qualifier.named
+import org.koin.dsl.bind
 import org.koin.dsl.module
 
 val dataSourceModule = module {
@@ -12,42 +23,42 @@ val dataSourceModule = module {
         CsvDataSourceImpl<Project>(
             get(named("projectReader")),
             get(named("projectWriter")),
-            get()
+            get<ProjectCsvParser>()
         )
     }
     single(named("userDataSource")) {
         CsvDataSourceImpl<User>(
             get(named("userReader")),
             get(named("userWriter")),
-            get()
+            get<UserCsvParser>()
         )
     }
     single(named("taskDataSource")) {
         CsvDataSourceImpl<Task>(
             get(named("taskReader")),
             get(named("taskWriter")),
-            get()
+            get<TaskCsvParser>()
         )
     }
     single(named("stateDataSource")) {
         CsvDataSourceImpl<State>(
             get(named("stateReader")),
             get(named("stateWriter")),
-            get()
+            get<StateCsvParser>()
         )
     }
     single(named("auditDataSource")) {
         CsvDataSourceImpl<Audit>(
             get(named("auditReader")),
             get(named("auditWriter")),
-            get()
+            get<AuditCsvParser>()
         )
     }
 
     // Implementations
-    single { ProjectCsvDataSourceImpl(get(named("projectDataSource"))) }
-    single { UserCsvDataSourceImpl(get(named("userDataSource"))) }
-    single { TasksCsvDataSourceImpl(get(named("taskDataSource"))) }
-    single { StatesCsvDataSourceImpl(get(named("stateDataSource"))) }
-    single { AuditCsvDataSourceImpl(get(named("auditDataSource"))) }
+    single { ProjectCsvDataSourceImpl(get(named("projectDataSource"))) } bind ProjectDataSource::class
+    single { UserCsvDataSourceImpl(get(named("userDataSource"))) } bind UserDataSource::class
+    single { TasksCsvDataSourceImpl(get(named("taskDataSource"))) } bind TasksDataSource::class
+    single { StatesCsvDataSourceImpl(get(named("stateDataSource"))) } bind StatesDataSource::class
+    single { AuditCsvDataSourceImpl(get(named("auditDataSource"))) } bind AuditDataSource::class
 }
