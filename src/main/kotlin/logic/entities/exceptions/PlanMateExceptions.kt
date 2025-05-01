@@ -15,9 +15,10 @@ class TaskAlreadyExistsException(message: String) : TaskException(message)
 class TaskNotFoundException(message: String) : TaskException(message)
 
 open class StateException(message: String) : PlanMateException(message)
-class InvalidStateNameException(message: String): StateException(message)
-class StateUnauthorizedUserException(message: String): StateException(message)
-class StateNotFoundException(message: String): StateException(message)
+class InvalidStateNameException(message: String) : StateException(message)
+class StateUnauthorizedUserException(message: String) : StateException(message)
+class StateNotFoundException(message: String) : StateException(message)
+class StateAlreadyExistException(message: String) : StateException(message)
 
 open class ValidationException(message: String) : PlanMateException(message)
 class InvalidInputException(message: String) : ValidationException(message)
