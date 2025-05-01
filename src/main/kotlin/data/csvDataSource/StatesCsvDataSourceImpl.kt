@@ -3,8 +3,6 @@ package data.csvDataSource
 import data.csvDataSource.csv.CsvDataSourceImpl
 import data.repository.dataSource.StatesDataSource
 import logic.entities.State
-import logic.entities.exceptions.StateAlreadyExistException
-import logic.entities.exceptions.StateNotFoundException
 import kotlin.uuid.ExperimentalUuidApi
 
 class StatesCsvDataSourceImpl(
@@ -13,7 +11,7 @@ class StatesCsvDataSourceImpl(
     private val states = csvDataSource.loadAllDataFromFile().toMutableList()
 
     override fun getAllStates(): List<State> {
-        return states.toList()
+        return csvDataSource.loadAllDataFromFile()
     }
 
     override fun getStatesByProjectId(projectId: String): List<State> {
