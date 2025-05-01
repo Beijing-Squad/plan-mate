@@ -48,7 +48,7 @@ class UserCsvDataSourceImplTest {
     @Test
     fun `should return all users when data source has users`() {
         // Given
-        every { csvDataSourceImpl.loadAll() } returns testUsers
+        every { csvDataSourceImpl.loadAllDataFromFile() } returns testUsers
         userCsvDataSourceImpl = UserCsvDataSourceImpl(csvDataSourceImpl)
 
         // When
@@ -61,7 +61,7 @@ class UserCsvDataSourceImplTest {
     @Test
     fun `should return empty list when data source has no users`() {
         // Given
-        every { csvDataSourceImpl.loadAll() } returns emptyList()
+        every { csvDataSourceImpl.loadAllDataFromFile() } returns emptyList()
         userCsvDataSourceImpl = UserCsvDataSourceImpl(csvDataSourceImpl)
 
         // When
@@ -75,7 +75,7 @@ class UserCsvDataSourceImplTest {
     @Test
     fun `should return user when user id is founded`() {
         // Given
-        every { csvDataSourceImpl.loadAll() } returns testUsers
+        every { csvDataSourceImpl.loadAllDataFromFile() } returns testUsers
         userCsvDataSourceImpl = UserCsvDataSourceImpl(csvDataSourceImpl)
         val firstUser = testUsers.first()
 
@@ -90,7 +90,7 @@ class UserCsvDataSourceImplTest {
     @Test
     fun `should throw UserNotFoundException when user id is not found`() {
         // Given
-        every { csvDataSourceImpl.loadAll() } returns testUsers
+        every { csvDataSourceImpl.loadAllDataFromFile() } returns testUsers
         userCsvDataSourceImpl = UserCsvDataSourceImpl(csvDataSourceImpl)
         val nonExistentUserId = "non-existent-id"
 
@@ -104,8 +104,8 @@ class UserCsvDataSourceImplTest {
     @Test
     fun `should update user when user exists`() {
         // Given
-        every { csvDataSourceImpl.loadAll() } returns testUsers
-        every { csvDataSourceImpl.update(any()) } returns Unit
+        every { csvDataSourceImpl.loadAllDataFromFile() } returns testUsers
+        every { csvDataSourceImpl.updateFile(any()) } returns Unit
         userCsvDataSourceImpl = UserCsvDataSourceImpl(csvDataSourceImpl)
 
         val existingUser = testUsers.first()
@@ -119,6 +119,6 @@ class UserCsvDataSourceImplTest {
 
         // Then
         assertThat(result).isEqualTo(existingUser)
-        verify { csvDataSourceImpl.update(any()) }
+        verify { csvDataSourceImpl.updateFile(any()) }
     }
 }
