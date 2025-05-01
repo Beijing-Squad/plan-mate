@@ -20,10 +20,9 @@ class StatesCsvDataSourceImpl(
     }
 
     @OptIn(ExperimentalUuidApi::class)
-    override fun getStateById(stateId: String): State {
+    override fun getStateById(stateId: String): State? {
         return getAllStates()
             .find { it.id.toString() == stateId }
-            ?: throw StateNotFoundException("state not found")
     }
 
     @OptIn(ExperimentalUuidApi::class)
