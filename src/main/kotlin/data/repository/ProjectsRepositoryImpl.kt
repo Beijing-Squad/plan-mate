@@ -20,7 +20,7 @@ class ProjectsRepositoryImpl(
     }
 
     override fun deleteProject(projectId: String) {
-        return deleteProject(projectId)
+        return  projectDataSource.deleteProject(projectId)
     }
 
     override fun updateProject(newProject: Project): Boolean {
