@@ -10,7 +10,7 @@ class StatesCsvDataSourceImpl(
     private val states = csvDataSource.loadAllDataFromFile().toMutableList()
 
     override fun getAllStates(): List<State> {
-        TODO("Not yet implemented")
+        return states.toList()
     }
 
     override fun getStatesByProjectId(projectId: String): List<State> {
