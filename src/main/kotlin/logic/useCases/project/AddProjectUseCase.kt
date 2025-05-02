@@ -15,7 +15,7 @@ class AddProjectUseCase(
 
     fun addProject(project: Project, role: UserRole): Result<Boolean> {
 
-        return if (CheckDuplicateProject(project))
+        return if (checkDuplicateProject(project))
             Result.failure(ProjectAlreadyExistsException("Project is already exists"))
         else if (project.name.isEmpty())
             Result.failure(ProjectNameIsEmptyException("Project Have No Name"))
@@ -32,6 +32,6 @@ class AddProjectUseCase(
         }
     }
 
-    private fun CheckDuplicateProject(project: Project) =
+    private fun checkDuplicateProject(project: Project) =
         projectsRepository.getAllProjects().any { it.name == project.name }
 }
