@@ -76,7 +76,18 @@ class AuditScreenTest {
         verify { consoleIO.showWithLine(any()) }
     }
 
+    @Test
+    fun `handleFeatureChoice should call getAllAuditLogs when this option is selected`() {
+        // Given
+        val getAllAuditLogsOption = "1"
+        every { consoleIO.read() } returns getAllAuditLogsOption
 
+        // When
+        auditScreen.handleFeatureChoice()
+
+        // Then
+        verify { getAllAuditLogsUseCase.getAllAuditLogs() }
+    }
 
 
 
