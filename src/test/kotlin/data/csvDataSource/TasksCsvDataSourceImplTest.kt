@@ -3,9 +3,7 @@ package data.csvDataSource
 import com.google.common.truth.Truth.assertThat
 import data.csvDataSource.csv.CsvDataSourceImpl
 import fake.createTask
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.verify
+import io.mockk.*
 import kotlinx.datetime.LocalDate
 import logic.entities.Task
 import logic.entities.exceptions.TaskNotFoundException
@@ -150,4 +148,27 @@ class TasksCsvDataSourceImplTest {
         verify(exactly = 0) { csvDataSource.updateFile(any()) }
     }
 
+    private val task1 = createTask(title = "First Task")
+    private val task2 = createTask(title = "Second Task")
+
+    @Test
+    fun `addTask should append task to data source`() {
+        // When
+        tasksCsvDataSource.addTask(task1)
+
+        // Then
+        verify { csvDataSource.appendToFile(task1) }
+    }
+
+    @Test
+    fun `deleteTask should remove task by id`() {
+        // Given
+        every { csvDataSource.loadAllDataFromFile() } returns listOf(task1, task2)
+
+        // When
+        tasksCsvDataSource.deleteTask(task1.id.toString())
+
+        // Then
+        verify { csvDataSource.deleteById(task1.id.toString()) }
+    }
 }
