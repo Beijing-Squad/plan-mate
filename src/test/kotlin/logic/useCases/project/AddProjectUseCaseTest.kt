@@ -27,7 +27,7 @@ class AddProjectUseCaseTest {
     }
 
     @Test
-    fun `should create project when project is valid`() {
+    fun `should add new project when project is valid`() {
         // Given
         val project = createProject()
         // When
