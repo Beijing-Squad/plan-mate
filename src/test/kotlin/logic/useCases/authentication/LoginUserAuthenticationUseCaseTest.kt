@@ -15,14 +15,16 @@ class LoginUserAuthenticationUseCaseTest {
 
     private lateinit var repository: AuthenticationRepository
     private lateinit var loginUserAuthenticationUseCase: LoginUserAuthenticationUseCase
+    private lateinit var mD5PasswordUseCase: MD5PasswordUseCase
 
     private val testUsername = "john_doe"
     private val testPassword = "secure123"
 
     @BeforeEach
     fun setUp() {
-        repository = mockk()
-        loginUserAuthenticationUseCase = LoginUserAuthenticationUseCase(repository)
+        repository = mockk(relaxed = true)
+        mD5PasswordUseCase = mockk(relaxed = true)
+        loginUserAuthenticationUseCase = LoginUserAuthenticationUseCase(repository,mD5PasswordUseCase)
     }
 
     @Test
@@ -73,6 +75,22 @@ class LoginUserAuthenticationUseCaseTest {
             loginUserAuthenticationUseCase.execute(testUsername, wrongPassword)
         }
         assertThat(exception.message).isEqualTo(PASSWORD_ERROR)
+    }
+
+    @Test
+    fun `given valid username and password, when execute called, then return User`() {
+        // Given
+        val hashedPassword = "hashed_secure123"
+        val expectedUser = createUser(userName = testUsername, password = hashedPassword)
+
+        every { repository.loginUser(testUsername, testPassword) } returns expectedUser
+        every { mD5PasswordUseCase.hashPassword(testPassword) } returns hashedPassword
+
+        // When
+        val result = loginUserAuthenticationUseCase.execute(testUsername, testPassword)
+
+        // Then
+        assertThat(result).isEqualTo(expectedUser)
     }
 
     private companion object {
