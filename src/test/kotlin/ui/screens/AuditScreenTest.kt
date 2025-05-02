@@ -152,7 +152,24 @@ class AuditScreenTest {
         }
     }
 
+    @Test
+    fun `should view PROJECT_NOT_FOUND_ERROR message when getAuditLogsByProjectId returns empty list`() {
+        // Given
+        val getAuditLogsByProjectIdOption = "2"
+        val projectId = "123"
+        val projectNotFoundError = "❌ Error: Project logs not found"
+        every { consoleIO.read() } returns getAuditLogsByProjectIdOption andThen projectId
+        every {
+            getAuditLogsByProjectIdUseCase.getAuditLogsByProjectId(projectId)
+        } throws ProjectNotFoundException(projectNotFoundError)
 
+
+        // When
+        auditScreen.handleFeatureChoice()
+
+        // Then
+        verify { consoleIO.showWithLine("❌ $projectNotFoundError") }
+    }
 
 
 
