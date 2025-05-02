@@ -42,7 +42,7 @@ class ProjectCsvDataSourceImplTest {
 
 
     @Test
-    fun `should add a new project to the data source`() {
+    fun `should add a new project to the data source when project is valid`() {
         // Given
         val project = createProject(name = "NewProject")
         every { csvDataSource.appendToFile(project) } just Runs
