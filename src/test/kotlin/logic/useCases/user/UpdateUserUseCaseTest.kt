@@ -5,7 +5,6 @@ import data.repository.UserRepositoryImpl
 import fake.createUser
 import io.mockk.every
 import io.mockk.mockk
-import logic.entities.User
 import logic.repository.UserRepository
 import logic.useCases.authentication.MD5PasswordUseCase
 import logic.useCases.authentication.SessionManager
