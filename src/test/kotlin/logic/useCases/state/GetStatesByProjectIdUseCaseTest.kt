@@ -53,7 +53,6 @@ class GetStatesByProjectIdUseCaseTest {
     @Test
     fun `should throw exception when not found states with the project id`() {
         // Given
-        val errorMessage = "Not found states with this project id"
         val projectId = createProject().id.toString()
         val states = listOf(
             createState(),
