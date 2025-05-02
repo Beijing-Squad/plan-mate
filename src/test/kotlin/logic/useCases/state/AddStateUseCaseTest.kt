@@ -7,6 +7,7 @@ import io.mockk.every
 import io.mockk.mockk
 import logic.entities.UserRole
 import logic.entities.exceptions.InvalidStateNameException
+import logic.entities.exceptions.StateAlreadyExistException
 import logic.entities.exceptions.StateUnauthorizedUserException
 import logic.repository.StatesRepository
 import org.junit.jupiter.api.BeforeEach
@@ -129,6 +130,5 @@ class AddStateUseCaseTest {
 
         // When && Then
         assertThrows<StateUnauthorizedUserException> { addStateUseCase.addState(state, mateRole) }
-
     }
 }

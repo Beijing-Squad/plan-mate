@@ -61,7 +61,7 @@ class GetStatesByProjectIdUseCaseTest {
         )
 
         every { stateRepository.getAllStates() } returns states
-        every { stateRepository.getStatesByProjectId(projectId) } throws StateNotFoundException(errorMessage)
+        every { stateRepository.getStatesByProjectId(projectId) } returns emptyList()
 
         // When & Then
         assertThrows<StateNotFoundException> {

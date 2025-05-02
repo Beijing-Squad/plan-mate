@@ -58,7 +58,7 @@ class UpdateStateUseCaseTest {
         val adminRole = UserRole.ADMIN
         val newState = createState()
 
-        every { statesRepository.getStateById(newState.id) } throws StateNotFoundException(errorMessage)
+        every { statesRepository.getStateById(newState.id) } returns null
 
         // When & Then
         assertThrows<StateNotFoundException> {
