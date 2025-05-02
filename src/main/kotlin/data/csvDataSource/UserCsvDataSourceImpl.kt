@@ -9,10 +9,12 @@ import kotlin.uuid.ExperimentalUuidApi
 class UserCsvDataSourceImpl(
     private val csvDataSource: CsvDataSourceImpl<User>
 ) : UserDataSource {
-    private val users = csvDataSource.loadAllDataFromFile().toMutableList()
 
     override fun getAllUsers(): List<User> {
-        return users.toList()
+        return csvDataSource
+            .loadAllDataFromFile()
+            .toMutableList()
+            .toList()
     }
 
     @OptIn(ExperimentalUuidApi::class)
@@ -25,6 +27,7 @@ class UserCsvDataSourceImpl(
 
     @OptIn(ExperimentalUuidApi::class)
     override fun updateUser(user: User): User {
+        val users = csvDataSource.loadAllDataFromFile().toMutableList()
         val currentUser = getUserByUserId(user.id.toString())
         val userUpdated = currentUser
             .copy(userName = user.userName, password = user.password)
