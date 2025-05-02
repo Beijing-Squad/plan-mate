@@ -3,33 +3,52 @@ package data.csvDataSource
 import data.csvDataSource.csv.CsvDataSourceImpl
 import data.repository.dataSource.StatesDataSource
 import logic.entities.State
+import kotlin.uuid.ExperimentalUuidApi
 
 class StatesCsvDataSourceImpl(
     private val csvDataSource: CsvDataSourceImpl<State>
-): StatesDataSource {
+) : StatesDataSource {
+    private val states = getAllStates().toMutableList()
 
     override fun getAllStates(): List<State> {
-        TODO("Not yet implemented")
+        return csvDataSource.loadAllDataFromFile()
     }
 
     override fun getStatesByProjectId(projectId: String): List<State> {
-        TODO("Not yet implemented")
+        return getAllStates()
+            .filter { it.projectId == projectId }
     }
 
-    override fun getStateById(stateId: String): State {
-        TODO("Not yet implemented")
+    @OptIn(ExperimentalUuidApi::class)
+    override fun getStateById(stateId: String): State? {
+        return getAllStates()
+            .find { it.id == stateId }
     }
 
-    override fun addState(state: State) {
-        TODO("Not yet implemented")
+    @OptIn(ExperimentalUuidApi::class)
+    override fun addState(state: State): Boolean {
+        return states.add(state).also { isAdded ->
+            if (isAdded) {
+                csvDataSource.updateFile(states)
+            }
+        }
     }
 
-    override fun updateState(state: State) {
-        TODO("Not yet implemented")
+    @OptIn(ExperimentalUuidApi::class)
+    override fun updateState(newState: State): State {
+        return getStateById(newState.id).let { currentState ->
+            val updatedState = newState.copy(
+                name = newState.name,
+                projectId = newState.projectId
+            )
+            val updatedStates = states.map { if (it == currentState) updatedState else it }
+            csvDataSource.updateFile(updatedStates)
+            updatedState
+        }
     }
 
-    override fun deleteState(state: State) {
-        TODO("Not yet implemented")
+    @OptIn(ExperimentalUuidApi::class)
+    override fun deleteState(state: State): Boolean {
+        return states.remove(state)
     }
-
 }

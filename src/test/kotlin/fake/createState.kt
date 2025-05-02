@@ -1,9 +1,11 @@
 package fake
 
 import logic.entities.State
+import kotlin.uuid.ExperimentalUuidApi
 
+@OptIn(ExperimentalUuidApi::class)
 fun createState(
-    id: String = "defaultStateId",
+    id: String = "DefaultStateId",
     name: String = "defaultStateName",
     projectId: String = "defaultProjectId"
 ): State {
