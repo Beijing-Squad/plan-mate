@@ -46,19 +46,19 @@ class StateScreen(
 
     override fun handleFeatureChoice() {
         when (getInput()) {
-            "1" -> onClickAddState()
-            "2" -> onClickDeleteState()
-            "3" -> onClickUpdateState()
-            "4" -> onClickGetAllStates()
-            "5" -> onClickGetStateById()
-            "6" -> onClickGetStatesByProjectId()
+            "1" -> onChooseAddState()
+            "2" -> onChooseDeleteState()
+            "3" -> onChooseUpdateState()
+            "4" -> onChooseGetAllStates()
+            "5" -> onChooseGetStateById()
+            "6" -> onChooseGetStatesByProjectId()
             "0" -> return
             else -> consoleIO.showWithLine("❌ Invalid Option")
         }
     }
 
     @OptIn(ExperimentalUuidApi::class)
-    private fun onClickAddState() {
+    private fun onChooseAddState() {
         try {
             val id = getInputWithLabel("🆔 Enter State ID: ")
             val name = getInputWithLabel("📛 Enter State Name: ")
@@ -74,7 +74,7 @@ class StateScreen(
         }
     }
 
-    private fun onClickDeleteState() {
+    private fun onChooseDeleteState() {
         try {
             val id = getInputWithLabel("🆔 Enter State ID to delete: ")
             val role = getRoleInput()
@@ -88,7 +88,7 @@ class StateScreen(
         }
     }
 
-    private fun onClickUpdateState() {
+    private fun onChooseUpdateState() {
         try {
             val id = getInputWithLabel("🆔 Enter State ID to update: ")
             val name = getInputWithLabel("📛 Enter New State Name: ")
@@ -104,7 +104,7 @@ class StateScreen(
         }
     }
 
-    private fun onClickGetAllStates() {
+    private fun onChooseGetAllStates() {
         try {
             val states = getAllStates.getAllStates()
             if (states.isEmpty()) {
@@ -118,7 +118,7 @@ class StateScreen(
         }
     }
 
-    private fun onClickGetStateById() {
+    private fun onChooseGetStateById() {
         try {
             val id = getInputWithLabel("🆔 Enter State ID: ")
             val state = getStateById.getStateById(id)
@@ -128,7 +128,7 @@ class StateScreen(
         }
     }
 
-    private fun onClickGetStatesByProjectId() {
+    private fun onChooseGetStatesByProjectId() {
         try {
             val projectId = getInputWithLabel("📁 Enter Project ID: ")
             val states = getStatesByProjectId.getStatesByProjectId(projectId)
