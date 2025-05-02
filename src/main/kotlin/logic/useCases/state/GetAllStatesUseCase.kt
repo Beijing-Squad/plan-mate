@@ -9,4 +9,5 @@ class GetAllStatesUseCase(
     fun getAllStates(): List<State>{
         return statesRepository.getAllStates()
     }
+
 }
