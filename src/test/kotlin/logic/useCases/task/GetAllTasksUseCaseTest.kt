@@ -9,9 +9,7 @@ import kotlinx.datetime.LocalDate
 import logic.repository.TasksRepository
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import kotlin.uuid.ExperimentalUuidApi
 
-@OptIn(ExperimentalUuidApi::class)
 class GetAllTasksUseCaseTest {
 
     private lateinit var tasksRepository: TasksRepository

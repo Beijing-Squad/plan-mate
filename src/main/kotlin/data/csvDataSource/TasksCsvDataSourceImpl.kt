@@ -6,6 +6,7 @@ import logic.entities.Task
 import logic.entities.exceptions.TaskNotFoundException
 import kotlin.uuid.ExperimentalUuidApi
 
+@OptIn(ExperimentalUuidApi::class)
 class TasksCsvDataSourceImpl(
     private val csvDataSource: CsvDataSourceImpl<Task>
 ) : TasksDataSource {
@@ -14,7 +15,6 @@ class TasksCsvDataSourceImpl(
         return csvDataSource.loadAllDataFromFile()
     }
 
-    @OptIn(ExperimentalUuidApi::class)
     override fun getTaskById(taskId: String): Task {
         val tasks = csvDataSource.loadAllDataFromFile()
         return tasks.find { it.id.toString() == taskId }
@@ -26,7 +26,6 @@ class TasksCsvDataSourceImpl(
 
     override fun deleteTask(taskId: String)  = csvDataSource.deleteById(taskId)
 
-    @OptIn(ExperimentalUuidApi::class)
     override fun updateTask(taskId: String, updatedTask: Task): Task {
         val tasks = csvDataSource.loadAllDataFromFile().toMutableList()
         val taskIndex = tasks.indexOfFirst { it.id.toString() == taskId }
