@@ -17,12 +17,14 @@ class RegisterUserAuthenticationUseCaseTest() {
     private lateinit var repository: AuthenticationRepository
     private lateinit var userRepository: UserRepository
     private lateinit var useCase: RegisterUserAuthenticationUseCase
+    private lateinit var mD5PasswordUseCase: MD5PasswordUseCase
 
     @BeforeEach
     fun setUp() {
         repository = mockk(relaxed = true)
         userRepository = mockk(relaxed = true)
-        useCase = RegisterUserAuthenticationUseCase(repository, userRepository)
+        mD5PasswordUseCase = mockk(relaxed = true)
+        useCase = RegisterUserAuthenticationUseCase(repository, userRepository,mD5PasswordUseCase)
     }
 
     @Test
