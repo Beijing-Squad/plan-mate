@@ -116,7 +116,7 @@ class TasksCsvDataSourceImplTest {
         every { csvDataSource.updateFile(any()) } returns Unit
 
         // When
-        val result = tasksCsvDataSource.updateTask(originalTask.id.toString(), updatedTask)
+        val result = tasksCsvDataSource.updateTask( updatedTask)
 
         // Then
         assertThat(result).isEqualTo(updatedTask)
@@ -127,7 +127,6 @@ class TasksCsvDataSourceImplTest {
     @Test
     fun `should throw TaskNotFoundException when updateTask is called with invalid ID`() {
         // Given
-        val invalidId = "invalid-id"
         val updatedTask = createTask(
             projectId = "project-1",
             title = "Updated Task",
@@ -137,15 +136,16 @@ class TasksCsvDataSourceImplTest {
             createdAt = LocalDate(2023, 1, 1),
             updatedAt = LocalDate(2023, 1, 2)
         )
+        val taskId = updatedTask.id.toString()
         every { csvDataSource.loadAllDataFromFile() } returns emptyList()
 
         // When
         val exception = assertFailsWith<TaskNotFoundException> {
-            tasksCsvDataSource.updateTask(invalidId, updatedTask)
+            tasksCsvDataSource.updateTask(updatedTask)
         }
 
         // Then
-        assertThat(exception.message).isEqualTo("Task with ID $invalidId not found")
+        assertThat(exception.message).isEqualTo("Task with ID $taskId not found")
         verify { csvDataSource.loadAllDataFromFile() }
         verify(exactly = 0) { csvDataSource.updateFile(any()) }
     }

@@ -11,5 +11,5 @@ interface TasksRepository{
 
     fun deleteTask(taskId: String)
 
-    fun updateTask(taskId: String, updatedTask: Task): Task
+    fun updateTask(updatedTask: Task): Task
 }

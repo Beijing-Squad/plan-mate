@@ -43,7 +43,7 @@ class UpdateTaskUseCaseTest {
 
         assertThat(exception.message).isEqualTo("Task with ID $taskId not found")
         verify { tasksRepository.getTaskById(taskId) }
-        verify(exactly = 0) { tasksRepository.updateTask(any(), any()) }
+        verify(exactly = 0) { tasksRepository.updateTask(any()) }
     }
 
     @Test
@@ -65,7 +65,7 @@ class UpdateTaskUseCaseTest {
         )
 
         every { tasksRepository.getTaskById(originalTask.id.toString()) } returns originalTask
-        every { tasksRepository.updateTask(originalTask.id.toString(), updatedTask) } returns updatedTask
+        every { tasksRepository.updateTask( updatedTask) } returns updatedTask
         // When
         val result = updateTaskUseCase.updateTask(
             taskId = originalTask.id.toString(),
@@ -76,7 +76,7 @@ class UpdateTaskUseCaseTest {
         // Then
         assertThat(result).isEqualTo(updatedTask)
         verify { tasksRepository.getTaskById(originalTask.id.toString()) }
-        verify { tasksRepository.updateTask(originalTask.id.toString(), updatedTask) }
+        verify { tasksRepository.updateTask(updatedTask) }
     }
 
     @Test
@@ -97,7 +97,7 @@ class UpdateTaskUseCaseTest {
         )
 
         every { tasksRepository.getTaskById(originalTask.id.toString()) } returns originalTask
-        every { tasksRepository.updateTask(originalTask.id.toString(), updatedTask) } returns updatedTask
+        every { tasksRepository.updateTask( updatedTask) } returns updatedTask
         // When
 
         val result = updateTaskUseCase.updateTask(
@@ -109,7 +109,7 @@ class UpdateTaskUseCaseTest {
         // Then
         assertThat(result).isEqualTo(updatedTask)
         verify { tasksRepository.getTaskById(originalTask.id.toString()) }
-        verify { tasksRepository.updateTask(originalTask.id.toString(), updatedTask) }
+        verify { tasksRepository.updateTask(updatedTask) }
     }
 
     @Test
@@ -131,7 +131,7 @@ class UpdateTaskUseCaseTest {
         )
 
         every { tasksRepository.getTaskById(originalTask.id.toString()) } returns originalTask
-        every { tasksRepository.updateTask(originalTask.id.toString(), updatedTask) } returns updatedTask
+        every { tasksRepository.updateTask( updatedTask) } returns updatedTask
         // When
         val result = updateTaskUseCase.updateTask(
             taskId = originalTask.id.toString(),
@@ -142,7 +142,7 @@ class UpdateTaskUseCaseTest {
         // Then
         assertThat(result).isEqualTo(updatedTask)
         verify { tasksRepository.getTaskById(originalTask.id.toString()) }
-        verify { tasksRepository.updateTask(originalTask.id.toString(), updatedTask) }
+        verify { tasksRepository.updateTask(updatedTask) }
     }
 
     @Test
@@ -161,7 +161,7 @@ class UpdateTaskUseCaseTest {
         }
         // Then
         assertThat(exception.message).isEqualTo("Task title cannot be empty")
-        verify(exactly = 0) { tasksRepository.updateTask(any(), any()) }
+        verify(exactly = 0) { tasksRepository.updateTask( any()) }
     }
 
     @Test
@@ -170,7 +170,7 @@ class UpdateTaskUseCaseTest {
         val originalTask = createTask(description = "Original description")
         val taskId = originalTask.id.toString()
         every { tasksRepository.getTaskById(taskId) } returns originalTask
-        every { tasksRepository.updateTask(any(), any()) } answers { secondArg() }
+        every { tasksRepository.updateTask(any()) } answers { firstArg() }
 
         // When
         val updated = updateTaskUseCase.updateTask(

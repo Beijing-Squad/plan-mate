@@ -20,6 +20,6 @@ class UpdateTaskUseCase(
             updatedAt = currentDate
         )
 
-        return tasksRepository.updateTask(taskId, updatedTask)
+        return tasksRepository.updateTask(updatedTask)
     }
 }

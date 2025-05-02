@@ -24,8 +24,8 @@ class TasksRepositoryImpl(
         TODO("Not yet implemented")
     }
 
-    override fun updateTask(taskId: String, updatedTask: Task): Task {
-        return tasksDataSource.updateTask(taskId,updatedTask)
+    override fun updateTask( updatedTask: Task): Task {
+        return tasksDataSource.updateTask(updatedTask)
 
     }
 }
