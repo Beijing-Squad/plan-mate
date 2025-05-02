@@ -1,13 +1,18 @@
-package data.repository
+package ui.serviceImpl
 
-import data.repository.dataSource.ProjectDataSource
 import logic.entities.Project
-import logic.entities.Task
-import logic.repository.ProjectsRepository
+import logic.useCases.project.*
+import ui.service.ConsoleIOService
+import ui.service.ProjectUIService
 
-class ProjectsRepositoryImpl(
-    private val projectDataSource: ProjectDataSource
-): ProjectsRepository{
+class ProjectUIServiceImpl(
+    private val addProjectUseCase: AddProjectUseCase,
+    private val deleteProjectUseCase: DeleteProjectUseCase,
+    private val getAllProjectsUseCase: GetAllProjectsUseCase,
+    private val getProjectByIdUseCase: GetProjectByIdUseCase,
+    private val updateProjectUseCase: UpdateProjectUseCase,
+    private val console: ConsoleIOService
+): ProjectUIService {
     override fun getAllProjects(): List<Project> {
         TODO("Not yet implemented")
     }
@@ -25,10 +30,6 @@ class ProjectsRepositoryImpl(
     }
 
     override fun updateProject(projectId: String): Project {
-        TODO("Not yet implemented")
-    }
-
-    override fun getTaskByProjectId(projectId: String): List<Task> {
         TODO("Not yet implemented")
     }
 
