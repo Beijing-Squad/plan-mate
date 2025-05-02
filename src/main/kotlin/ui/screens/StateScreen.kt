@@ -153,6 +153,12 @@ class StateScreen(
         }
     }
 
+    /*
+    private fun getRoleInput(): UserRole {
+        return SessionManager.getCurrentUser?.role
+    }
+     */
+
     private fun showResult(result: Boolean, action: String) {
         if (result) {
             consoleIO.showWithLine("✅ State $action successfully!")
