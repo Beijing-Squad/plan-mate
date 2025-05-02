@@ -242,7 +242,18 @@ class AuditScreenTest {
     }
 
 
+    @Test
+    fun `should exit from audit log system when 0 is selected`() {
+        // Given
+        val exitOption = "0"
+        every { consoleIO.read() } returns exitOption
 
+        // When
+        auditScreen.handleFeatureChoice()
+
+        // Then
+        verify(exactly = 0) { getAllAuditLogsUseCase.getAllAuditLogs() }
+    }
 
 
 
