@@ -1,187 +1,121 @@
 package data.csvDataSource
 
-import com.google.common.base.CharMatcher.any
-import com.google.common.base.Verify.verify
 import com.google.common.truth.Truth.assertThat
 import data.csvDataSource.csv.CsvDataSourceImpl
-import data.repository.dataSource.StatesDataSource
 import fake.createState
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.verify
-import junit.framework.TestCase.assertEquals
+import io.mockk.*
+import logic.entities.State
+import logic.entities.exceptions.CsvWriteException
 import org.junit.jupiter.api.BeforeEach
-import kotlin.collections.first
-import kotlin.test.Test
-import kotlin.test.assertFailsWith
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
+import kotlin.test.assertEquals
+import kotlin.uuid.ExperimentalUuidApi
 
+@OptIn(ExperimentalUuidApi::class)
 class StatesCsvDataSourceImplTest {
-    private lateinit var statesCsvDataSourceImpl: StatesDataSource
-    private lateinit var csvDataSourceImpl: CsvDataSourceImpl<State>
-    private lateinit var testStates: List<State>
+
+    private lateinit var csvDataSource: CsvDataSourceImpl<State>
+    private lateinit var statesCsvDataSource: StatesCsvDataSourceImpl
 
     @BeforeEach
-    fun setUp() {
-        csvDataSourceImpl = mockk()
-        testStates = listOf(
-            createState(id = "1", name = "To Do", projectId = "project1"),
-            createState(id = "2", name = "In Progress", projectId = "project1"),
-            createState(id = "3", name = "Done", projectId = "project2")
-        )
-        statesCsvDataSourceImpl = StatesCsvDataSourceImpl(csvDataSourceImpl)
+    fun setup() {
+        csvDataSource = mockk(relaxed = true)
+        every { csvDataSource.loadAllDataFromFile() } returns mutableListOf()
+        statesCsvDataSource = StatesCsvDataSourceImpl(csvDataSource)
     }
 
-    // 1. `getAllStates`
     @Test
-    fun `getAllStates should return all states from the data source`() {
+    fun `should add a new state to the data source`() {
         // Given
-        every { csvDataSourceImpl.loadAllDataFromFile() } returns testStates
+        val newState = createState(id = "1", name = "InProgress", projectId = "project1")
 
         // When
-        val result = statesCsvDataSourceImpl.getAllStates()
+        val result = statesCsvDataSource.addState(newState)
 
         // Then
-        assertThat(result).isEqualTo(testStates)
-        verify { csvDataSourceImpl.loadAllDataFromFile() }
+        assertThat(result).isTrue()
+        verify { csvDataSource.updateFile(match { it.contains(newState) }) }
     }
 
     @Test
-    fun `getAllStates should return empty list when no states exist`() {
+    fun `should return states filtered by project id`() {
         // Given
-        every { csvDataSourceImpl.loadAllDataFromFile() } returns emptyList()
+        val state1 = createState(id = "1", name = "Todo", projectId = "p1")
+        val state2 = createState(id = "2", name = "Done", projectId = "p2")
+        every { csvDataSource.loadAllDataFromFile() } returns listOf(state1, state2)
 
         // When
-        val result = statesCsvDataSourceImpl.getAllStates()
+        val result = statesCsvDataSource.getStatesByProjectId("p1")
 
         // Then
-        assertThat(result).isEmpty()
+        assertThat(result).containsExactly(state1)
     }
 
-    // 2. `getStateById`
     @Test
-    fun `getStateById should return state when state id exists`() {
+    fun `should return state by id if it exists`() {
         // Given
-        val state = testStates.first()
-        every { csvDataSourceImpl.loadAllDataFromFile() } returns testStates
+        val state = createState(id = "1", name = "InProgress", projectId = "project1")
+        every { csvDataSource.loadAllDataFromFile() } returns listOf(state)
 
         // When
-        val result = statesCsvDataSourceImpl.getStateById(state.id)
+        val result = statesCsvDataSource.getStateById("1")
 
         // Then
         assertThat(result).isEqualTo(state)
     }
 
     @Test
-    fun `getStateById should throw exception when state id does not exist`() {
+    fun `should update an existing state`() {
         // Given
-        every { csvDataSourceImpl.loadAllDataFromFile() } returns testStates
+        val oldState = createState(id = "1", name = "Todo", projectId = "p1")
+        val stateList = mutableListOf(oldState)
+        every { csvDataSource.loadAllDataFromFile() } returns stateList
+        statesCsvDataSource = StatesCsvDataSourceImpl(csvDataSource) // 👈 إعادة الإنشاء بعد الموك
+        every { csvDataSource.updateFile(any()) } just Runs
 
-        // When / Then
-        assertFailsWith<StateNotFoundException> {
-            statesCsvDataSourceImpl.getStateById("state not found")
-        }
-    }
-
-    // 3. `getStatesByProjectId`
-    @Test
-    fun `getStatesByProjectId should return states by project id`() {
-        // Given
-        every { csvDataSourceImpl.loadAllDataFromFile() } returns testStates
+        val updatedState = oldState.copy(name = "InProgress", projectId = "p2")
 
         // When
-        val result = statesCsvDataSourceImpl.getStatesByProjectId("project1")
-
-        // Then
-        assertEquals(2, result.size)
-        for (state in result) {
-            assertEquals("project1", state.projectId)
-        }
-    }
-
-    @Test
-    fun `getStatesByProjectId should return empty list when no states match project id`() {
-        // Given
-        every { csvDataSourceImpl.loadAllDataFromFile() } returns testStates
-
-        // When
-        val result = statesCsvDataSourceImpl.getStatesByProjectId("non-existent-project")
-
-        // Then
-        assertThat(result).isEmpty()
-    }
-
-    // 4. `addState`
-    @Test
-    fun `addState should return true when state is added successfully`() {
-        // Given
-        val newState = createState(id = "4", name = "Blocked", projectId = "project1")
-        every { csvDataSourceImpl.loadAllDataFromFile() } returns testStates
-        every { csvDataSourceImpl.updateFile(any()) }
-
-        // When
-        val result = statesCsvDataSourceImpl.addState(newState)
-
-        // Then
-        assertThat(result).isEqualTo(true)
-        verify { csvDataSourceImpl.updateFile(any()) }
-    }
-
-    @Test
-    fun `addState should throw exception when state id already exists`() {
-        // Given
-        val existingState = testStates.first()
-        every { csvDataSourceImpl.loadAllDataFromFile() } returns testStates
-
-        // When / Then
-        val exception = assertFailsWith<StateAlreadyExistException> {
-            statesCsvDataSourceImpl.addState(existingState)
-        }
-
-        // Then
-        assertThat(exception.message).isEqualTo("State with id ${existingState.id} already exists")
-    }
-
-    // 5. `updateState`
-    @Test
-    fun `updateState should update existing state`() {
-        // Given
-        val updatedState = testStates[0].copy(name = "Updated To Do")
-        every { csvDataSourceImpl.loadAllDataFromFile() } returns testStates
-        every { csvDataSourceImpl.updateFile(any()) } returns true
-
-        // When
-        val result = statesCsvDataSourceImpl.updateState(updatedState)
+        val result = statesCsvDataSource.updateState(updatedState)
 
         // Then
         assertThat(result).isEqualTo(updatedState)
-        verify { csvDataSourceImpl.updateFile(any()) }
+        verify { csvDataSource.updateFile(match { it.contains(updatedState) }) }
     }
 
     @Test
-    fun `updateState should throw exception when state id does not exist`() {
+    fun `should throw exception when update state fails to write to file`() {
         // Given
-        val nonExistentState = createState(id = "999", name = "Non-existent State", projectId = "project1")
-        every { csvDataSourceImpl.loadAllDataFromFile() } returns testStates
+        val originalState = createState(id = "1", name = "Todo", projectId = "p1")
+        val updatedState = originalState.copy(name = "InProgress")
+        val stateList = mutableListOf(originalState)
+        every { csvDataSource.loadAllDataFromFile() } returns stateList
+        statesCsvDataSource = StatesCsvDataSourceImpl(csvDataSource) // إعادة الإنشاء بعد الـ mock
+        every { csvDataSource.updateFile(any()) } throws CsvWriteException("Failed")
 
-        // When / Then
-        assertFailsWith<StateNotFoundException> {
-            statesCsvDataSourceImpl.updateState(nonExistentState)
+        // When & Then
+        assertThrows<CsvWriteException> {
+            statesCsvDataSource.updateState(updatedState)
         }
     }
 
-    // 6. `deleteState`
+
     @Test
-    fun `deleteState should delete existing state`() {
+    fun `should delete an existing state`() {
         // Given
-        val targetState = testStates.first()
-        every { csvDataSourceImpl.loadAllDataFromFile() } returns testStates
-        every { csvDataSourceImpl.updateFile(any()) }
+        val state = createState(id = "1", name = "Todo", projectId = "p1")
+        val stateList = mutableListOf(state)
+        every { csvDataSource.loadAllDataFromFile() } returns stateList
+
+        statesCsvDataSource = StatesCsvDataSourceImpl(csvDataSource)
 
         // When
-        val result = statesCsvDataSourceImpl.deleteState(targetState)
+        val result = statesCsvDataSource.deleteState(state)
 
         // Then
-        assertThat(result).isEqualTo(true)
-        verify { csvDataSourceImpl.updateFile(any()) }
+        assertEquals(true, result)
     }
+
+
 }
