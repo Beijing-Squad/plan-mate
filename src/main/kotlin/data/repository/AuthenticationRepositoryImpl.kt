@@ -1,12 +1,14 @@
 package data.repository
 
 import data.repository.dataSource.AuthenticationDataSource
+import logic.entities.User
 import logic.repository.AuthenticationRepository
 
 class AuthenticationRepositoryImpl(
-    private val authenticationDataSource: AuthenticationDataSource
+    private val dataSource: AuthenticationDataSource
 ) : AuthenticationRepository {
-    override fun login(username: String, password: String): Boolean {
-        TODO("Not yet implemented")
-    }
+
+    override fun registerUser(user: User): Boolean = dataSource.saveUser(user)
+    override fun loginUser(username: String, password: String): User = dataSource.getUserByUsername(username)
+
 }

@@ -2,8 +2,8 @@ package data.repository.dataSource
 
 import logic.entities.User
 
-interface AuthenticationDataSource{
+interface AuthenticationDataSource {
 
-    fun login(email: String, password: String): User
-
+    fun saveUser(user: User): Boolean
+    fun getUserByUsername(username: String): User
 }
