@@ -7,12 +7,7 @@ import logic.useCases.authentication.SessionManager
 import logic.useCases.user.GetAllUsersUseCase
 import logic.useCases.user.GetUserByUserIdUseCase
 import logic.useCases.user.UpdateUserUseCase
-import logic.useCases.state.AddStateUseCase
-import logic.useCases.state.DeleteStateUseCase
-import logic.useCases.state.GetAllStatesUseCase
-import logic.useCases.state.GetStateByIdUseCase
-import logic.useCases.state.GetStatesByProjectIdUseCase
-import logic.useCases.state.UpdateStateUseCase
+import logic.useCases.state.*
 import org.koin.dsl.module
 
 val useCaseModule = module {
@@ -22,12 +17,12 @@ val useCaseModule = module {
     single { LoginUserAuthenticationUseCase(get(), get(), get()) }
     single { RegisterUserAuthenticationUseCase(get(), get(), get()) }
     single { SessionManager() }
-    single<AddStateUseCase> { AddStateUseCase(get()) }
-    single<DeleteStateUseCase> { DeleteStateUseCase(get()) }
-    single<GetStateByIdUseCase> { GetStateByIdUseCase(get()) }
-    single<GetStatesByProjectIdUseCase> { GetStatesByProjectIdUseCase(get()) }
-    single<GetAllStatesUseCase> { GetAllStatesUseCase(get()) }
-    single< UpdateStateUseCase> { UpdateStateUseCase(get()) }
+    single { AddStateUseCase(get()) }
+    single { DeleteStateUseCase(get()) }
+    single { GetStateByIdUseCase(get()) }
+    single { GetStatesByProjectIdUseCase(get()) }
+    single { GetAllStatesUseCase(get()) }
+    single { UpdateStateUseCase(get()) }
 
     single { GetAllUsersUseCase(get()) }
     single { GetUserByUserIdUseCase(get()) }
