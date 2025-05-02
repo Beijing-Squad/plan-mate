@@ -10,7 +10,6 @@ class AuthenticationScreen(
     private val registerUseCase: RegisterUserAuthenticationUseCase,
     private val loginUseCase: LoginUserAuthenticationUseCase
 ) {
-    private val scanner = Scanner(System.`in`)
 
     fun start(): AuthResult {
         while (true) {
@@ -20,7 +19,7 @@ class AuthenticationScreen(
             println("0. Exit")
             print("Choose an option: ")
 
-            when (scanner.nextLine()) {
+            when (readln().trim()) {
                 "1" -> {
                     val user = login()
                     if (user != null) {
@@ -37,9 +36,9 @@ class AuthenticationScreen(
     private fun login(): User? {
         println("\n--- Login ---")
         print("Username: ")
-        val username = scanner.nextLine().trim()
+        val username = readln().trim()
         print("Password: ")
-        val password = scanner.nextLine().trim()
+        val password = readln().trim()
 
         return try {
             val user = loginUseCase.execute(username, password)
@@ -54,9 +53,9 @@ class AuthenticationScreen(
     private fun register() {
         println("\n--- Register ---")
         print("Username: ")
-        val username = scanner.nextLine().trim()
+        val username = readln().trim()
         print("Password: ")
-        val password = scanner.nextLine().trim()
+        val password = readln().trim()
         val role = selectRole()
 
         try {
@@ -74,7 +73,7 @@ class AuthenticationScreen(
             println("2. Mate")
             print("Enter choice: ")
 
-            return when (scanner.nextLine()) {
+            return when (readln().trim()) {
                 "1" -> UserRole.ADMIN
                 "2" -> UserRole.MATE
                 else -> {
