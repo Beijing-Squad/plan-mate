@@ -204,7 +204,23 @@ class AuditScreenTest {
         verify { getAuditLogsByTaskIdUseCase.getAuditLogsByTaskId(any()) }
     }
 
+    @Test
+    fun `should view all task audit logs when getAuditLogsByTaskId returns non-empty list`() {
+        // Given
+        val getAuditLogsByTaskIdOption = "3"
+        val taskId = "456"
+        every { consoleIO.read() } returns getAuditLogsByTaskIdOption andThen taskId
+        every { getAuditLogsByTaskIdUseCase.getAuditLogsByTaskId(taskId) } returns allAudit
 
+        // When
+        auditScreen.handleFeatureChoice()
+
+        // Then
+        verifyOrder {
+            consoleIO.showWithLine("\n🔍 Audit Logs For Task ID: $taskId\n")
+            consoleIO.showWithLine(any())
+        }
+    }
 
 
 
