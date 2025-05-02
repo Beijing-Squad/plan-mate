@@ -7,6 +7,7 @@ import io.mockk.every
 import io.mockk.mockk
 import logic.entities.UserRole
 import logic.entities.exceptions.InvalidStateNameException
+import logic.entities.exceptions.StateAlreadyExistException
 import logic.entities.exceptions.StateUnauthorizedUserException
 import logic.repository.StatesRepository
 import org.junit.jupiter.api.BeforeEach
@@ -98,6 +99,27 @@ class AddStateUseCaseTest {
 
     @OptIn(ExperimentalUuidApi::class)
     @Test
+    fun `should throw exception when add new state already exist`() {
+        // Given
+        val adminRole = UserRole.ADMIN
+        val errorMessage = "the new state is exist"
+        val project = createProject(
+            name = "PlanMate Core Features", createdBy = "adminUser01"
+        )
+        val newState = createState(
+            projectId = project.id.toString()
+        )
+        every { statesRepository.getAllStates() } returns listOf(newState)
+        every { statesRepository.addState(newState) } throws StateAlreadyExistException(errorMessage)
+
+        // When&Then
+        assertThrows<StateAlreadyExistException> {
+            addStateUseCase.addState(newState, adminRole)
+        }
+    }
+
+    @OptIn(ExperimentalUuidApi::class)
+    @Test
     fun `should throw exception when user is not admin`() {
         // Given
         val mateRole = UserRole.MATE
@@ -108,6 +130,5 @@ class AddStateUseCaseTest {
 
         // When && Then
         assertThrows<StateUnauthorizedUserException> { addStateUseCase.addState(state, mateRole) }
-
     }
 }

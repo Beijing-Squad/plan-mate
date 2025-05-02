@@ -53,7 +53,6 @@ class GetStatesByProjectIdUseCaseTest {
     @Test
     fun `should throw exception when not found states with the project id`() {
         // Given
-        val errorMessage = "Not found states with this project id"
         val projectId = createProject().id.toString()
         val states = listOf(
             createState(),
@@ -61,7 +60,7 @@ class GetStatesByProjectIdUseCaseTest {
         )
 
         every { stateRepository.getAllStates() } returns states
-        every { stateRepository.getStatesByProjectId(projectId) } throws StateNotFoundException(errorMessage)
+        every { stateRepository.getStatesByProjectId(projectId) } returns emptyList()
 
         // When & Then
         assertThrows<StateNotFoundException> {

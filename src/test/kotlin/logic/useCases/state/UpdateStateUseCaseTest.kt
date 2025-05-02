@@ -54,11 +54,10 @@ class UpdateStateUseCaseTest {
     @Test
     fun `should throw exception when not found state with this state id`() {
         // Given
-        val errorMessage = "not found this state"
         val adminRole = UserRole.ADMIN
         val newState = createState()
 
-        every { statesRepository.getStateById(newState.id) } throws StateNotFoundException(errorMessage)
+        every { statesRepository.getStateById(newState.id) } returns null
 
         // When & Then
         assertThrows<StateNotFoundException> {
