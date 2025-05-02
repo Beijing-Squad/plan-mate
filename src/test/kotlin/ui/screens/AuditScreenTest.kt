@@ -67,7 +67,14 @@ class AuditScreenTest {
         )
     }
 
+    @Test
+    fun `showOptionService should display audit logs options when called`() {
+        // Given && When
+        auditScreen.showOptionService()
 
+        // Then
+        verify { consoleIO.showWithLine(any()) }
+    }
 
 
 
