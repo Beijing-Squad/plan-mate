@@ -71,7 +71,7 @@ class StatesCsvDataSourceImplTest {
         val oldState = createState(id = "1", name = "Todo", projectId = "p1")
         val stateList = mutableListOf(oldState)
         every { csvDataSource.loadAllDataFromFile() } returns stateList
-        statesCsvDataSource = StatesCsvDataSourceImpl(csvDataSource) // 👈 إعادة الإنشاء بعد الموك
+        statesCsvDataSource = StatesCsvDataSourceImpl(csvDataSource)
         every { csvDataSource.updateFile(any()) } just Runs
 
         val updatedState = oldState.copy(name = "InProgress", projectId = "p2")
@@ -91,7 +91,7 @@ class StatesCsvDataSourceImplTest {
         val updatedState = originalState.copy(name = "InProgress")
         val stateList = mutableListOf(originalState)
         every { csvDataSource.loadAllDataFromFile() } returns stateList
-        statesCsvDataSource = StatesCsvDataSourceImpl(csvDataSource) // إعادة الإنشاء بعد الـ mock
+        statesCsvDataSource = StatesCsvDataSourceImpl(csvDataSource)
         every { csvDataSource.updateFile(any()) } throws CsvWriteException("Failed")
 
         // When & Then
