@@ -4,9 +4,12 @@ import com.google.common.truth.Truth.assertThat
 import fake.createState
 import io.mockk.every
 import io.mockk.mockk
+import logic.entities.exceptions.StateNotFoundException
 import logic.repository.StatesRepository
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.assertThrows
 import kotlin.test.Test
+import kotlin.uuid.ExperimentalUuidApi
 
 class GetStateByIdUseCaseTest {
     private lateinit var statesRepository: StatesRepository
@@ -32,16 +35,23 @@ class GetStateByIdUseCaseTest {
         assertThat(result).isEqualTo(expectedState)
     }
 
+    @OptIn(ExperimentalUuidApi::class)
     @Test
-    fun `should return null when state id does not exist`() {
-        // Given
-        every { statesRepository.getStateById("999") } returns null
+    fun `should throw exception when state id does not exist`() {
+        val errorMessage = "Not found states with this project id"
+        val state = createState(id = "999")
 
-        // When
-        val result = getStateByIdUseCase.getStateById("999")
+        val states = listOf(
+            createState(),
+            createState()
+        )
 
-        // Then
-        assertThat(result).isNull()
+        every { statesRepository.getAllStates() } returns states
+        every { statesRepository.getStateById(state.id) } returns null
+
+        // When & Then
+        assertThrows<StateNotFoundException> {
+            getStateByIdUseCase.getStateById(state.id)
+        }
     }
-
 }
