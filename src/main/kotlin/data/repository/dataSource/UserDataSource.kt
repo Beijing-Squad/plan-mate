@@ -8,7 +8,5 @@ interface UserDataSource{
 
     fun getUserByUserId(userId: String): User
 
-    fun addUser(user: User)
-
-    fun updateUser(userId: String): User
+    fun updateUser(user: User): User
 }
