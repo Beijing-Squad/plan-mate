@@ -17,6 +17,7 @@ class ProjectManagementScreen(
     private val getAllProjectsUseCase: GetAllProjectsUseCase,
     private val getProjectByIdUseCase: GetProjectByIdUseCase,
     private val updateProjectUseCase: UpdateProjectUseCase,
+    private val userRole: UserRole = UserRole.ADMIN,
     private val consoleIO: ConsoleIO
 ) : BaseScreen(consoleIO) {
     override val id: String
@@ -25,23 +26,26 @@ class ProjectManagementScreen(
         get() = "Project Screen"
 
     override fun showOptionService() {
-        consoleIO.show("\u001B[32mEnter option: \u001B[0m")
         consoleIO.showWithLine(
-            """
-            \u001B[36m╔════════════════════════════════╗
-            ║      Project Management     ║
-            ╚════════════════════════════════╝\u001B[0m
-            
-            \u001B[33m1\u001B[0m. 📋 List All Project
-            \u001B[33m2\u001B[0m. 🔍 Find Project by ID
-            \u001B[33m3\u001B[0m. ✏️ Update Project
-            \u001B[33m4\u001B[0m. ➕ Add Project
-            \u001B[33m5\u001B[0m. ➖ Delete Project
-            \u001B[33m0\u001B[0m. 🔙 Exit to Main Menu
-            
-            \u001B[32mPlease select an option:\u001B[0m
-             """.trimIndent()
+        """
+        ╔════════════════════════════════════════╗
+        ║        Project Management System       ║
+        ╚════════════════════════════════════════╝
+        ┌─── Available Options ────────────────────┐
+        │                                          │
+        │  1. List All Project                     │
+        │  2. Find Project by ID                   │
+        │  3. Update Project                       │
+        │  4. Add Project                          │
+        │  5. Delete Project                       │     
+        │  0. Exit to Main Menu                    │
+        │                                          │
+        └──────────────────────────────────────────┘
+        """
+            .trimIndent()
         )
+
+        consoleIO.show("\uD83D\uDCA1 Please enter your choice:")
     }
 
     override fun handleFeatureChoice() {
@@ -58,7 +62,7 @@ class ProjectManagementScreen(
     }
 
     private fun listAllProjects() {
-        val result = getAllProjectsUseCase.getAllProjects(UserRole.ADMIN)
+        val result = getAllProjectsUseCase.getAllProjects(userRole)
         result.fold(
             onSuccess = { projects ->
                 if (projects.isEmpty()) {
@@ -78,7 +82,7 @@ class ProjectManagementScreen(
     private fun findProjectById() {
         consoleIO.show("\u001B[32mEnter project ID: \u001B[0m")
         val id = getInput() ?: return
-        val result = getProjectByIdUseCase.getProjectById(id, UserRole.ADMIN)
+        val result = getProjectByIdUseCase.getProjectById(id, userRole)
         result.fold(
             onSuccess = { project -> showProjectInfo(project) },
             onFailure = { error -> consoleIO.showWithLine("\u001B[31m❌ ${error.message}\u001B[0m") }
@@ -88,7 +92,7 @@ class ProjectManagementScreen(
     private fun updateProject() {
         consoleIO.show("\u001B[32mEnter project ID to update: \u001B[0m")
         val id = getInput() ?: return
-        val existing = getProjectByIdUseCase.getProjectById(id, UserRole.ADMIN)
+        val existing = getProjectByIdUseCase.getProjectById(id, userRole)
         existing.fold(
             onSuccess = { project ->
                 consoleIO.show("\u001B[32mEnter new name: \u001B[0m")
@@ -100,7 +104,7 @@ class ProjectManagementScreen(
                     description = desc,
                     updatedAt = Clock.System.todayIn(TimeZone.currentSystemDefault())
                 )
-                val result = updateProjectUseCase.updateProject(updated, UserRole.ADMIN)
+                val result = updateProjectUseCase.updateProject(updated, userRole)
                 result.fold(
                     onSuccess = {
                         consoleIO.showWithLine("\u001B[32m✅ Project updated successfully.\u001B[0m")
@@ -129,7 +133,7 @@ class ProjectManagementScreen(
             createdAt = now,
             updatedAt = now
         )
-        val result = addProjectUseCase.addProject(newProject, UserRole.ADMIN)
+        val result = addProjectUseCase.addProject(newProject, userRole)
         result.fold(
             onSuccess = {
                 consoleIO.showWithLine("\u001B[32m✅ Project added successfully.\u001B[0m")
@@ -143,7 +147,7 @@ class ProjectManagementScreen(
     private fun deleteProject() {
         consoleIO.show("\u001B[32mEnter project ID to delete: \u001B[0m")
         val id = getInput() ?: return
-        val result = deleteProjectUseCase.deleteProject(id, UserRole.ADMIN)
+        val result = deleteProjectUseCase.deleteProject(id, userRole)
         result.fold(
             onSuccess = {
                 consoleIO.showWithLine("\u001B[32m✅ Project deleted successfully.\u001B[0m")
