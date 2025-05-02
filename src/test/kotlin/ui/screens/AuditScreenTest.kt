@@ -191,7 +191,18 @@ class AuditScreenTest {
     }
 
 
+    @Test
+    fun `handleFeatureChoice should call getAuditLogsByTaskId when this option is selected`() {
+        // Given
+        val getAuditLogsByTaskIdOption = "3"
+        every { consoleIO.read() } returns getAuditLogsByTaskIdOption
 
+        // When
+        auditScreen.handleFeatureChoice()
+
+        // Then
+        verify { getAuditLogsByTaskIdUseCase.getAuditLogsByTaskId(any()) }
+    }
 
 
 
