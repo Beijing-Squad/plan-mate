@@ -101,15 +101,11 @@ class AuditScreen(
         val action = audit.action.name.padEnd(8)
         val entity = audit.entityType.name.padEnd(8)
         val entityId = audit.entityId.take(13).padEnd(12)
+        val oldState = (audit.oldState ?: "").padEnd(17)
+        val newState = (audit.newState ?: "").padEnd(17)
         val date = audit.timeStamp.toString()
 
-        return if (audit.entityType == EntityType.TASK) {
-            val oldState = audit.oldState ?: "N/A"
-            val newState = audit.newState ?: "N/A"
-            "$role| $userName| $action| $entity| $entityId| $oldState| $newState| $date"
-        } else {
-            "$role| $userName| $action| $entity| $entityId| $date"
-        }
+        return "$role| $userName| $action| $entity| $entityId| $oldState| $newState| $date"
     }
 
     private fun getIdInput(): String {
