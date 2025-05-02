@@ -8,10 +8,10 @@ import kotlin.uuid.ExperimentalUuidApi
 class StatesCsvDataSourceImpl(
     private val csvDataSource: CsvDataSourceImpl<State>
 ) : StatesDataSource {
-    private val states = csvDataSource.loadAllDataFromFile().toMutableList()
+    private val states = getAllStates().toMutableList()
 
     override fun getAllStates(): List<State> {
-        return states
+        return csvDataSource.loadAllDataFromFile()
     }
 
     override fun getStatesByProjectId(projectId: String): List<State> {
@@ -22,7 +22,7 @@ class StatesCsvDataSourceImpl(
     @OptIn(ExperimentalUuidApi::class)
     override fun getStateById(stateId: String): State? {
         return getAllStates()
-            .find { it.id.toString() == stateId }
+            .find { it.id == stateId }
     }
 
     @OptIn(ExperimentalUuidApi::class)
@@ -36,7 +36,7 @@ class StatesCsvDataSourceImpl(
 
     @OptIn(ExperimentalUuidApi::class)
     override fun updateState(newState: State): State {
-        return getStateById(newState.id.toString()).let { currentState ->
+        return getStateById(newState.id).let { currentState ->
             val updatedState = newState.copy(
                 name = newState.name,
                 projectId = newState.projectId
@@ -46,7 +46,6 @@ class StatesCsvDataSourceImpl(
             updatedState
         }
     }
-
 
     @OptIn(ExperimentalUuidApi::class)
     override fun deleteState(state: State): Boolean {
