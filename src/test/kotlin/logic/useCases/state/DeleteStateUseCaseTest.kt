@@ -67,4 +67,25 @@ class DeleteStateUseCaseTest {
         assertThat(result.isFailure).isFalse()
     }
 
+    @OptIn(ExperimentalUuidApi::class)
+    @Test
+    fun `should throw exception when user is not admin`() {
+        // Given
+        val mateRole = UserRole.MATE
+        val project = createProject()
+        val state = createState(
+            name = "in progress",
+            projectId = project.id.toString()
+        )
+        val newState = createState(
+            id = state.id,
+            name = "done",
+            projectId = state.projectId
+        )
+
+        // When && Then
+        assertThrows<StateUnauthorizedUserException> {
+            deleteStateUseCase.deleteState(newState, mateRole)
+        }
+    }
 }
