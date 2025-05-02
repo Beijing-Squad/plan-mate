@@ -171,7 +171,24 @@ class AuditScreenTest {
         verify { consoleIO.showWithLine("❌ $projectNotFoundError") }
     }
 
+    @Test
+    fun `should view INVALID_ID_ERROR message when project id is blank`() {
+        // Given
+        val getAuditLogsByProjectIdOption = "2"
+        val projectId = ""
+        val INVALID_ID_ERROR = "Error: ID shouldn't be blank"
+        every { consoleIO.read() } returns getAuditLogsByProjectIdOption andThen projectId
+        every {
+            getAuditLogsByProjectIdUseCase.getAuditLogsByProjectId(projectId)
+        } throws InvalidInputException(INVALID_ID_ERROR)
 
+
+        // When
+        auditScreen.handleFeatureChoice()
+
+        // Then
+        verify { consoleIO.showWithLine("❌ $INVALID_ID_ERROR") }
+    }
 
 
 
