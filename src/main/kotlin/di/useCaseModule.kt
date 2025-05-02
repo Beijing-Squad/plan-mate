@@ -1,5 +1,9 @@
 package di
 
+import logic.useCases.audit.AddAuditLogUseCase
+import logic.useCases.audit.GetAllAuditLogsUseCase
+import logic.useCases.audit.GetAuditLogsByProjectIdUseCase
+import logic.useCases.audit.GetAuditLogsByTaskIdUseCase
 import logic.useCases.project.*
 import logic.useCases.authentication.LoginUserAuthenticationUseCase
 import logic.useCases.authentication.MD5PasswordUseCase
@@ -33,5 +37,9 @@ val useCaseModule = module {
     single { GetAllUsersUseCase(get()) }
     single { GetUserByUserIdUseCase(get()) }
     single { UpdateUserUseCase(get(), get(), get()) }
+    single { AddAuditLogUseCase(get())}
+    single { GetAllAuditLogsUseCase(get())}
+    single { GetAuditLogsByProjectIdUseCase(get())}
+    single { GetAuditLogsByTaskIdUseCase(get())}
 }
 
