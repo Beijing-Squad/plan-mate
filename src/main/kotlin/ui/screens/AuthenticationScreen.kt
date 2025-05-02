@@ -4,8 +4,6 @@ import logic.entities.User
 import logic.entities.UserRole
 import logic.useCases.authentication.LoginUserAuthenticationUseCase
 import logic.useCases.authentication.RegisterUserAuthenticationUseCase
-import java.util.*
-
 class AuthenticationScreen(
     private val registerUseCase: RegisterUserAuthenticationUseCase,
     private val loginUseCase: LoginUserAuthenticationUseCase
