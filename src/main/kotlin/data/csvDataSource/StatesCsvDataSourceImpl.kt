@@ -11,7 +11,7 @@ class StatesCsvDataSourceImpl(
     private val states = csvDataSource.loadAllDataFromFile().toMutableList()
 
     override fun getAllStates(): List<State> {
-        return csvDataSource.loadAllDataFromFile()
+        return states
     }
 
     override fun getStatesByProjectId(projectId: String): List<State> {
@@ -41,8 +41,8 @@ class StatesCsvDataSourceImpl(
                 name = newState.name,
                 projectId = newState.projectId
             )
-            states[states.indexOf(currentState)] = updatedState
-            csvDataSource.updateFile(states)
+            val updatedStates = states.map { if (it == currentState) updatedState else it }
+            csvDataSource.updateFile(updatedStates)
             updatedState
         }
     }
