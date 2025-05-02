@@ -98,6 +98,27 @@ class AddStateUseCaseTest {
 
     @OptIn(ExperimentalUuidApi::class)
     @Test
+    fun `should throw exception when add new state already exist`() {
+        // Given
+        val adminRole = UserRole.ADMIN
+        val errorMessage = "the new state is exist"
+        val project = createProject(
+            name = "PlanMate Core Features", createdBy = "adminUser01"
+        )
+        val newState = createState(
+            projectId = project.id.toString()
+        )
+        every { statesRepository.getAllStates() } returns listOf(newState)
+        every { statesRepository.addState(newState) } throws StateAlreadyExistException(errorMessage)
+
+        // When&Then
+        assertThrows<StateAlreadyExistException> {
+            addStateUseCase.addState(newState, adminRole)
+        }
+    }
+
+    @OptIn(ExperimentalUuidApi::class)
+    @Test
     fun `should throw exception when user is not admin`() {
         // Given
         val mateRole = UserRole.MATE
