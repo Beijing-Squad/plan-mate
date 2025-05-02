@@ -103,7 +103,22 @@ class AuditScreenTest {
         verify { consoleIO.showWithLine("❌ No Audit Logs Found") }
     }
 
+    @Test
+    fun `should view all audit logs when getAllAuditLogs returns non-empty list`() {
+        // Given
+        val getAllAuditLogsOption = "1"
+        every { consoleIO.read() } returns getAllAuditLogsOption
+        every { getAllAuditLogsUseCase.getAllAuditLogs() } returns allAudit
 
+        // When
+        auditScreen.handleFeatureChoice()
+
+        // Then
+        verifyOrder {
+            consoleIO.showWithLine("\n📋 All Audit Logs:\n")
+            consoleIO.showWithLine(any())
+        }
+    }
 
 
 
