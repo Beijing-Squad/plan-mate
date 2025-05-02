@@ -255,6 +255,18 @@ class AuditScreenTest {
         verify(exactly = 0) { getAllAuditLogsUseCase.getAllAuditLogs() }
     }
 
+    @Test
+    fun `should show error message when enter invalid option`() {
+        // Given
+        val invalidOption = "999"
+        val invalidOptionMessage = "❌ Invalid Option"
+        every { consoleIO.read() } returns invalidOption
 
+        // When
+        auditScreen.handleFeatureChoice()
+
+        // Then
+        verify { consoleIO.showWithLine(invalidOptionMessage) }
+    }
 
 }
