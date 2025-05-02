@@ -4,28 +4,17 @@ import data.csvDataSource.csv.CsvDataSourceImpl
 import data.repository.dataSource.ProjectDataSource
 import logic.entities.Project
 
-class ProjectCsvDataSourceImpl (
+
+class ProjectCsvDataSourceImpl(
     private val csvDataSource: CsvDataSourceImpl<Project>
-): ProjectDataSource {
+) : ProjectDataSource {
 
-    override fun getAllProjects(): List<Project> {
-        TODO("Not yet implemented")
-    }
+    override fun getAllProjects(): List<Project> = csvDataSource.loadAllDataFromFile()
 
-    override fun getProjectById(projectId: String): Project {
-        TODO("Not yet implemented")
-    }
+    override fun addProject(project: Project) = csvDataSource.appendToFile(project)
 
-    override fun addProject(project: Project) {
-        TODO("Not yet implemented")
-    }
+    override fun deleteProject(projectId: String) = csvDataSource.deleteById(projectId)
 
-    override fun deleteProject(projectId: String) {
-        TODO("Not yet implemented")
-    }
-
-    override fun updateProject(projectId: String): Project {
-        TODO("Not yet implemented")
-    }
+    override fun updateProject(newProjects: List<Project>) = csvDataSource.updateFile(newProjects)
 
 }
