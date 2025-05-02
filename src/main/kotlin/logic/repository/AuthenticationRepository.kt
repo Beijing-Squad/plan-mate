@@ -1,7 +1,9 @@
 package logic.repository
 
-interface AuthenticationRepository{
+import logic.entities.User
 
-    fun login(username: String, password: String): Boolean
+interface AuthenticationRepository {
 
+    fun registerUser(user: User): Boolean
+    fun loginUser(username: String, password: String): User?
 }
