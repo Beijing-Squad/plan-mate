@@ -222,7 +222,24 @@ class AuditScreenTest {
         }
     }
 
+    @Test
+    fun `should view INVALID_ID_ERROR message when task id is blank`() {
+        // Given
+        val getAuditLogsByTaskIdOption = "3"
+        val taskId = ""
+        val INVALID_ID_ERROR = "Error: ID shouldn't be blank"
+        every { consoleIO.read() } returns getAuditLogsByTaskIdOption andThen taskId
+        every {
+            getAuditLogsByTaskIdUseCase.getAuditLogsByTaskId(taskId)
+        } throws InvalidInputException(INVALID_ID_ERROR)
 
+
+        // When
+        auditScreen.handleFeatureChoice()
+
+        // Then
+        verify { consoleIO.showWithLine("❌ $INVALID_ID_ERROR") }
+    }
 
 
 
