@@ -20,6 +20,7 @@ class ProjectManagementScreenTest {
     private lateinit var updateProjectUseCase: UpdateProjectUseCase
     private lateinit var consoleIO: ConsoleIO
     private lateinit var projectScreen: ProjectManagementScreen
+    private  val userRole: UserRole = UserRole.ADMIN
 
     @BeforeEach
     fun setup() {
@@ -36,6 +37,7 @@ class ProjectManagementScreenTest {
             getAllProjectsUseCase,
             getProjectByIdUseCase,
             updateProjectUseCase,
+            userRole,
             consoleIO
         )
     }
