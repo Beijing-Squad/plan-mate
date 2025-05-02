@@ -7,12 +7,12 @@ interface StatesRepository{
 
     fun getStatesByProjectId(projectId: String): List<State>
 
-    fun getStateById(stateId: String): State
+    fun getStateById(stateId: String): State?
 
-    fun addState(state: State)
+    fun addState(state: State): Boolean
 
-    fun updateState(state: State)
+    fun updateState(state: State): State
 
-    fun deleteState(state: State)
+    fun deleteState(state: State): Boolean
 
 }

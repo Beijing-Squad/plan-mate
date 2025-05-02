@@ -16,6 +16,7 @@ class LoginUserAuthenticationUseCaseTest {
     private lateinit var repository: AuthenticationRepository
     private lateinit var loginUserAuthenticationUseCase: LoginUserAuthenticationUseCase
     private lateinit var mD5PasswordUseCase: MD5PasswordUseCase
+    private lateinit var sessionManager: SessionManager
 
     private val testUsername = "john_doe"
     private val testPassword = "secure123"
@@ -24,7 +25,8 @@ class LoginUserAuthenticationUseCaseTest {
     fun setUp() {
         repository = mockk(relaxed = true)
         mD5PasswordUseCase = mockk(relaxed = true)
-        loginUserAuthenticationUseCase = LoginUserAuthenticationUseCase(repository,mD5PasswordUseCase)
+        sessionManager = mockk(relaxed = true)
+        loginUserAuthenticationUseCase = LoginUserAuthenticationUseCase(repository,mD5PasswordUseCase,sessionManager)
     }
 
     @Test

@@ -4,9 +4,12 @@ import logic.entities.User
 import logic.entities.UserRole
 import logic.useCases.authentication.LoginUserAuthenticationUseCase
 import logic.useCases.authentication.RegisterUserAuthenticationUseCase
+import logic.useCases.authentication.SessionManager
+
 class AuthenticationScreen(
     private val registerUseCase: RegisterUserAuthenticationUseCase,
-    private val loginUseCase: LoginUserAuthenticationUseCase
+    private val loginUseCase: LoginUserAuthenticationUseCase,
+    private val sessionManager: SessionManager
 ) {
 
     fun start(): AuthResult {
@@ -24,6 +27,7 @@ class AuthenticationScreen(
                         return AuthResult.Success(user)
                     }
                 }
+
                 "2" -> register()
                 "0" -> return AuthResult.Exit
                 else -> println("❌ Invalid option. Please try again.")
@@ -40,7 +44,7 @@ class AuthenticationScreen(
 
         return try {
             val user = loginUseCase.execute(username, password)
-            println("✅ Login successful. Welcome, ${user.userName}!")
+            println("✅ Login successful. Welcome, ${sessionManager.getCurrentUser()?.userName}!")
             user
         } catch (e: Exception) {
             println("❌ ${e.message}")

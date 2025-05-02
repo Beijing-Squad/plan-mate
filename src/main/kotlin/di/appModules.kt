@@ -6,5 +6,6 @@ val appModule = listOf(
     parsersModule,
     dataSourceModule,
     repositoryModule,
-    useCaseModule
+    useCaseModule,
+    uiModule,
 )

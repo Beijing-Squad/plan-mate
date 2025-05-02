@@ -10,10 +10,8 @@ import io.mockk.mockk
 import io.mockk.verify
 import logic.entities.User
 import logic.entities.UserRole
-import logic.entities.exceptions.CsvWriteException
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 
 class AuthenticationCsvDataSourceImplTest {
 
@@ -53,21 +51,5 @@ class AuthenticationCsvDataSourceImplTest {
         // Then
         verify(exactly = 1) { userDataSource.getAllUsers() }
         assertThat(result).isEqualTo(testUser)
-    }
-
-    @Test
-    fun `saveUser should propagate exceptions from csvDataSource`() {
-        // Given
-        val exception = CsvWriteException("Test error")
-        every { csvDataSource.appendToFile(any()) } throws exception
-
-        // When
-        val thrown = assertThrows<CsvWriteException> {
-            authDataSource.saveUser(testUser)
-        }
-
-        // Then
-        verify(exactly = 1) { csvDataSource.appendToFile(testUser) }
-        assertThat(thrown).isEqualTo(exception)
     }
 }

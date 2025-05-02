@@ -12,7 +12,7 @@ interface TasksDataSource {
 
     fun deleteTask(taskId: String)
 
-    fun updateTask(taskId: String): Task
+    fun updateTask(updatedTask: Task): Task
 
 }
 

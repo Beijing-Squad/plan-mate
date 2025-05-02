@@ -8,19 +8,15 @@ class UserRepositoryImpl(
     private val userDataSource: UserDataSource
 ): UserRepository{
     override fun getAllUsers(): List<User> {
-        TODO("Not yet implemented")
+        return userDataSource.getAllUsers()
     }
 
     override fun getUserByUserId(userId: String): User {
-        TODO("Not yet implemented")
+        return userDataSource.getUserByUserId(userId)
     }
 
-    override fun addUser(user: User) {
-        TODO("Not yet implemented")
-    }
-
-    override fun updateUser(userId: String): User {
-        TODO("Not yet implemented")
+    override fun updateUser(user: User): User {
+        return userDataSource.updateUser(user)
     }
 
 }
