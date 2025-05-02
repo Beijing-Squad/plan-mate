@@ -23,6 +23,7 @@ open class ValidationException(message: String) : PlanMateException(message)
 class InvalidInputException(message: String) : ValidationException(message)
 class InvalidUserNameException(message: String) : ValidationException(message)
 class InvalidPasswordException(message: String) : ValidationException(message)
+class UnauthorizedUserException(message: String) : ValidationException(message)
 
 class DataAccessException(message: String) : PlanMateException(message)
 

@@ -4,23 +4,23 @@ import data.repository.dataSource.AuditDataSource
 import logic.entities.Audit
 import logic.repository.AuditRepository
 
-class AuditRepositoryImpl (
+class AuditRepositoryImpl(
     private val auditDataSource: AuditDataSource
-): AuditRepository{
+) : AuditRepository {
+
     override fun getAllAuditLogs(): List<Audit> {
-        TODO("Not yet implemented")
+        return auditDataSource.getAllAuditLogs()
     }
 
     override fun addAuditLog(audit: Audit) {
-        TODO("Not yet implemented")
+        auditDataSource.addAuditLog(audit)
     }
 
     override fun getAuditLogsByProjectId(projectId: String): List<Audit> {
-        TODO("Not yet implemented")
+        return auditDataSource.getAuditLogsByProjectId(projectId)
     }
 
     override fun getAuditLogsByTaskId(taskId: String): List<Audit> {
-        TODO("Not yet implemented")
+        return auditDataSource.getAuditLogsByTaskId(taskId)
     }
-
 }
