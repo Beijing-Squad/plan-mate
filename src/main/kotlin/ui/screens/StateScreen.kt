@@ -2,7 +2,7 @@ package ui.screens
 
 import logic.entities.State
 import logic.entities.UserRole
-import logic.entities.exceptions.StateUnauthorizedUserException
+import logic.useCases.authentication.SessionManager
 import logic.useCases.state.*
 import ui.main.BaseScreen
 import ui.main.consoleIO.ConsoleIO
@@ -15,7 +15,8 @@ class StateScreen(
     private val getAllStates: GetAllStatesUseCase,
     private val getStateById: GetStateByIdUseCase,
     private val getStatesByProjectId: GetStatesByProjectIdUseCase,
-    private val consoleIO: ConsoleIO
+    private val consoleIO: ConsoleIO,
+    private val sessionManager: SessionManager
 ) : BaseScreen(consoleIO) {
 
     override val id = "1"
@@ -145,19 +146,9 @@ class StateScreen(
     }
 
     private fun getRoleInput(): UserRole {
-        val roleInput = getInputWithLabel("👤 Enter your role (ADMIN / MATE): ")
-        return try {
-            UserRole.valueOf(roleInput.uppercase())
-        } catch (e: Exception) {
-            throw StateUnauthorizedUserException("❌ Invalid role")
-        }
+        return sessionManager.getCurrentUser()?.role ?: UserRole.MATE
     }
 
-    /*
-    private fun getRoleInput(): UserRole {
-        return SessionManager.getCurrentUser?.role
-    }
-     */
 
     private fun showResult(result: Boolean, action: String) {
         if (result) {
