@@ -4,10 +4,10 @@ import logic.entities.User
 import logic.entities.exceptions.InvalidPasswordException
 import logic.entities.exceptions.InvalidUserNameException
 import logic.repository.AuthenticationRepository
-import logic.useCases.hashPassword
 
 class LoginUserAuthenticationUseCase(
-    private val repository: AuthenticationRepository
+    private val repository: AuthenticationRepository,
+    private val md5Password: MD5PasswordUseCase
 ) {
     fun execute(username: String, password: String): User {
         require(username.isNotBlank()) { throw InvalidUserNameException(USERNAME_ERROR) }
@@ -16,7 +16,7 @@ class LoginUserAuthenticationUseCase(
         val user = repository.loginUser(username, password)
             ?: throw InvalidUserNameException(USERNAME_ERROR)
 
-        val hashedInputPassword = hashPassword(password)
+        val hashedInputPassword = md5Password.hashPassword(password)
         if (user.password != hashedInputPassword) {
             throw InvalidPasswordException(PASSWORD_ERROR)
         }
