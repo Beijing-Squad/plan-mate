@@ -1,6 +1,7 @@
 package ui.screens
 
 import logic.entities.User
+import logic.useCases.authentication.SessionManager
 import logic.useCases.user.GetAllUsersUseCase
 import logic.useCases.user.GetUserByUserIdUseCase
 import logic.useCases.user.UpdateUserUseCase
@@ -12,7 +13,8 @@ class UserScreen(
     private val getAllUsers: GetAllUsersUseCase,
     private val getUserByUserId: GetUserByUserIdUseCase,
     private val updateUser: UpdateUserUseCase,
-    private val consoleIO: ConsoleIO
+    private val consoleIO: ConsoleIO,
+    private val sessionManager: SessionManager
 ) : BaseScreen(consoleIO) {
     override val id: String
         get() = "1"
@@ -79,11 +81,10 @@ class UserScreen(
     @OptIn(ExperimentalUuidApi::class)
     private fun onClickUpdateUser() {
         consoleIO.showWithLine("\n\u001B[36m✏️ Update User\u001B[0m")
-        consoleIO.show("\u001B[32mEnter user ID: \u001B[0m")
-        val userId = getInput()
+        val userId = sessionManager.getCurrentUser()?.id.toString()
 
         try {
-            val user = userId?.let { getUserByUserId.getUserByUserId(it) } ?: return
+            val user = userId.let { getUserByUserId.getUserByUserId(it) }
             showCurrentUserDetails(user)
             updateUserMenu(user)
         } catch (e: Exception) {
@@ -168,7 +169,7 @@ class UserScreen(
         updateUser.updateUser(user)
             .fold(
                 onSuccess = ::onUpdateUserSuccess,
-                onFailure = ::onUpdateUserFailer
+                onFailure = ::onUpdateUserFailure
             )
     }
 
@@ -184,7 +185,7 @@ class UserScreen(
         )
     }
 
-    private fun onUpdateUserFailer(throwable: Throwable) {
+    private fun onUpdateUserFailure(throwable: Throwable) {
         consoleIO.showWithLine("\u001B[31m❌ Error updating user: ${throwable.message}\u001B[0m")
     }
 

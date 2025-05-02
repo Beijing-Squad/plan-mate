@@ -16,7 +16,7 @@ class RegisterUserAuthenticationUseCase(
     @OptIn(ExperimentalUuidApi::class)
     fun execute(username: String, password: String, role: UserRole): Boolean {
         require(username.isNotBlank()) { "Username cannot be blank" }
-        require(password.isNotBlank()) {"Password cannot be black"}
+        require(password.isNotBlank()) { "Password cannot be black" }
         val hashedPassword = md5Password.hashPassword(password)
         val user = User(Uuid.random(), username, hashedPassword, role)
         val existingUser = userRepository.getAllUsers().find { it.userName == username }

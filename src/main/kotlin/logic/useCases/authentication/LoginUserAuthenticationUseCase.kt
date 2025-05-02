@@ -7,7 +7,8 @@ import logic.repository.AuthenticationRepository
 
 class LoginUserAuthenticationUseCase(
     private val repository: AuthenticationRepository,
-    private val md5Password: MD5PasswordUseCase
+    private val md5Password: MD5PasswordUseCase,
+    private val sessionManager: SessionManager
 ) {
     fun execute(username: String, password: String): User {
         require(username.isNotBlank()) { throw InvalidUserNameException(USERNAME_ERROR) }
@@ -20,6 +21,7 @@ class LoginUserAuthenticationUseCase(
         if (user.password != hashedInputPassword) {
             throw InvalidPasswordException(PASSWORD_ERROR)
         }
+        sessionManager.setCurrentUser(user)
         return user
     }
 

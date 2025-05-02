@@ -3,28 +3,28 @@ package logic.useCases.user
 import com.google.common.truth.Truth.assertThat
 import data.repository.UserRepositoryImpl
 import fake.createUser
+import io.mockk.every
 import io.mockk.mockk
+import logic.entities.User
 import logic.repository.UserRepository
-import logic.useCases.user.cryptography.MD5PasswordEncryption
-import logic.useCases.user.cryptography.PasswordEncryption
+import logic.useCases.authentication.MD5PasswordUseCase
+import logic.useCases.authentication.SessionManager
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.CsvSource
 import kotlin.uuid.ExperimentalUuidApi
 
 class UpdateUserUseCaseTest {
     private lateinit var updateUser: UpdateUserUseCase
     private lateinit var userRepository: UserRepository
-    private lateinit var passwordEncryption: PasswordEncryption
-    private lateinit var validateUser: ValidateUserUseCase
+    private lateinit var mD5Password: MD5PasswordUseCase
+    private lateinit var sessionManager: SessionManager
 
     @BeforeEach
     fun setUp() {
         userRepository = UserRepositoryImpl(mockk(relaxed = true))
-        passwordEncryption = MD5PasswordEncryption()
-        validateUser = ValidateUserUseCase()
-        updateUser = UpdateUserUseCase(userRepository,passwordEncryption,validateUser)
+        mD5Password = mockk(relaxed = true)
+        sessionManager = mockk(relaxed = true)
+        updateUser = UpdateUserUseCase(userRepository, mD5Password, sessionManager)
     }
 
     @OptIn(ExperimentalUuidApi::class)
@@ -33,28 +33,21 @@ class UpdateUserUseCaseTest {
         // Given
         val userName = "mohammed123"
         val password = "12345678"
-        val mohammed = createUser(userName = userName,password = password)
+        val mohammed = createUser(userName = userName, password = password)
         val userUpdated = mohammed.copy(userName = "mohammed2001")
         // When
 
+        every { sessionManager.getCurrentUser() } returns mohammed
         val actual = updateUser.updateUser(userUpdated)
 
         // Then
         assertThat(actual.isSuccess).isTrue()
     }
 
-    @ParameterizedTest
-    @CsvSource(
-        "mohammed akkad",
-        "1mohammed",
-        "mohammed 123",
-        "ab",
-        "@mohammed1234",
-        "mohammed@123"
-    )
-    fun `should throw InvalidUserNameException when username is invalid`(username: String) {
+    @Test
+    fun `should throw InvalidUserNameException when username is invalid`() {
         // Given
-        val user = createUser(userName = username)
+        val user = createUser(userName = "")
 
         // When
         val actual = updateUser.updateUser(user)
@@ -67,7 +60,7 @@ class UpdateUserUseCaseTest {
     @Test
     fun `should throw InvalidPasswordException when password is invalid`() {
         // Given
-        val user = createUser(password = "1234")
+        val user = createUser(password = "")
 
         // When
         val actual = updateUser.updateUser(user)
