@@ -9,7 +9,7 @@ class StatesCsvDataSourceImpl(
 ): StatesDataSource {
 
     override fun getAllStates(): List<State> {
-        return csvDataSource.loadAllDataFromFile()
+        TODO("Not yet implemented")
     }
 
     override fun getStatesByProjectId(projectId: String): List<State> {
