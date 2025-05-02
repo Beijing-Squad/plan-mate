@@ -77,6 +77,22 @@ class LoginUserAuthenticationUseCaseTest {
         assertThat(exception.message).isEqualTo(PASSWORD_ERROR)
     }
 
+    @Test
+    fun `given valid username and password, when execute called, then return User`() {
+        // Given
+        val hashedPassword = "hashed_secure123"
+        val expectedUser = createUser(userName = testUsername, password = hashedPassword)
+
+        every { repository.loginUser(testUsername, testPassword) } returns expectedUser
+        every { mD5PasswordUseCase.hashPassword(testPassword) } returns hashedPassword
+
+        // When
+        val result = loginUserAuthenticationUseCase.execute(testUsername, testPassword)
+
+        // Then
+        assertThat(result).isEqualTo(expectedUser)
+    }
+
     private companion object {
         const val USERNAME_ERROR = "Invalid username"
         const val PASSWORD_ERROR = "Invalid password"
