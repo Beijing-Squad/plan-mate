@@ -23,11 +23,10 @@ class AuditCsvDataSourceImpl(
     }
 
     override fun getAuditLogsByTaskId(taskId: String): List<Audit> {
-        return csvDataSource.loadAllDataFromFile()
-            .filter { audit: Audit ->
-                audit.entityId == taskId
-                        && audit.entityType == EntityType.TASK
-            }
+        return getAllAuditLogs().filter { audit: Audit ->
+            audit.entityId == taskId
+                    && audit.entityType == EntityType.TASK
+        }
     }
 
     private fun isMatchingProject(audit: Audit, projectId: String): Boolean {

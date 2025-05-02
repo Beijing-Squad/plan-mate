@@ -4,9 +4,10 @@ import data.repository.dataSource.AuditDataSource
 import logic.entities.Audit
 import logic.repository.AuditRepository
 
-class AuditRepositoryImpl (
+class AuditRepositoryImpl(
     private val auditDataSource: AuditDataSource
-): AuditRepository{
+) : AuditRepository {
+
     override fun getAllAuditLogs(): List<Audit> {
         return auditDataSource.getAllAuditLogs()
     }
@@ -21,7 +22,5 @@ class AuditRepositoryImpl (
 
     override fun getAuditLogsByTaskId(taskId: String): List<Audit> {
         return auditDataSource.getAuditLogsByTaskId(taskId)
-
     }
-
 }
