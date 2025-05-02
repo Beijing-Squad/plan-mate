@@ -134,7 +134,23 @@ class AuditScreenTest {
         verify { getAuditLogsByProjectIdUseCase.getAuditLogsByProjectId(any()) }
     }
 
+    @Test
+    fun `should view all project audit logs when getAuditLogsByProjectId returns non-empty list`() {
+        // Given
+        val getAuditLogsByProjectIdOption = "2"
+        val projectId = "123"
+        every { consoleIO.read() } returns getAuditLogsByProjectIdOption andThen projectId
+        every { getAuditLogsByProjectIdUseCase.getAuditLogsByProjectId(projectId) } returns allAudit
 
+        // When
+        auditScreen.handleFeatureChoice()
+
+        // Then
+        verifyOrder {
+            consoleIO.showWithLine("\n🔍 Audit Logs For Project ID: $projectId\n")
+            consoleIO.showWithLine(any())
+        }
+    }
 
 
 
