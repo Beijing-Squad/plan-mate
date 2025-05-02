@@ -89,7 +89,19 @@ class AuditScreenTest {
         verify { getAllAuditLogsUseCase.getAllAuditLogs() }
     }
 
+    @Test
+    fun `should view no audit logs found message when getAllAuditLogs returns empty list`() {
+        // Given
+        val getAllAuditLogsOption = "1"
+        every { consoleIO.read() } returns getAllAuditLogsOption
+        every { getAllAuditLogsUseCase.getAllAuditLogs() } returns emptyList()
 
+        // When
+        auditScreen.handleFeatureChoice()
+
+        // Then
+        verify { consoleIO.showWithLine("❌ No Audit Logs Found") }
+    }
 
 
 
