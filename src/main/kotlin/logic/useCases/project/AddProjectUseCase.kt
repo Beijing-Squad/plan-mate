@@ -24,7 +24,7 @@ class AddProjectUseCase(
         else {
             try {
                 projectsRepository.addProject(project)
-                Result.success(true)
+                Result.success(ADD_PROJECT_SUCCESSFULLY)
             } catch (e: CsvWriteException) {
                 Result.failure(e)
             }
@@ -34,4 +34,8 @@ class AddProjectUseCase(
 
     private fun checkDuplicateProject(project: Project) =
         projectsRepository.getAllProjects().any { it.name == project.name }
+
+    companion object {
+        private const val ADD_PROJECT_SUCCESSFULLY = true
+    }
 }

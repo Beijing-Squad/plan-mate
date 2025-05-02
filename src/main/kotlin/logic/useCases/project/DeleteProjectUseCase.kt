@@ -10,26 +10,29 @@ import kotlin.uuid.ExperimentalUuidApi
 class DeleteProjectUseCase(
     private val projectsRepository: ProjectsRepository
 ) {
-    fun deleteProject(projectId: String,role: UserRole):Result<Boolean> {
+    fun deleteProject(projectId: String, role: UserRole): Result<Boolean> {
         return try {
-            if(role != UserRole.ADMIN) {
+            if (role != UserRole.ADMIN) {
                 Result.failure(ProjectUnauthorizedUserException("User Not Authorized"))
-            }
-            else if(!isProjectExists(projectId)){
+            } else if (!isProjectExists(projectId)) {
                 Result.failure(ProjectNotFoundException("There is no Project with ID:${projectId}"))
-            }
-            else{
+            } else {
 
                 projectsRepository.deleteProject(projectId)
-                Result.success(true)
+                Result.success(DELETE_PROJECT_SUCCESSFULLY)
             }
 
-        }catch (e:CsvWriteException){
+        } catch (e: CsvWriteException) {
             Result.failure(e)
         }
     }
-    @OptIn(ExperimentalUuidApi::class)
-    private fun isProjectExists(projectId: String): Boolean = projectsRepository.getAllProjects().any { it.id.toString() == projectId }
 
+    @OptIn(ExperimentalUuidApi::class)
+    private fun isProjectExists(projectId: String): Boolean =
+        projectsRepository.getAllProjects().any { it.id.toString() == projectId }
+
+    companion object {
+        private const val DELETE_PROJECT_SUCCESSFULLY = true
+    }
 
 }

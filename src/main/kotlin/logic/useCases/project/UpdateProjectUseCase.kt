@@ -26,7 +26,7 @@ class UpdateProjectUseCase(
                 }
 
                 projectsRepository.updateProject(newProjects)
-                Result.success(true)
+                Result.success(UPDATE_PROJECT_SUCCESSFULLY)
             } catch (e: CsvWriteException) {
                 Result.failure(e)
             }
@@ -36,4 +36,8 @@ class UpdateProjectUseCase(
     @OptIn(ExperimentalUuidApi::class)
     private fun isProjectExists(newProject: Project): Boolean =
         projectsRepository.getAllProjects().any { it.id == newProject.id }
+
+    companion object {
+        private const val UPDATE_PROJECT_SUCCESSFULLY = true
+    }
 }
