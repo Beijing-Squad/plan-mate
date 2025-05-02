@@ -121,7 +121,18 @@ class AuditScreenTest {
     }
 
 
+    @Test
+    fun `handleFeatureChoice should call getAuditLogsByProjectId when this option is selected`() {
+        // Given
+        val getAuditLogsByProjectIdOption = "2"
+        every { consoleIO.read() } returns getAuditLogsByProjectIdOption
 
+        // When
+        auditScreen.handleFeatureChoice()
+
+        // Then
+        verify { getAuditLogsByProjectIdUseCase.getAuditLogsByProjectId(any()) }
+    }
 
 
 
