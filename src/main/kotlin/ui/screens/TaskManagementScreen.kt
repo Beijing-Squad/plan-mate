@@ -67,17 +67,9 @@ class TaskManagementScreen(
     private fun showTasksInSwimlanes() {
         consoleIO.showWithLine("\n\u001B[36m📋 All Tasks (Swimlanes View):\u001B[0m")
         val tasks = getAllTasksUseCase.getAllTasks()
-
-        // ⚠️ States added manually just for testing
-        val mockStates = listOf(
-            logic.entities.State(id = 1.toString(), name = "To Do", projectId = 1.toString()),
-            logic.entities.State(id = 2.toString(), name = "In Progress", projectId = 2.toString()),
-            logic.entities.State(id = 3.toString(), name = "Done", projectId = 3.toString())
-        )
-
-        swimlanesRenderer.render(tasks, mockStates)
+        val states = getAllStatesUseCase.getAllStates()
+        swimlanesRenderer.render(tasks, states)
     }
-
 
     @OptIn(ExperimentalUuidApi::class)
     fun addTask() {
