@@ -5,6 +5,7 @@ open class PlanMateException(message: String) : Exception(message)
 open class AuthenticationException(message: String) : PlanMateException(message)
 class UserNotFoundException(message: String) : AuthenticationException(message)
 class InvalidLoginException(message: String) : AuthenticationException(message)
+class UserExistsException(message: String) : AuthenticationException(message)
 
 open class ProjectException(message: String) : PlanMateException(message)
 class ProjectAlreadyExistsException(message: String) : ProjectException(message)
