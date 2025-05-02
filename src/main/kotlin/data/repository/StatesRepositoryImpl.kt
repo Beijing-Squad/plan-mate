@@ -8,7 +8,7 @@ class StatesRepositoryImpl(
     private val stateDataSource: StatesDataSource
 ) : StatesRepository{
     override fun getAllStates(): List<State> {
-       return stateDataSource.getAllStates()
+        TODO("Not yet implemented")
     }
 
     override fun getStatesByProjectId(projectId: String): List<State> {
