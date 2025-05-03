@@ -5,6 +5,8 @@ import logic.entities.UserRole
 import logic.useCases.authentication.LoginUserAuthenticationUseCase
 import logic.useCases.authentication.RegisterUserAuthenticationUseCase
 import logic.useCases.authentication.SessionManager
+import org.koin.mp.KoinPlatform.getKoin
+import ui.main.PlanMateConsoleUi
 
 class AuthenticationScreen(
     private val registerUseCase: RegisterUserAuthenticationUseCase,
@@ -45,6 +47,8 @@ class AuthenticationScreen(
         return try {
             val user = loginUseCase.execute(username, password)
             println("✅ Login successful. Welcome, ${sessionManager.getCurrentUser()?.userName}!")
+            val planMateConsoleUi: PlanMateConsoleUi = getKoin().get()
+            planMateConsoleUi.start()
             user
         } catch (e: Exception) {
             println("❌ ${e.message}")

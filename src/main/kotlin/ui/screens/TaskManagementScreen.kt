@@ -16,6 +16,7 @@ import ui.main.BaseScreen
 import ui.main.consoleIO.ConsoleIO
 import kotlin.uuid.ExperimentalUuidApi
 
+@OptIn(ExperimentalUuidApi::class)
 class TaskManagementScreen(
     private val getAllTasksUseCase: GetAllTasksUseCase,
     private val getAllStatesUseCase: GetAllStatesUseCase,
@@ -70,7 +71,7 @@ class TaskManagementScreen(
         }
     }
 
-    private fun showTasksInSwimlanes() {
+    fun showTasksInSwimlanes() {
         consoleIO.showWithLine("\n\u001B[36m📋 All Tasks (Swimlanes View):\u001B[0m")
         val tasks = getAllTasksUseCase.getAllTasks()
         val states = getAllStatesUseCase.getAllStates()
@@ -126,7 +127,7 @@ class TaskManagementScreen(
     }
 
     @OptIn(ExperimentalUuidApi::class)
-    private fun showAllTasksList() {
+    fun showAllTasksList() {
         consoleIO.showWithLine("\n\u001B[36m📋 All Tasks (List View):\u001B[0m")
         val tasks = getAllTasksUseCase.getAllTasks()
 
@@ -151,8 +152,7 @@ class TaskManagementScreen(
         }
     }
 
-    @OptIn(ExperimentalUuidApi::class)
-    private fun getTaskById() {
+    fun getTaskById() {
         consoleIO.showWithLine("\n\u001B[36m🔍 Find Task by ID\u001B[0m")
         consoleIO.show("\u001B[32mEnter Task ID: \u001B[0m")
         val id = consoleIO.read()
@@ -211,16 +211,16 @@ class TaskManagementScreen(
         }
     }
 
-    private fun deleteTaskById() {
+     fun deleteTaskById() {
         consoleIO.showWithLine("\n\u001B[36m🗑️ Delete Task\u001B[0m")
         consoleIO.show("\u001B[32mEnter Task ID to delete: \u001B[0m")
         val id = consoleIO.read()
 
         try {
             deleteTaskUseCase.deleteTask(id ?: "")
-            consoleIO.showWithLine("\u001B[32m✅ Task deleted successfully.\u001B[0m")
+            consoleIO.showWithLine("✅ Task deleted successfully.")
         } catch (e: Exception) {
-            consoleIO.showWithLine("\u001B[31m❌ Error deleting task: ${e.message}\u001B[0m")
+            consoleIO.showWithLine("❌ Error deleting task: ${e.message}")
         }
     }
 }

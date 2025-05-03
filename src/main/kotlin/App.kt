@@ -13,7 +13,4 @@ fun main() {
 
     val authenticationScreen: AuthenticationScreen = getKoin().get()
     authenticationScreen.start()
-
-    val planMateConsoleUi: PlanMateConsoleUi = getKoin().get()
-    planMateConsoleUi.start()
 }
