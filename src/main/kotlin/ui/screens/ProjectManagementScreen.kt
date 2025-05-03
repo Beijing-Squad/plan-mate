@@ -112,6 +112,19 @@ class ProjectManagementScreen(
                 result.fold(
                     onSuccess = {
                         consoleIO.showWithLine("\u001B[32m✅ Project updated successfully.\u001B[0m")
+                        addAudit.addAuditLog(
+                            Audit(
+                                id = Uuid.random(),
+                                userRole = userRole,
+                                userName = sessionManager.getCurrentUser()!!.userName,
+                                action = ActionType.UPDATE,
+                                entityType = EntityType.PROJECT,
+                                entityId = updated.id.toString(),
+                                oldState = updated.name,
+                                newState = updated.description,
+                                timeStamp = Clock.System.todayIn(TimeZone.currentSystemDefault())
+                            )
+                        )
                     },
                     onFailure = { error ->
                         consoleIO.showWithLine("\u001B[31m❌ ${error.message}\u001B[0m")
