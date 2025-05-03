@@ -39,7 +39,7 @@ val uiModule = module {
         TaskManagementScreen(
             get(), get(), get(),
             get(), get(), get(),
-            get()
+            get(), get(), get()
         )
     }
 

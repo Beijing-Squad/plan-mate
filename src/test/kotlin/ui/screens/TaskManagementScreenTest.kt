@@ -4,6 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import fake.createState
 import fake.createTask
 import io.mockk.*
+import logic.useCases.authentication.SessionManager
 import logic.useCases.state.GetAllStatesUseCase
 import logic.useCases.task.*
 import org.junit.jupiter.api.BeforeEach
@@ -19,10 +20,12 @@ class TaskManagementScreenTest {
     private val getAllTasksUseCase = mockk<GetAllTasksUseCase>()
     private val getAllStatesUseCase = mockk<GetAllStatesUseCase>()
     private val addTaskUseCase = mockk<AddTaskUseCase>(relaxed = true)
+    private val updateTaskUseCase = mockk<UpdateTaskUseCase>(relaxed = true)
     private val deleteTaskUseCase = mockk<DeleteTaskUseCase>(relaxed = true)
     private val getTaskByIdUseCase = mockk<GetTaskByIdUseCase>()
     private val swimlanesRenderer = mockk<SwimlanesRenderer>(relaxed = true)
     private val consoleIO = mockk<ConsoleIO>(relaxed = true)
+    private val sessionManager = mockk<SessionManager>(relaxed = true)
 
     @BeforeEach
     fun setUp() {
@@ -32,9 +35,30 @@ class TaskManagementScreenTest {
             addTaskUseCase,
             deleteTaskUseCase,
             getTaskByIdUseCase,
+            updateTaskUseCase,
             swimlanesRenderer,
-            consoleIO
+            consoleIO,
+            sessionManager
         )
+    }
+
+
+    @Test
+    fun `should display all task management options when showOptionService is called`() {
+        // When
+        screen.showOptionService()
+
+        // Then
+        verify {
+            consoleIO.showWithLine(match { it.contains("Task Management") })
+            consoleIO.showWithLine(match { it.contains("1. Show All Tasks (Swimlanes)") })
+            consoleIO.showWithLine(match { it.contains("2. Add Task") })
+            consoleIO.showWithLine(match { it.contains("3. Find Task by ID") })
+            consoleIO.showWithLine(match { it.contains("4. Delete Task") })
+            consoleIO.showWithLine(match { it.contains("5. Show All Tasks (List View)") })
+            consoleIO.showWithLine(match { it.contains("6. Update Task") })
+        }
+        verify { consoleIO.show("💡 Please enter your choice: ") }
     }
 
     @Test
@@ -77,6 +101,81 @@ class TaskManagementScreenTest {
         verify { deleteTaskUseCase.deleteTask("task-id-123") }
         assertThat("task-id-123").isEqualTo("task-id-123")
     }
+    @Test
+    fun `should update task when input is valid`() {
+        // Given
+        val oldTask = createTask(title = "Old", description = "Old Desc")
+        every { consoleIO.read() } returnsMany listOf(oldTask.id.toString(), "New", "New Desc")
+        every { getTaskByIdUseCase.getTaskById(oldTask.id.toString()) } returns oldTask
+        val updatedTask = oldTask.copy(title = "New", description = "New Desc")
+        every {
+            updateTaskUseCase.updateTask(oldTask.id.toString(), "New", "New Desc", any())
+        } returns updatedTask
+
+        // When
+        screen.updateTaskById()
+
+        // Then
+        verify { updateTaskUseCase.updateTask(oldTask.id.toString(), "New", "New Desc", any()) }
+        verify { consoleIO.showWithLine(match { it.contains("✅ Task updated successfully") }) }
+    }
+    @Test
+    fun `should show error when task ID is blank`() {
+        // Given
+        every { consoleIO.read() } returns ""
+
+        // When
+        screen.updateTaskById()
+
+        // Then
+        verify { consoleIO.showWithLine("❌ Task ID is required.") }
+    }
+    @Test
+    fun `should show error when task not found`() {
+        // Given
+        every { consoleIO.read() } returns "non-existing-id"
+        every { getTaskByIdUseCase.getTaskById("non-existing-id") } throws RuntimeException("Task not found")
+
+        // When
+        screen.updateTaskById()
+
+        // Then
+        verify { consoleIO.showWithLine("❌ Failed to update task: Task not found") }
+    }
+    @Test
+    fun `should show error when update use case throws exception`() {
+        // Given
+        val task = createTask()
+        every { consoleIO.read() } returnsMany listOf(task.id.toString(), "New Title", "New Desc")
+        every { getTaskByIdUseCase.getTaskById(task.id.toString()) } returns task
+        every {
+            updateTaskUseCase.updateTask(any(), any(), any(), any())
+        } throws RuntimeException("Unexpected error")
+
+        // When
+        screen.updateTaskById()
+
+        // Then
+        verify { consoleIO.showWithLine("❌ Failed to update task: Unexpected error") }
+    }
+    @Test
+    fun `should keep original values when inputs are blank`() {
+        // Given
+        val task = createTask(title = "Original Title", description = "Original Desc")
+        every { consoleIO.read() } returnsMany listOf(task.id.toString(), "", "")
+        every { getTaskByIdUseCase.getTaskById(task.id.toString()) } returns task
+        val updatedTask = task.copy()
+        every {
+            updateTaskUseCase.updateTask(task.id.toString(), null, null, any())
+        } returns updatedTask
+
+        // When
+        screen.updateTaskById()
+
+        // Then
+        verify { updateTaskUseCase.updateTask(task.id.toString(), null, null, any()) }
+        verify { consoleIO.showWithLine(match { it.contains("✅ Task updated successfully") }) }
+    }
 
     @Test
     fun `showTasksInSwimlanes should render tasks and states`() {
@@ -94,15 +193,6 @@ class TaskManagementScreenTest {
         assertThat(states.first().name).isEqualTo("To Do")
     }
 
-    @Test
-    fun `showOptionService should list all options`() {
-        // When
-        screen.showOptionService()
-
-        // Then
-        verify { consoleIO.showWithLine(match { it.contains("Task Board") }) }
-        assertThat(true).isTrue()
-    }
 
     @Test
     fun `handleFeatureChoice should trigger correct actions for all options`() {
