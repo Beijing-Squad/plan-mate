@@ -176,7 +176,7 @@ class TaskManagementScreen(
         }
     }
     @OptIn(ExperimentalUuidApi::class)
-    private fun updateTaskById() {
+    fun updateTaskById() {
         consoleIO.showWithLine("\n\u001B[36m🔄 Update Task\u001B[0m")
         consoleIO.show("Enter Task ID to update: ")
         val id = consoleIO.read()
