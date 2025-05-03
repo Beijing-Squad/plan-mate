@@ -10,7 +10,7 @@ import ui.screens.*
 
 val uiModule = module {
 
-    single<ConsoleIO> { get<SystemConsoleIOImpl>() }
+    single<ConsoleIO> { SystemConsoleIOImpl() }
     single { SwimlanesRenderer(get()) }
 
     single {

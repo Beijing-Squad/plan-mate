@@ -10,10 +10,12 @@ import logic.useCases.task.DeleteTaskUseCase
 import logic.useCases.task.GetAllTasksUseCase
 import logic.useCases.task.GetTaskByIdUseCase
 import ui.console.SwimlanesRenderer
+import ui.enums.TaskBoardOption
 import ui.main.BaseScreen
 import ui.main.consoleIO.ConsoleIO
 import kotlin.uuid.ExperimentalUuidApi
 
+@OptIn(ExperimentalUuidApi::class)
 class TaskManagementScreen(
     private val getAllTasksUseCase: GetAllTasksUseCase,
     private val getAllStatesUseCase: GetAllStatesUseCase,
@@ -29,26 +31,16 @@ class TaskManagementScreen(
 
     override fun showOptionService() {
         consoleIO.showWithLine(
-            """
-            ╔════════════════════════════════════════╗
-            ║           Task Management              ║
-            ╚════════════════════════════════════════╝
-
-            ┌─── Available Options ────────────────────┐
-            │                                          │
-            │  1. Show All Tasks (Swimlanes)           │
-            │  2. Add Task                             │
-            │  3. Find Task by ID                      │
-            │  4. Delete Task                          │
-            │  5. Show All Tasks (List View)           │
-            │  0. Exit to Main Menu                    │
-            │                                          │
-            └──────────────────────────────────────────┘
-
-            """.trimIndent()
+            "\n\u001B[36m╔════════════════════════════╗\n" +
+                    "║        Task Board         ║\n" +
+                    "╚════════════════════════════╝"
         )
-        consoleIO.show("\uD83D\uDCA1 Please enter your choice: ")
+        TaskBoardOption.entries.forEach {
+            consoleIO.showWithLine("${it.code}. ${it.description}")
+        }
+        consoleIO.show("\u001B[32mEnter option:\u001B[0m ")
     }
+
     override fun handleFeatureChoice() {
         while (true) {
             when (getInput()) {
@@ -64,14 +56,13 @@ class TaskManagementScreen(
         }
     }
 
-    private fun showTasksInSwimlanes() {
+    fun showTasksInSwimlanes() {
         consoleIO.showWithLine("\n\u001B[36m📋 All Tasks (Swimlanes View):\u001B[0m")
         val tasks = getAllTasksUseCase.getAllTasks()
         val states = getAllStatesUseCase.getAllStates()
         swimlanesRenderer.render(tasks, states)
     }
 
-    @OptIn(ExperimentalUuidApi::class)
     fun addTask() {
         consoleIO.show("Enter Task Title: ")
         val title = consoleIO.read()
@@ -113,8 +104,7 @@ class TaskManagementScreen(
         }
     }
 
-    @OptIn(ExperimentalUuidApi::class)
-    private fun showAllTasksList() {
+    fun showAllTasksList() {
         consoleIO.showWithLine("\n\u001B[36m📋 All Tasks (List View):\u001B[0m")
         val tasks = getAllTasksUseCase.getAllTasks()
 
@@ -139,8 +129,7 @@ class TaskManagementScreen(
         }
     }
 
-    @OptIn(ExperimentalUuidApi::class)
-    private fun getTaskById() {
+    fun getTaskById() {
         consoleIO.showWithLine("\n\u001B[36m🔍 Find Task by ID\u001B[0m")
         consoleIO.show("\u001B[32mEnter Task ID: \u001B[0m")
         val id = consoleIO.read()
@@ -164,16 +153,16 @@ class TaskManagementScreen(
         }
     }
 
-    private fun deleteTaskById() {
+     fun deleteTaskById() {
         consoleIO.showWithLine("\n\u001B[36m🗑️ Delete Task\u001B[0m")
         consoleIO.show("\u001B[32mEnter Task ID to delete: \u001B[0m")
         val id = consoleIO.read()
 
         try {
             deleteTaskUseCase.deleteTask(id ?: "")
-            consoleIO.showWithLine("\u001B[32m✅ Task deleted successfully.\u001B[0m")
+            consoleIO.showWithLine("✅ Task deleted successfully.")
         } catch (e: Exception) {
-            consoleIO.showWithLine("\u001B[31m❌ Error deleting task: ${e.message}\u001B[0m")
+            consoleIO.showWithLine("❌ Error deleting task: ${e.message}")
         }
     }
 }
