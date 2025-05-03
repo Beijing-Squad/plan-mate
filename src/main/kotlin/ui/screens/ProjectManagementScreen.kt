@@ -3,13 +3,14 @@ package ui.screens
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.todayIn
-import logic.entities.Project
-import logic.entities.UserRole
+import logic.entities.*
+import logic.useCases.audit.AddAuditLogUseCase
 import logic.useCases.authentication.SessionManager
 import logic.useCases.project.*
 import ui.main.BaseScreen
 import ui.main.consoleIO.ConsoleIO
 import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
 @OptIn(ExperimentalUuidApi::class)
 class ProjectManagementScreen(
@@ -18,7 +19,8 @@ class ProjectManagementScreen(
     private val getAllProjectsUseCase: GetAllProjectsUseCase,
     private val getProjectByIdUseCase: GetProjectByIdUseCase,
     private val updateProjectUseCase: UpdateProjectUseCase,
-    private val sessionManager: SessionManager ,
+    private val addAudit: AddAuditLogUseCase,
+    private val sessionManager: SessionManager,
     private val consoleIO: ConsoleIO
 ) : BaseScreen(consoleIO) {
     override val id: String
@@ -29,7 +31,7 @@ class ProjectManagementScreen(
     private val userRole = sessionManager.getCurrentUser()?.role ?: UserRole.MATE
     override fun showOptionService() {
         consoleIO.showWithLine(
-        """
+            """
         ╔════════════════════════════════════════╗
         ║        Project Management System       ║
         ╚════════════════════════════════════════╝
@@ -44,7 +46,7 @@ class ProjectManagementScreen(
         │                                          │
         └──────────────────────────────────────────┘
         """
-            .trimIndent()
+                .trimIndent()
         )
 
         consoleIO.show("\uD83D\uDCA1 Please enter your choice:")
@@ -138,6 +140,19 @@ class ProjectManagementScreen(
         result.fold(
             onSuccess = {
                 consoleIO.showWithLine("\u001B[32m✅ Project added successfully.\u001B[0m")
+                addAudit.addAuditLog(
+                    Audit(
+                        id = Uuid.random(),
+                        userRole = userRole,
+                        userName = newProject.createdBy,
+                        action = ActionType.CREATE,
+                        entityType = EntityType.PROJECT,
+                        entityId = newProject.id.toString(),
+                        oldState = name,
+                        newState = newProject.description,
+                        timeStamp = now
+                    )
+                )
             },
             onFailure = { error ->
                 consoleIO.showWithLine("\u001B[31m❌ ${error.message}\u001B[0m")
@@ -152,6 +167,19 @@ class ProjectManagementScreen(
         result.fold(
             onSuccess = {
                 consoleIO.showWithLine("\u001B[32m✅ Project deleted successfully.\u001B[0m")
+                addAudit.addAuditLog(
+                    Audit(
+                        id = Uuid.random(),
+                        userRole = UserRole.ADMIN,
+                        userName = sessionManager.getCurrentUser()!!.userName,
+                        action = ActionType.DELETE,
+                        entityType = EntityType.PROJECT,
+                        entityId = id,
+                        oldState = "",
+                        newState = "",
+                        timeStamp = Clock.System.todayIn(TimeZone.currentSystemDefault())
+                    )
+                )
             },
             onFailure = { error ->
                 consoleIO.showWithLine("\u001B[31m❌ ${error.message}\u001B[0m")
