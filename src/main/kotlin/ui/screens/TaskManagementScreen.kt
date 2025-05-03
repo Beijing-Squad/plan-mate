@@ -3,18 +3,19 @@ package ui.screens
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.todayIn
+import logic.entities.ActionType
+import logic.entities.Audit
+import logic.entities.EntityType
 import logic.entities.Task
+import logic.useCases.audit.AddAuditLogUseCase
 import logic.useCases.authentication.SessionManager
 import logic.useCases.state.GetAllStatesUseCase
-import logic.useCases.task.AddTaskUseCase
-import logic.useCases.task.DeleteTaskUseCase
-import logic.useCases.task.GetAllTasksUseCase
-import logic.useCases.task.GetTaskByIdUseCase
-import logic.useCases.task.UpdateTaskUseCase
+import logic.useCases.task.*
 import ui.console.SwimlanesRenderer
 import ui.main.BaseScreen
 import ui.main.consoleIO.ConsoleIO
 import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
 @OptIn(ExperimentalUuidApi::class)
 class TaskManagementScreen(
@@ -25,6 +26,7 @@ class TaskManagementScreen(
     private val getTaskByIdUseCase: GetTaskByIdUseCase,
     private val updateTaskUseCase: UpdateTaskUseCase,
     private val swimlanesRenderer: SwimlanesRenderer,
+    private val addAudit: AddAuditLogUseCase,
     private val consoleIO: ConsoleIO,
     private val sessionManager: SessionManager
 ) : BaseScreen(consoleIO) {
@@ -55,6 +57,7 @@ class TaskManagementScreen(
         )
         consoleIO.show("\uD83D\uDCA1 Please enter your choice: ")
     }
+
     override fun handleFeatureChoice() {
         while (true) {
             when (getInput()) {
@@ -101,7 +104,7 @@ class TaskManagementScreen(
         val createdBy = currentUser.id
 
 
-        if (title.isNullOrBlank() || stateId.isNullOrBlank() || projectId.isNullOrBlank() ) {
+        if (title.isNullOrBlank() || stateId.isNullOrBlank() || projectId.isNullOrBlank()) {
             consoleIO.showWithLine("❌ Title, State ID, Project ID, and Creator Name are required.")
             return
         }
@@ -121,6 +124,19 @@ class TaskManagementScreen(
         try {
             addTaskUseCase.addTask(task)
             consoleIO.showWithLine("✅ Task added successfully.")
+            addAudit.addAuditLog(
+                Audit(
+                    id = Uuid.random(),
+                    userRole = currentUser.role,
+                    userName = currentUser.userName,
+                    action = ActionType.CREATE,
+                    entityType = EntityType.TASK,
+                    entityId = task.id.toString(),
+                    oldState = "",
+                    newState = "New Task",
+                    timeStamp = today
+                )
+            )
         } catch (e: Exception) {
             consoleIO.showWithLine("❌ Failed to add task: ${e.message}")
         }
@@ -175,6 +191,7 @@ class TaskManagementScreen(
             consoleIO.showWithLine("\u001B[31m❌ ${e.message ?: "Task not found."}\u001B[0m")
         }
     }
+
     @OptIn(ExperimentalUuidApi::class)
     fun updateTaskById() {
         consoleIO.showWithLine("\n\u001B[36m🔄 Update Task\u001B[0m")
@@ -205,13 +222,25 @@ class TaskManagementScreen(
             )
 
             consoleIO.showWithLine("✅ Task updated successfully:\n📌 Title: ${updatedTask.title}, 📝 Description: ${updatedTask.description}")
-
+            addAudit.addAuditLog(
+                Audit(
+                    id = Uuid.random(),
+                    userRole = sessionManager.getCurrentUser()!!.role,
+                    userName = sessionManager.getCurrentUser()!!.userName,
+                    action = ActionType.UPDATE,
+                    entityType = EntityType.TASK,
+                    entityId = updatedTask.id.toString(),
+                    oldState = "",
+                    newState = newTitle,
+                    timeStamp = Clock.System.todayIn(TimeZone.currentSystemDefault())
+                )
+            )
         } catch (e: Exception) {
             consoleIO.showWithLine("❌ Failed to update task: ${e.message}")
         }
     }
 
-     fun deleteTaskById() {
+    fun deleteTaskById() {
         consoleIO.showWithLine("\n\u001B[36m🗑️ Delete Task\u001B[0m")
         consoleIO.show("\u001B[32mEnter Task ID to delete: \u001B[0m")
         val id = consoleIO.read()
@@ -219,6 +248,19 @@ class TaskManagementScreen(
         try {
             deleteTaskUseCase.deleteTask(id ?: "")
             consoleIO.showWithLine("✅ Task deleted successfully.")
+            addAudit.addAuditLog(
+                Audit(
+                    id = Uuid.random(),
+                    userRole = sessionManager.getCurrentUser()!!.role,
+                    userName = sessionManager.getCurrentUser()!!.userName,
+                    action = ActionType.DELETE,
+                    entityType = EntityType.TASK,
+                    entityId = id.toString(),
+                    oldState = "",
+                    newState = "",
+                    timeStamp = Clock.System.todayIn(TimeZone.currentSystemDefault())
+                )
+            )
         } catch (e: Exception) {
             consoleIO.showWithLine("❌ Error deleting task: ${e.message}")
         }
