@@ -20,15 +20,16 @@ class ProjectManagementScreen(
     private val getProjectByIdUseCase: GetProjectByIdUseCase,
     private val updateProjectUseCase: UpdateProjectUseCase,
     private val addAudit: AddAuditLogUseCase,
-    private val sessionManager: SessionManager,
+    private val userRole: UserRole = UserRole.ADMIN,
     private val consoleIO: ConsoleIO
 ) : BaseScreen(consoleIO) {
+
+    private val sessionManager = SessionManager()
     override val id: String
         get() = "1"
     override val name: String
         get() = "Project Screen"
 
-    private val userRole = sessionManager.getCurrentUser()?.role ?: UserRole.MATE
     override fun showOptionService() {
         consoleIO.showWithLine(
             """
@@ -112,19 +113,21 @@ class ProjectManagementScreen(
                 result.fold(
                     onSuccess = {
                         consoleIO.showWithLine("\u001B[32m✅ Project updated successfully.\u001B[0m")
-                        addAudit.addAuditLog(
-                            Audit(
-                                id = Uuid.random(),
-                                userRole = userRole,
-                                userName = sessionManager.getCurrentUser()!!.userName,
-                                action = ActionType.UPDATE,
-                                entityType = EntityType.PROJECT,
-                                entityId = updated.id.toString(),
-                                oldState = updated.name,
-                                newState = updated.description,
-                                timeStamp = Clock.System.todayIn(TimeZone.currentSystemDefault())
+                        sessionManager.getCurrentUser()?.userName?.let { userName ->
+                            addAudit.addAuditLog(
+                                Audit(
+                                    id = Uuid.random(),
+                                    userRole = userRole,
+                                    userName = userName,
+                                    action = ActionType.UPDATE,
+                                    entityType = EntityType.PROJECT,
+                                    entityId = updated.id.toString(),
+                                    oldState = updated.name,
+                                    newState = updated.description,
+                                    timeStamp = Clock.System.todayIn(TimeZone.currentSystemDefault())
+                                )
                             )
-                        )
+                        }
                     },
                     onFailure = { error ->
                         consoleIO.showWithLine("\u001B[31m❌ ${error.message}\u001B[0m")
@@ -140,7 +143,8 @@ class ProjectManagementScreen(
         val name = getInput() ?: return
         consoleIO.show("\u001B[32mEnter description: \u001B[0m")
         val desc = getInput() ?: return
-        val createdBy = sessionManager.getCurrentUser()?.userName ?: return
+        consoleIO.show("\u001B[32mEnter created by (user ID): \u001B[0m")
+        val createdBy = getInput() ?: return
         val now = Clock.System.todayIn(TimeZone.currentSystemDefault())
         val newProject = Project(
             name = name,
@@ -180,19 +184,21 @@ class ProjectManagementScreen(
         result.fold(
             onSuccess = {
                 consoleIO.showWithLine("\u001B[32m✅ Project deleted successfully.\u001B[0m")
-                addAudit.addAuditLog(
-                    Audit(
-                        id = Uuid.random(),
-                        userRole = UserRole.ADMIN,
-                        userName = sessionManager.getCurrentUser()!!.userName,
-                        action = ActionType.DELETE,
-                        entityType = EntityType.PROJECT,
-                        entityId = id,
-                        oldState = "",
-                        newState = "",
-                        timeStamp = Clock.System.todayIn(TimeZone.currentSystemDefault())
+                sessionManager.getCurrentUser()?.userName?.let { userName ->
+                    addAudit.addAuditLog(
+                        Audit(
+                            id = Uuid.random(),
+                            userRole = UserRole.ADMIN,
+                            userName = userName,
+                            action = ActionType.DELETE,
+                            entityType = EntityType.PROJECT,
+                            entityId = id,
+                            oldState = "",
+                            newState = "",
+                            timeStamp = Clock.System.todayIn(TimeZone.currentSystemDefault())
+                        )
                     )
-                )
+                }
             },
             onFailure = { error ->
                 consoleIO.showWithLine("\u001B[31m❌ ${error.message}\u001B[0m")

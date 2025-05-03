@@ -4,6 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import fake.createState
 import fake.createTask
 import io.mockk.*
+import logic.useCases.audit.AddAuditLogUseCase
 import logic.useCases.authentication.SessionManager
 import logic.useCases.state.GetAllStatesUseCase
 import logic.useCases.task.*
@@ -26,6 +27,7 @@ class TaskManagementScreenTest {
     private val swimlanesRenderer = mockk<SwimlanesRenderer>(relaxed = true)
     private val consoleIO = mockk<ConsoleIO>(relaxed = true)
     private val sessionManager = mockk<SessionManager>(relaxed = true)
+    private val addAuditLogUseCase: AddAuditLogUseCase = mockk(relaxed = true)
 
     @BeforeEach
     fun setUp() {
@@ -37,6 +39,7 @@ class TaskManagementScreenTest {
             getTaskByIdUseCase,
             updateTaskUseCase,
             swimlanesRenderer,
+            addAuditLogUseCase,
             consoleIO,
             sessionManager
         )
