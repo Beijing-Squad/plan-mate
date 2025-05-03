@@ -16,7 +16,7 @@ class AuditScreen(
 ) : BaseScreen(consoleIO) {
 
     override val id: String
-        get() = "2"
+        get() = "4"
     override val name: String
         get() = "Audit Screen"
 

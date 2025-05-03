@@ -13,6 +13,7 @@ import logic.useCases.user.GetAllUsersUseCase
 import logic.useCases.user.GetUserByUserIdUseCase
 import logic.useCases.user.UpdateUserUseCase
 import logic.useCases.state.*
+import logic.useCases.task.*
 import org.koin.dsl.module
 
 val useCaseModule = module {
@@ -27,7 +28,7 @@ val useCaseModule = module {
     single { RegisterUserAuthenticationUseCase(get(), get(), get()) }
     single { SessionManager() }
     // state use cases
-    single { AddStateUseCase(get()) }
+    single { AddStateUseCase(get(),get()) }
     single { DeleteStateUseCase(get()) }
     single { GetStateByIdUseCase(get()) }
     single { GetStatesByProjectIdUseCase(get()) }
@@ -41,5 +42,12 @@ val useCaseModule = module {
     single { GetAllAuditLogsUseCase(get())}
     single { GetAuditLogsByProjectIdUseCase(get())}
     single { GetAuditLogsByTaskIdUseCase(get())}
+
+    // task use cases
+    single { AddTaskUseCase(get()) }
+    single { DeleteTaskUseCase(get()) }
+    single { GetTaskByIdUseCase(get()) }
+    single { GetAllTasksUseCase(get()) }
+    single { UpdateTaskUseCase(get()) }
 }
 

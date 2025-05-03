@@ -3,19 +3,24 @@ package ui.console
 import logic.entities.State
 import logic.entities.Task
 import ui.main.consoleIO.ConsoleIO
+
 class SwimlanesRenderer(
     private val consoleIO: ConsoleIO
 ) {
     fun render(tasks: List<Task>, states: List<State>) {
+        val lines = renderToLines(tasks, states)
+        lines.forEach { consoleIO.showWithLine(it) }
+    }
+
+    private fun renderToLines(tasks: List<Task>, states: List<State>): List<String> {
         if (states.isEmpty()) {
-            consoleIO.showWithLine("⚠️ No states available.")
-            return
+            return listOf("⚠️ No states available.")
         }
         if (tasks.isEmpty()) {
-            consoleIO.showWithLine("⚠️ No tasks available.")
-            return
+            return listOf("⚠️ No tasks available.")
         }
 
+        val lines = mutableListOf<String>()
         val tasksByState = states.associate { state ->
             state.id to tasks.filter { it.stateId == state.id }
         }
@@ -26,10 +31,10 @@ class SwimlanesRenderer(
         val headerLine = states.joinToString(" | ") { state ->
             state.name.take(columnWidth).padEnd(columnWidth)
         }
-        consoleIO.showWithLine(headerLine)
+        lines.add(headerLine)
 
         val separatorLine = "-".repeat(headerLine.length)
-        consoleIO.showWithLine(separatorLine)
+        lines.add(separatorLine)
 
         val maxRows = tasksByState.values.maxOfOrNull { it.size } ?: 0
 
@@ -38,13 +43,14 @@ class SwimlanesRenderer(
                 val taskList = tasksByState[state.id] ?: emptyList()
                 if (row < taskList.size) {
                     val task = taskList[row]
-                    val displayText = "#${row + 1}: ${task.title}".take(maxTitleLength).padEnd(columnWidth)
-                    displayText
+                    "#${row + 1}: ${task.title}".take(maxTitleLength).padEnd(columnWidth)
                 } else {
                     " ".repeat(columnWidth)
                 }
             }
-            consoleIO.showWithLine(rowLine)
+            lines.add(rowLine)
         }
+
+        return lines
     }
 }

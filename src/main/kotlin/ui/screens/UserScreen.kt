@@ -17,7 +17,7 @@ class UserScreen(
     private val sessionManager: SessionManager
 ) : BaseScreen(consoleIO) {
     override val id: String
-        get() = "1"
+        get() = "5"
     override val name: String
         get() = "User Screen"
 

@@ -7,8 +7,10 @@ import io.mockk.every
 import io.mockk.mockk
 import logic.entities.UserRole
 import logic.entities.exceptions.InvalidStateNameException
+import logic.entities.exceptions.ProjectNotFoundException
 import logic.entities.exceptions.StateAlreadyExistException
 import logic.entities.exceptions.StateUnauthorizedUserException
+import logic.repository.ProjectsRepository
 import logic.repository.StatesRepository
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -18,12 +20,14 @@ import kotlin.uuid.Uuid
 
 class AddStateUseCaseTest {
     private lateinit var statesRepository: StatesRepository
+    private lateinit var projectsRepository: ProjectsRepository
     private lateinit var addStateUseCase: AddStateUseCase
 
     @BeforeEach
     fun setup() {
         statesRepository = mockk()
-        addStateUseCase = AddStateUseCase(statesRepository)
+        projectsRepository = mockk()
+        addStateUseCase = AddStateUseCase(statesRepository, projectsRepository)
     }
 
     @OptIn(ExperimentalUuidApi::class)
@@ -31,14 +35,18 @@ class AddStateUseCaseTest {
     fun `should return true when add valid new state`() {
         // Given
         val adminRole = UserRole.ADMIN
-        val project = createProject(
-            name = "PlanMate Core Features", createdBy = "adminUser01"
+        val project = listOf(
+            createProject(
+                name = "PlanMate Core Features", createdBy = "adminUser01"
+            )
         )
+
         val newState = createState(
-            name = "Done", projectId = project.id.toString()
+            name = "Done", projectId = project[0].id.toString()
         )
 
         // when
+        every { projectsRepository.getAllProjects() } returns project
         every { statesRepository.getAllStates() } returns listOf()
         every { statesRepository.addState(newState) } returns true
         val result = addStateUseCase.addState(newState, adminRole)
@@ -53,12 +61,15 @@ class AddStateUseCaseTest {
         // Given
         val adminRole = UserRole.ADMIN
         val errorMessage = "the name of the new state is empty"
-        val project = createProject(
-            name = "PlanMate Core Features", createdBy = "adminUser01"
+        val project = listOf(
+            createProject(
+                name = "PlanMate Core Features", createdBy = "adminUser01"
+            )
         )
         val newState = createState(
-            name = "", projectId = project.id.toString()
+            name = "", projectId = project[0].id.toString()
         )
+        every { projectsRepository.getAllProjects() } returns project
         every { statesRepository.getAllStates() } returns listOf()
         every { statesRepository.addState(newState) } throws InvalidStateNameException(errorMessage)
 
@@ -84,17 +95,14 @@ class AddStateUseCaseTest {
             name = "Done", projectId = Uuid.random().toString()
         )
 
+        every { statesRepository.getAllStates() } returns listOf()
+        every { projectsRepository.getAllProjects() } returns project
+        every { statesRepository.addState(newState) } throws ProjectNotFoundException("the project id with this state not found")
 
         // when
-        every { statesRepository.getAllStates() } returns listOf()
-        every { statesRepository.addState(newState) } returns false
-
-        addStateUseCase.addState(newState, adminRole)
-
-        //Then
-        assertThat(newState.projectId).isNotIn(
-            project.map { it.id.toString() }
-        )
+        assertThrows<ProjectNotFoundException> {
+            addStateUseCase.addState(newState, UserRole.ADMIN)
+        }
     }
 
     @OptIn(ExperimentalUuidApi::class)
@@ -103,12 +111,15 @@ class AddStateUseCaseTest {
         // Given
         val adminRole = UserRole.ADMIN
         val errorMessage = "the new state is exist"
-        val project = createProject(
-            name = "PlanMate Core Features", createdBy = "adminUser01"
+        val project = listOf(
+            createProject(
+                name = "PlanMate Core Features", createdBy = "adminUser01"
+            )
         )
         val newState = createState(
-            projectId = project.id.toString()
+            projectId = project[0].id.toString()
         )
+        every { projectsRepository.getAllProjects() } returns project
         every { statesRepository.getAllStates() } returns listOf(newState)
         every { statesRepository.addState(newState) } throws StateAlreadyExistException(errorMessage)
 
