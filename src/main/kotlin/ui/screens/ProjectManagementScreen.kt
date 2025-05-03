@@ -5,6 +5,7 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.todayIn
 import logic.entities.Project
 import logic.entities.UserRole
+import logic.useCases.authentication.SessionManager
 import logic.useCases.project.*
 import ui.main.BaseScreen
 import ui.main.consoleIO.ConsoleIO
@@ -17,7 +18,7 @@ class ProjectManagementScreen(
     private val getAllProjectsUseCase: GetAllProjectsUseCase,
     private val getProjectByIdUseCase: GetProjectByIdUseCase,
     private val updateProjectUseCase: UpdateProjectUseCase,
-    private val userRole: UserRole = UserRole.ADMIN,
+    private val sessionManager: SessionManager ,
     private val consoleIO: ConsoleIO
 ) : BaseScreen(consoleIO) {
     override val id: String
@@ -25,6 +26,7 @@ class ProjectManagementScreen(
     override val name: String
         get() = "Project Screen"
 
+    private val userRole = sessionManager.getCurrentUser()?.role ?: UserRole.MATE
     override fun showOptionService() {
         consoleIO.showWithLine(
         """
@@ -123,8 +125,7 @@ class ProjectManagementScreen(
         val name = getInput() ?: return
         consoleIO.show("\u001B[32mEnter description: \u001B[0m")
         val desc = getInput() ?: return
-        consoleIO.show("\u001B[32mEnter created by (user ID): \u001B[0m")
-        val createdBy = getInput() ?: return
+        val createdBy = sessionManager.getCurrentUser()?.userName ?: return
         val now = Clock.System.todayIn(TimeZone.currentSystemDefault())
         val newProject = Project(
             name = name,
