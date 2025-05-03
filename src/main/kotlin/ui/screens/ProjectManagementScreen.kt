@@ -21,7 +21,7 @@ class ProjectManagementScreen(
     private val consoleIO: ConsoleIO
 ) : BaseScreen(consoleIO) {
     override val id: String
-        get() = "2"
+        get() = "1"
     override val name: String
         get() = "Project Screen"
 

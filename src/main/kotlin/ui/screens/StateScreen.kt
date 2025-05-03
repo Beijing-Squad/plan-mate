@@ -19,7 +19,7 @@ class StateScreen(
     private val sessionManager: SessionManager
 ) : BaseScreen(consoleIO) {
 
-    override val id = "1"
+    override val id = "2"
     override val name = "State Management Screen"
 
     override fun showOptionService() {
