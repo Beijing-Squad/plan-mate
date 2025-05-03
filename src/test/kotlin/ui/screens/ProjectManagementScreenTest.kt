@@ -4,6 +4,7 @@ import fake.createProject
 import io.mockk.*
 import logic.useCases.project.*
 import logic.entities.UserRole
+import logic.useCases.authentication.SessionManager
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import ui.main.consoleIO.ConsoleIO
@@ -20,7 +21,7 @@ class ProjectManagementScreenTest {
     private lateinit var updateProjectUseCase: UpdateProjectUseCase
     private lateinit var consoleIO: ConsoleIO
     private lateinit var projectScreen: ProjectManagementScreen
-    private  val userRole: UserRole = UserRole.ADMIN
+    private lateinit var sessionManager: SessionManager
 
     @BeforeEach
     fun setup() {
@@ -30,6 +31,12 @@ class ProjectManagementScreenTest {
         getProjectByIdUseCase = mockk(relaxed = true)
         updateProjectUseCase = mockk(relaxed = true)
         consoleIO = mockk(relaxed = true)
+        sessionManager = mockk(relaxed = true)
+
+        every { sessionManager.getCurrentUser() } returns mockk {
+            every { role } returns UserRole.ADMIN
+            every { userName } returns "adminUser"
+        }
 
         projectScreen = ProjectManagementScreen(
             addProjectUseCase,
@@ -37,7 +44,7 @@ class ProjectManagementScreenTest {
             getAllProjectsUseCase,
             getProjectByIdUseCase,
             updateProjectUseCase,
-            userRole,
+            sessionManager,
             consoleIO
         )
     }
