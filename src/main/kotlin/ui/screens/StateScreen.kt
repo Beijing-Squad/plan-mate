@@ -1,12 +1,16 @@
 package ui.screens
 
-import logic.entities.State
-import logic.entities.UserRole
+import kotlinx.datetime.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.todayIn
+import logic.entities.*
+import logic.useCases.audit.AddAuditLogUseCase
 import logic.useCases.authentication.SessionManager
 import logic.useCases.state.*
 import ui.main.BaseScreen
 import ui.main.consoleIO.ConsoleIO
 import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
 class StateScreen(
     private val addStateUseCase: AddStateUseCase,
@@ -15,6 +19,7 @@ class StateScreen(
     private val getAllStates: GetAllStatesUseCase,
     private val getStateById: GetStateByIdUseCase,
     private val getStatesByProjectId: GetStatesByProjectIdUseCase,
+    private val addAudit: AddAuditLogUseCase,
     private val consoleIO: ConsoleIO,
     private val sessionManager: SessionManager
 ) : BaseScreen(consoleIO) {
@@ -69,6 +74,19 @@ class StateScreen(
             val state = State(id = id, name = name, projectId = projectId)
 
             val result = addStateUseCase.addState(state, role)
+            addAudit.addAuditLog(
+                Audit(
+                    id = Uuid.random(),
+                    userRole = role,
+                    userName = sessionManager.getCurrentUser()!!.userName,
+                    action = ActionType.UPDATE,
+                    entityType = EntityType.PROJECT,
+                    entityId = projectId,
+                    oldState = "",
+                    newState = name,
+                    timeStamp = Clock.System.todayIn(TimeZone.currentSystemDefault())
+                )
+            )
             showResult(result, "added")
         } catch (e: Exception) {
             consoleIO.showWithLine("❌ ${e.message}")
@@ -82,13 +100,13 @@ class StateScreen(
 
             val state = State(id = id, name = "", projectId = "")
             val result = deleteStateUseCase.deleteState(state, role)
-
             showResult(result, "deleted")
         } catch (e: Exception) {
             consoleIO.showWithLine("❌ ${e.message}")
         }
     }
 
+    @OptIn(ExperimentalUuidApi::class)
     private fun onChooseUpdateState() {
         try {
             val id = getInputWithLabel("🆔 Enter State ID to update: ")
@@ -98,7 +116,19 @@ class StateScreen(
 
             val state = State(id = id, name = name, projectId = projectId)
             val updated = updateStateUseCase.updateState(state, role)
-
+            addAudit.addAuditLog(
+                Audit(
+                    id = Uuid.random(),
+                    userRole = role,
+                    userName = sessionManager.getCurrentUser()!!.userName,
+                    action = ActionType.UPDATE,
+                    entityType = EntityType.PROJECT,
+                    entityId = projectId,
+                    oldState = "",
+                    newState = name,
+                    timeStamp = Clock.System.todayIn(TimeZone.currentSystemDefault())
+                )
+            )
             consoleIO.showWithLine("✅ State updated:\n$updated")
         } catch (e: Exception) {
             consoleIO.showWithLine("❌ ${e.message}")

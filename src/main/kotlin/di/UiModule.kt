@@ -24,6 +24,7 @@ val uiModule = module {
         ProjectManagementScreen(
             get(), get(), get(), get(), get(),
             get(),
+            get(),
             get()
         )
     }
@@ -32,7 +33,7 @@ val uiModule = module {
         StateScreen(
             get(), get(), get(),
             get(), get(), get(),
-            get(), get()
+            get(), get(), get()
         )
     }
 
@@ -40,7 +41,8 @@ val uiModule = module {
         TaskManagementScreen(
             get(), get(), get(),
             get(), get(), get(),
-            get(), get(), get()
+            get(), get(), get(),
+            get()
         )
     }
 
