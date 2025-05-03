@@ -17,6 +17,7 @@ val uiModule = module {
         AuthenticationScreen(
             get(),
             get(),
+            get(),
             get()
         )
     }
