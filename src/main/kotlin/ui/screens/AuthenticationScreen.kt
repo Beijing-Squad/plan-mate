@@ -7,91 +7,86 @@ import logic.useCases.authentication.RegisterUserAuthenticationUseCase
 import logic.useCases.authentication.SessionManager
 import org.koin.mp.KoinPlatform.getKoin
 import ui.main.PlanMateConsoleUi
+import ui.main.consoleIO.ConsoleIO
+import kotlin.system.exitProcess
 
 class AuthenticationScreen(
     private val registerUseCase: RegisterUserAuthenticationUseCase,
     private val loginUseCase: LoginUserAuthenticationUseCase,
-    private val sessionManager: SessionManager
+    private val sessionManager: SessionManager,
+    private val consoleIO: ConsoleIO
 ) {
 
-    fun start(): AuthResult {
+    fun start(): User {
         while (true) {
-            println("\n=== Welcome to PlanMate CLI ===")
-            println("1. Login")
-            println("2. Register")
-            println("0. Exit")
-            print("Choose an option: ")
+            consoleIO.showWithLine("\n=== Welcome to PlanMate CLI ===")
+            consoleIO.showWithLine("1. Login")
+            consoleIO.showWithLine("2. Register")
+            consoleIO.showWithLine("0. Exit")
+            consoleIO.show("Choose an option: ")
 
-            when (readln().trim()) {
+            when (consoleIO.read()!!.trim()) {
                 "1" -> {
                     val user = login()
-                    if (user != null) {
-                        return AuthResult.Success(user)
-                    }
+                    if (user != null) return user
                 }
-
                 "2" -> register()
-                "0" -> return AuthResult.Exit
-                else -> println("❌ Invalid option. Please try again.")
+                "0" -> exitProcess(0)
+                else -> consoleIO.showWithLine("❌ Invalid option. Please try again.")
             }
         }
     }
 
     private fun login(): User? {
-        println("\n--- Login ---")
-        print("Username: ")
-        val username = readln().trim()
-        print("Password: ")
-        val password = readln().trim()
+        consoleIO.showWithLine("\n--- Login ---")
+        consoleIO.show("Username: ")
+        val username = consoleIO.read()!!.trim()
+        consoleIO.show("Password: ")
+        val password = consoleIO.read()!!.trim()
 
         return try {
             val user = loginUseCase.execute(username, password)
-            println("✅ Login successful. Welcome, ${sessionManager.getCurrentUser()?.userName}!")
+            consoleIO.showWithLine("✅ Login successful. Welcome, ${sessionManager.getCurrentUser()?.userName}!")
             val planMateConsoleUi: PlanMateConsoleUi = getKoin().get()
             planMateConsoleUi.start()
             user
         } catch (e: Exception) {
-            println("❌ ${e.message}")
+            consoleIO.showWithLine("❌ ${e.message}")
             null
         }
     }
 
     private fun register() {
-        println("\n--- Register ---")
-        print("Username: ")
-        val username = readln().trim()
-        print("Password: ")
-        val password = readln().trim()
+        consoleIO.showWithLine("\n--- Register ---")
+        consoleIO.show("Username: ")
+        val username = consoleIO.read()!!.trim()
+        consoleIO.show("Password: ")
+        val password = consoleIO.read()!!.trim()
         val role = selectRole()
 
         try {
             registerUseCase.execute(username, password, role)
-            println("✅ Registration successful. You can now login.")
+            consoleIO.showWithLine("✅ Registration successful. You can now login.")
         } catch (e: Exception) {
-            println("❌ Registration failed: ${e.message}")
+            consoleIO.showWithLine("❌ Registration failed: ${e.message}")
         }
     }
 
     private fun selectRole(): UserRole {
         while (true) {
-            println("Select Role:")
-            println("1. Admin")
-            println("2. Mate")
-            print("Enter choice: ")
+            consoleIO.showWithLine("Select Role:")
+            consoleIO.showWithLine("1. Admin")
+            consoleIO.showWithLine("2. Mate")
+            consoleIO.show("Enter choice: ")
 
-            return when (readln().trim()) {
+            return when (consoleIO.read()!!.trim()) {
                 "1" -> UserRole.ADMIN
                 "2" -> UserRole.MATE
                 else -> {
-                    println("❌ Invalid role. Please choose again.")
+                    consoleIO.showWithLine("❌ Invalid role. Please choose again.")
                     continue
                 }
             }
         }
-    }
-
-    sealed class AuthResult {
-        data class Success(val user: User) : AuthResult()
-        data object Exit : AuthResult()
     }
 }
