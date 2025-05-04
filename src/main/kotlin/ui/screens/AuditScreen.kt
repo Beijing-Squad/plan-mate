@@ -1,12 +1,13 @@
 package ui.screens
 
 import logic.entities.Audit
-import logic.entities.EntityType
 import logic.useCases.audit.GetAllAuditLogsUseCase
 import logic.useCases.audit.GetAuditLogsByProjectIdUseCase
 import logic.useCases.audit.GetAuditLogsByTaskIdUseCase
+import ui.enums.AuditBoardOption
 import ui.main.BaseScreen
 import ui.main.consoleIO.ConsoleIO
+import ui.util.MenuRenderer
 
 class AuditScreen(
     private val getAllAudits: GetAllAuditLogsUseCase,
@@ -21,28 +22,16 @@ class AuditScreen(
         get() = "Audit Screen"
 
     override fun showOptionService() {
-        consoleIO.showWithLine(
+        MenuRenderer.renderMenu(
             """
         ╔════════════════════════════════════════╗
-        ║      Audit Logs Management System      ║
+        ║       Audit Logs Management System     ║
         ╚════════════════════════════════════════╝
-
-        ┌─── Available Options ───────────────────┐
-        │                                         │
-        │  1. 📋 List All Audit Logs              │
-        │  2. 🔍 Get Audit Logs For Project       │
-        │  3. 🔍️ Get Audit Logs For Task          │
-        │  0. 🔙 Exit to Main Menu                │
-        │                                         │
-        └─────────────────────────────────────────┘
-
-        """
-                .trimIndent()
+        """,
+            AuditBoardOption.entries,
+            consoleIO
         )
-
-        consoleIO.show("Please enter your choice: ")
     }
-
     override fun handleFeatureChoice() {
         when (getInput()) {
             "1" -> onClickGetAllAuditLogs()

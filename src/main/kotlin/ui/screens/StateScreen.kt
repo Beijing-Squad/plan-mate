@@ -7,8 +7,10 @@ import logic.entities.*
 import logic.useCases.audit.AddAuditLogUseCase
 import logic.useCases.authentication.SessionManager
 import logic.useCases.state.*
+import ui.enums.StateBoardOption
 import ui.main.BaseScreen
 import ui.main.consoleIO.ConsoleIO
+import ui.util.MenuRenderer
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -28,28 +30,16 @@ class StateScreen(
     override val name = "State Management Screen"
 
     override fun showOptionService() {
-        consoleIO.showWithLine(
+        MenuRenderer.renderMenu(
             """
-            ╔══════════════════════════════════════╗
-            ║         📂 State Management          ║
-            ╚══════════════════════════════════════╝
-
-            ┌─── Available Options ───────────────┐
-            │                                     │
-            │  1. ➕ Add State                    │
-            │  2. ❌ Delete State                 │
-            │  3. 🔁 Update State                 │
-            │  4. 📋 Get All States               │
-            │  5. 🔍 Get State by ID              │
-            │  6. 📁 Get States by Project ID     │
-            │  0. 🔙 Back to Main Menu            │
-            │                                     │
-            └─────────────────────────────────────┘
-            """.trimIndent()
+        ╔══════════════════════════════════════╗
+        ║            State Management          ║
+        ╚══════════════════════════════════════╝
+        """,
+            StateBoardOption.entries,
+            consoleIO
         )
-        consoleIO.show("Please enter your choice: ")
     }
-
     override fun handleFeatureChoice() {
         when (getInput()) {
             "1" -> onChooseAddState()
