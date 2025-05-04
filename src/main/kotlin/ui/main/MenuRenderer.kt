@@ -1,4 +1,4 @@
-package ui.util
+package ui.main
 
 import ui.main.consoleIO.ConsoleIO
 import kotlin.enums.EnumEntries

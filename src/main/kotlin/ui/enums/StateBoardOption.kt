@@ -1,6 +1,6 @@
 package ui.enums
 
-import ui.util.MenuOption
+import ui.main.MenuOption
 
 enum class StateBoardOption(override val code: String, override val description: String) : MenuOption {
     ADD("1", "Add State"),

@@ -10,7 +10,7 @@ import logic.useCases.state.*
 import ui.enums.StateBoardOption
 import ui.main.BaseScreen
 import ui.main.consoleIO.ConsoleIO
-import ui.util.MenuRenderer
+import ui.main.MenuRenderer
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 

@@ -1,4 +1,4 @@
-package ui.util
+package ui.main
 
 interface MenuOption {
     val code: String

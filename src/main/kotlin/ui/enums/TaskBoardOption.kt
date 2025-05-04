@@ -1,6 +1,6 @@
 package ui.enums
 
-import ui.util.MenuOption
+import ui.main.MenuOption
 
 enum class TaskBoardOption(override val code: String, override val description: String) : MenuOption {
     VIEW_TASKS("1", "Show All Tasks (Swimlanes)"),

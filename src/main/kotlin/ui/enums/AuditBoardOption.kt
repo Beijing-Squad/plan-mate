@@ -1,6 +1,6 @@
 package ui.enums
 
-import ui.util.MenuOption
+import ui.main.MenuOption
 
 enum class AuditBoardOption(override val code: String, override val description: String) : MenuOption {
     LIST_ALL("1", "List All Audit Logs"),

@@ -7,7 +7,7 @@ import logic.useCases.audit.GetAuditLogsByTaskIdUseCase
 import ui.enums.AuditBoardOption
 import ui.main.BaseScreen
 import ui.main.consoleIO.ConsoleIO
-import ui.util.MenuRenderer
+import ui.main.MenuRenderer
 
 class AuditScreen(
     private val getAllAudits: GetAllAuditLogsUseCase,

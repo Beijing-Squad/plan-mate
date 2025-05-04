@@ -15,7 +15,7 @@ import ui.console.SwimlanesRenderer
 import ui.enums.TaskBoardOption
 import ui.main.BaseScreen
 import ui.main.consoleIO.ConsoleIO
-import ui.util.MenuRenderer
+import ui.main.MenuRenderer
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 

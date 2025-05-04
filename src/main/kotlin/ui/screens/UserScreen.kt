@@ -8,7 +8,7 @@ import logic.useCases.user.UpdateUserUseCase
 import ui.enums.UserBoardOption
 import ui.main.BaseScreen
 import ui.main.consoleIO.ConsoleIO
-import ui.util.MenuRenderer
+import ui.main.MenuRenderer
 import kotlin.uuid.ExperimentalUuidApi
 
 class UserScreen(
