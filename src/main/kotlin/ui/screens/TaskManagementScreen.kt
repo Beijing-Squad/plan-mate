@@ -12,8 +12,10 @@ import logic.useCases.authentication.SessionManager
 import logic.useCases.state.GetAllStatesUseCase
 import logic.useCases.task.*
 import ui.console.SwimlanesRenderer
+import ui.enums.TaskBoardOption
 import ui.main.BaseScreen
 import ui.main.consoleIO.ConsoleIO
+import ui.main.MenuRenderer
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -35,27 +37,15 @@ class TaskManagementScreen(
     override val name: String get() = "Task Screen"
 
     override fun showOptionService() {
-        consoleIO.showWithLine(
+        MenuRenderer.renderMenu(
             """
-            ╔════════════════════════════════════════╗
-            ║           Task Management              ║
-            ╚════════════════════════════════════════╝
-
-            ┌─── Available Options ────────────────────┐
-            │                                          │
-            │  1. Show All Tasks (Swimlanes)           │
-            │  2. Add Task                             │
-            │  3. Find Task by ID                      │
-            │  4. Delete Task                          │
-            │  5. Show All Tasks (List View)           │
-            │  6. Update Task                          │
-            │  0. Exit to Main Menu                    │
-            │                                          │
-            └──────────────────────────────────────────┘
-
-            """.trimIndent()
+        ╔══════════════════════════════════════╗
+        ║            Task Management           ║
+        ╚══════════════════════════════════════╝
+        """,
+            TaskBoardOption.entries,
+            consoleIO
         )
-        consoleIO.show("\uD83D\uDCA1 Please enter your choice: ")
     }
 
     override fun handleFeatureChoice() {
