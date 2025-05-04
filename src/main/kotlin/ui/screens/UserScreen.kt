@@ -9,8 +9,10 @@ import logic.useCases.authentication.SessionManager
 import logic.useCases.user.GetAllUsersUseCase
 import logic.useCases.user.GetUserByIdUseCase
 import logic.useCases.user.UpdateUserUseCase
+import ui.enums.UserBoardOption
 import ui.main.BaseScreen
 import ui.main.consoleIO.ConsoleIO
+import ui.main.MenuRenderer
 import kotlin.uuid.ExperimentalUuidApi
 
 class UserScreen(
@@ -27,26 +29,15 @@ class UserScreen(
 
 
     override fun showOptionService() {
-        consoleIO.showWithLine(
+        MenuRenderer.renderMenu(
             """
         ╔════════════════════════════════════════╗
-        ║          User Management System        ║
+        ║         User Management System         ║
         ╚════════════════════════════════════════╝
-
-        ┌─── Available Options ────────────────────┐
-        │                                          │
-        │  1. List All Users                       │
-        │  2. Find User by ID                      │
-        │  3. Update User                          │
-        │  0. Exit to Main Menu                    │
-        │                                          │
-        └──────────────────────────────────────────┘
-
-        """
-                .trimIndent()
+        """,
+            UserBoardOption.entries,
+            consoleIO
         )
-
-        consoleIO.show("\uD83D\uDCA1 Please enter your choice:")
     }
 
     override fun handleFeatureChoice() {

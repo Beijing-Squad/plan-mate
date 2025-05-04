@@ -7,8 +7,10 @@ import logic.entities.*
 import logic.useCases.audit.AddAuditLogUseCase
 import logic.useCases.authentication.SessionManager
 import logic.useCases.project.*
+import ui.enums.ProjectBoardOption
 import ui.main.BaseScreen
 import ui.main.consoleIO.ConsoleIO
+import ui.main.MenuRenderer
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -31,28 +33,16 @@ class ProjectManagementScreen(
         get() = "Project Screen"
 
     override fun showOptionService() {
-        consoleIO.showWithLine(
+        MenuRenderer.renderMenu(
             """
         ╔════════════════════════════════════════╗
         ║        Project Management System       ║
         ╚════════════════════════════════════════╝
-        ┌─── Available Options ────────────────────┐
-        │                                          │
-        │  1. List All Project                     │
-        │  2. Find Project by ID                   │
-        │  3. Update Project                       │
-        │  4. Add Project                          │
-        │  5. Delete Project                       │     
-        │  0. Exit to Main Menu                    │
-        │                                          │
-        └──────────────────────────────────────────┘
-        """
-                .trimIndent()
+        """,
+            ProjectBoardOption.entries,
+            consoleIO
         )
-
-        consoleIO.show("\uD83D\uDCA1 Please enter your choice:")
     }
-
     override fun handleFeatureChoice() {
         when (getInput()) {
             "1" -> listAllProjects()
