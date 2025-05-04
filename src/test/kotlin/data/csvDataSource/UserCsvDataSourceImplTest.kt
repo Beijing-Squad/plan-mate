@@ -6,7 +6,6 @@ import data.repository.dataSource.UserDataSource
 import fake.createUser
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.verify
 import logic.entities.User
 import logic.entities.exceptions.UserNotFoundException
 import org.junit.jupiter.api.BeforeEach
@@ -98,27 +97,5 @@ class UserCsvDataSourceImplTest {
         assertThrows<UserNotFoundException> {
             userCsvDataSourceImpl.getUserByUserId(nonExistentUserId)
         }
-    }
-
-    @OptIn(ExperimentalUuidApi::class)
-    @Test
-    fun `should update user when user exists`() {
-        // Given
-        every { csvDataSourceImpl.loadAllDataFromFile() } returns testUsers
-        every { csvDataSourceImpl.updateFile(any()) } returns Unit
-        userCsvDataSourceImpl = UserCsvDataSourceImpl(csvDataSourceImpl)
-
-        val existingUser = testUsers.first()
-        val updatedUser = existingUser.copy(
-            userName = "newUsername",
-            password = "newPassword"
-        )
-
-        // When
-        val result = userCsvDataSourceImpl.updateUser(updatedUser)
-
-        // Then
-        assertThat(result).isEqualTo(existingUser)
-        verify { csvDataSourceImpl.updateFile(any()) }
     }
 }

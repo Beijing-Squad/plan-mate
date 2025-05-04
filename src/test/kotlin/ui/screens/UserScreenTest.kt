@@ -6,9 +6,12 @@ import io.mockk.mockk
 import io.mockk.verify
 import io.mockk.verifyOrder
 import logic.entities.User
+import logic.entities.UserRole
+import logic.entities.exceptions.InvalidPasswordException
+import logic.entities.exceptions.InvalidUserNameException
 import logic.useCases.authentication.SessionManager
 import logic.useCases.user.GetAllUsersUseCase
-import logic.useCases.user.GetUserByUserIdUseCase
+import logic.useCases.user.GetUserByIdUseCase
 import logic.useCases.user.UpdateUserUseCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -19,25 +22,24 @@ import kotlin.uuid.Uuid
 class UserScreenTest {
     private lateinit var getAllUsersUseCase: GetAllUsersUseCase
     private lateinit var updateUsersUseCase: UpdateUserUseCase
-    private lateinit var getUserByUserIdUseCase: GetUserByUserIdUseCase
+    private lateinit var getUserByIdUseCase: GetUserByIdUseCase
     private lateinit var consoleIO: ConsoleIO
     private lateinit var userScreen: UserScreen
     private lateinit var sessionManager: SessionManager
 
     @BeforeEach
     fun setUp() {
-        getUserByUserIdUseCase = GetUserByUserIdUseCase(mockk())
+        getUserByIdUseCase = GetUserByIdUseCase(mockk())
         updateUsersUseCase = UpdateUserUseCase(
             mockk(relaxed = true),
             mockk(relaxed = true),
-            mockk(relaxed = true)
         )
         sessionManager = mockk(relaxed = true)
         getAllUsersUseCase = GetAllUsersUseCase(mockk())
         consoleIO = mockk(relaxed = true)
         userScreen = UserScreen(
             getAllUsersUseCase,
-            getUserByUserIdUseCase,
+            getUserByIdUseCase,
             updateUsersUseCase,
             consoleIO,
             sessionManager
@@ -55,11 +57,19 @@ class UserScreenTest {
         }
     }
 
+    @OptIn(ExperimentalUuidApi::class)
     @Test
-    fun `should call onClickGetAllUsers when input is 1`() {
+    fun `should call onClickGetAllUsers when user role is admin`() {
         // Given
-        every { consoleIO.read() } returns GET_ALL_USER_OPTION
-        every { getAllUsersUseCase.getAllUsers() } returns emptyList()
+        val userId = Uuid.parse(FAKE_ID)
+        val mockUser = mockk<User>(relaxed = true) {
+            every { id } returns userId
+            every { userName } returns FAKE_USERNAME
+            every { role } returns UserRole.ADMIN
+        }
+        every { consoleIO.read() } returns GET_ALL_USER_OPTION andThen EXIT_CHOICE
+        every { sessionManager.getCurrentUser() } returns mockUser
+        every { getAllUsersUseCase.getAllUsers() } returns listOf(mockUser)
 
         // When
         userScreen.handleFeatureChoice()
@@ -70,10 +80,33 @@ class UserScreenTest {
         }
     }
 
+    @OptIn(ExperimentalUuidApi::class)
+    @Test
+    fun `should not call onClickGetAllUsers when user role is mate`() {
+        // Given
+        val userId = Uuid.parse(FAKE_ID)
+        val mockUser = mockk<User>(relaxed = true) {
+            every { id } returns userId
+            every { userName } returns FAKE_USERNAME
+            every { role } returns UserRole.MATE
+        }
+        every { consoleIO.read() } returns GET_ALL_USER_OPTION andThen EXIT_CHOICE
+        every { sessionManager.getCurrentUser() } returns mockUser
+        every { getAllUsersUseCase.getAllUsers() } returns listOf(mockUser)
+
+        // When
+        userScreen.handleFeatureChoice()
+
+        // Then
+        verify(exactly = 0) {
+            getAllUsersUseCase.getAllUsers()
+        }
+    }
+
     @Test
     fun `should call onClickGetUserByID when input is 2`() {
         // Given
-        every { consoleIO.read() } returns GET_USER_BY_USER_ID
+        every { consoleIO.read() } returns GET_USER_BY_USER_ID andThen EXIT_CHOICE
 
         // When
         userScreen.handleFeatureChoice()
@@ -89,7 +122,7 @@ class UserScreenTest {
     fun `should return when input is 0`() {
         // Given
         every { consoleIO.read() } returns EXIT_CHOICE
-        every { getUserByUserIdUseCase.getUserByUserId(any()) } returns mockk(relaxed = true)
+        every { getUserByIdUseCase.getUserByUserId(any()) } returns mockk(relaxed = true)
 
         // When
         userScreen.handleFeatureChoice()
@@ -103,7 +136,10 @@ class UserScreenTest {
     @Test
     fun `should show error message when inter invalid input`() {
         // Given
-        every { consoleIO.read() } returns "999"
+        every { consoleIO.read() } returnsMany listOf(
+            INVALID_INPUT,
+            EXIT_CHOICE
+        )
 
         // When
         userScreen.handleFeatureChoice()
@@ -115,7 +151,10 @@ class UserScreenTest {
     @Test
     fun `should show error message when input is empty`() {
         // Given
-        every { consoleIO.read() } returns EMPTY_STRING
+        every { consoleIO.read() } returnsMany listOf(
+            EMPTY_STRING,
+            EXIT_CHOICE
+        )
 
         // When
         userScreen.handleFeatureChoice()
@@ -157,8 +196,8 @@ class UserScreenTest {
             FAKE_USERNAME,
             EXIT_CHOICE
         )
-
-        every { getUserByUserIdUseCase.getUserByUserId(FAKE_ID) } returns mockUser
+        every { getAllUsersUseCase.getAllUsers() } returns listOf(mockUser)
+        every { getUserByIdUseCase.getUserByUserId(FAKE_ID) } returns mockUser
 
         // When
         userScreen.handleFeatureChoice()
@@ -190,7 +229,7 @@ class UserScreenTest {
             EXIT_CHOICE
         )
 
-        every { getUserByUserIdUseCase.getUserByUserId(userId.toString()) } returns mockUser
+        every { getUserByIdUseCase.getUserByUserId(userId.toString()) } returns mockUser
         every { sessionManager.getCurrentUser() } returns mockUser
 
         // When
@@ -223,7 +262,7 @@ class UserScreenTest {
             EXIT_CHOICE
         )
 
-        every { getUserByUserIdUseCase.getUserByUserId(FAKE_ID) } returns mockUser
+        every { getUserByIdUseCase.getUserByUserId(FAKE_ID) } returns mockUser
 
         // When
         userScreen.handleFeatureChoice()
@@ -235,12 +274,136 @@ class UserScreenTest {
 
     }
 
+    @OptIn(ExperimentalUuidApi::class)
+    @Test
+    fun `should update user name when choice update user name`() {
+        // Given
+        val userId = Uuid.parse(FAKE_ID)
+        val mockUser = mockk<User>(relaxed = true) {
+            every { id } returns userId
+            every { userName } returns FAKE_USERNAME
+        }
+
+        every { sessionManager.getCurrentUser() } returns mockUser
+        every { consoleIO.read() } returnsMany listOf(
+            UPDATE_USER_OPTION,
+            UPDATE_USERNAME_OPTION,
+            FAKE_USERNAME,
+            EXIT_CHOICE
+        )
+
+        every { getUserByIdUseCase.getUserByUserId(FAKE_ID) } returns mockUser
+
+        // When
+        userScreen.handleFeatureChoice()
+
+        // Then
+        verify {
+            consoleIO.showWithLine(any())
+        }
+
+    }
+
+    @OptIn(ExperimentalUuidApi::class)
+    @Test
+    fun `should show message error when user name is empty`() {
+        // Given
+        val userId = Uuid.parse(FAKE_ID)
+        val mockUser = mockk<User>(relaxed = true) {
+            every { id } returns userId
+            every { userName } returns FAKE_USERNAME
+        }
+
+        every { sessionManager.getCurrentUser() } returns mockUser
+        every { consoleIO.read() } returnsMany listOf(
+            UPDATE_USER_OPTION,
+            UPDATE_USERNAME_OPTION,
+            EMPTY_STRING,
+            EXIT_CHOICE
+        )
+
+        every { getUserByIdUseCase.getUserByUserId(FAKE_ID) } returns mockUser
+
+        // When
+        userScreen.handleFeatureChoice()
+
+        // Then
+        verify {
+            consoleIO.showWithLine(any())
+        }
+    }
+
+    @OptIn(ExperimentalUuidApi::class)
+    @Test
+    fun `should catch invalidUserNameException when user name is empty`() {
+        // Given
+        val userId = Uuid.parse(FAKE_ID)
+        val mockUser = mockk<User>(relaxed = true) {
+            every { id } returns userId
+            every { userName } returns FAKE_USERNAME
+        }
+
+        every { sessionManager.getCurrentUser() } returns mockUser
+        every { consoleIO.read() } returnsMany listOf(
+            UPDATE_USER_OPTION,
+            UPDATE_USERNAME_OPTION,
+            EMPTY_STRING,
+            EXIT_CHOICE
+        )
+
+        every { getUserByIdUseCase.getUserByUserId(FAKE_ID) } returns mockUser
+        every {
+            updateUsersUseCase.updateUser(mockUser)
+        } throws InvalidUserNameException(message = "invalid user name")
+
+        // When
+        userScreen.handleFeatureChoice()
+
+        // Then
+        verify {
+            consoleIO.showWithLine(any())
+        }
+    }
+
+    @OptIn(ExperimentalUuidApi::class)
+    @Test
+    fun `should catch invalidPasswordException when password is empty`() {
+        // Given
+        val userId = Uuid.parse(FAKE_ID)
+        val mockUser = mockk<User>(relaxed = true) {
+            every { id } returns userId
+            every { userName } returns FAKE_USERNAME
+        }
+
+        every { sessionManager.getCurrentUser() } returns mockUser
+        every { consoleIO.read() } returnsMany listOf(
+            UPDATE_USER_OPTION,
+            UPDATE_PASSWORD_OPTION,
+            EMPTY_STRING,
+            EMPTY_STRING,
+            EXIT_CHOICE
+        )
+
+        every { getUserByIdUseCase.getUserByUserId(FAKE_ID) } returns mockUser
+        every {
+            updateUsersUseCase.updateUser(mockUser)
+        } throws InvalidPasswordException(message = "invalid password")
+
+        // When
+        userScreen.handleFeatureChoice()
+
+        // Then
+        verify {
+            consoleIO.showWithLine(any())
+        }
+    }
+
     @Test
     fun `should handle user not found during update when enter invalid id`() {
         // Given
-        every { consoleIO.read() } returns UPDATE_USER_OPTION andThen INVALID_FAKE_ID
+        every { consoleIO.read() } returns UPDATE_USER_OPTION andThen INVALID_FAKE_ID andThen EXIT_CHOICE
         every {
-            getUserByUserIdUseCase.getUserByUserId(INVALID_FAKE_ID)
+            getUserByIdUseCase.getUserByUserId(INVALID_FAKE_ID)
         } throws Exception("User not found")
 
         // When
@@ -258,6 +421,7 @@ class UserScreenTest {
         const val FAKE_USERNAME = "testUser"
         const val EXIT_CHOICE = "0"
         const val EMPTY_STRING = ""
+        const val INVALID_INPUT = "999"
         const val GET_ALL_USER_OPTION = "1"
         const val UPDATE_USERNAME_OPTION = "1"
         const val UPDATE_PASSWORD_OPTION = "2"
