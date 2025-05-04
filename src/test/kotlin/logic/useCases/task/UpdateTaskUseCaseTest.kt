@@ -7,6 +7,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalDateTime
 import logic.entities.exceptions.InvalidInputException
 import logic.repository.TasksRepository
 import org.junit.jupiter.api.BeforeEach
@@ -35,13 +36,13 @@ class UpdateTaskUseCaseTest {
             description = "Original Description",
             createdBy = "user-1",
             stateId = "state-1",
-            createdAt = LocalDate(2023, 1, 1),
-            updatedAt = LocalDate(2023, 1, 1)
+            createdAt = LocalDateTime(2023, 1, 1, 0, 0),
+            updatedAt = LocalDateTime(2023, 1, 1, 0, 0)
         )
         val taskToUpdate = originalTask.copy(
             title = "Updated Title",
             description = "Updated Description",
-            updatedAt = LocalDate(2023, 1, 2)
+            updatedAt = LocalDateTime(2023, 1, 1, 0, 0),
         )
 
         every { tasksRepository.updateTask(taskToUpdate) } returns taskToUpdate
@@ -64,7 +65,7 @@ class UpdateTaskUseCaseTest {
         )
         val taskWithEmptyTitle = originalTask.copy(
             title = "",
-            updatedAt = LocalDate(2023, 1, 2)
+            updatedAt = LocalDateTime(2023, 1, 1, 0, 0)
         )
 
         // When/Then
@@ -86,12 +87,12 @@ class UpdateTaskUseCaseTest {
             description = "Original Description",
             createdBy = "user-1",
             stateId = "state-1",
-            createdAt = LocalDate(2023, 1, 1),
-            updatedAt = LocalDate(2023, 2, 1)
+            createdAt = LocalDateTime(2023, 1, 1, 0, 0),
+            updatedAt = LocalDateTime(2023, 1, 1, 0, 0)
         )
         val taskWithNewDescription = originalTask.copy(
             description = "Updated Description",
-            updatedAt = LocalDate(2023, 1, 2)
+            updatedAt = LocalDateTime(2023, 1, 1, 0, 0)
         )
 
         every { tasksRepository.updateTask(taskWithNewDescription) } returns taskWithNewDescription
@@ -113,12 +114,12 @@ class UpdateTaskUseCaseTest {
             description = "Original Description",
             createdBy = "user-1",
             stateId = "state-1",
-            createdAt = LocalDate(2023, 1, 1),
-            updatedAt = LocalDate(2023, 2, 1)
+            createdAt = LocalDateTime(2023, 1, 1, 0, 0),
+            updatedAt = LocalDateTime(2023, 1, 1, 0, 0)
         )
         val taskWithNewTitle = originalTask.copy(
             title = "Updated Title",
-            updatedAt = LocalDate(2023, 1, 2)
+            updatedAt = LocalDateTime(2023, 1, 1, 0, 0)
         )
 
         every { tasksRepository.updateTask(taskWithNewTitle) } returns taskWithNewTitle
