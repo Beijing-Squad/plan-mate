@@ -5,17 +5,17 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import logic.entities.Task
+import logic.useCases.audit.AddAuditLogUseCase
 import logic.useCases.authentication.SessionManager
 import logic.useCases.state.GetAllStatesUseCase
-import logic.useCases.task.AddTaskUseCase
-import logic.useCases.task.DeleteTaskUseCase
-import logic.useCases.task.GetAllTasksUseCase
-import logic.useCases.task.GetTaskByIdUseCase
-import logic.useCases.task.UpdateTaskUseCase
+import logic.useCases.task.*
 import ui.console.SwimlanesRenderer
+import ui.enums.TaskBoardOption
 import ui.main.BaseScreen
 import ui.main.consoleIO.ConsoleIO
+import ui.main.MenuRenderer
 import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
 @OptIn(ExperimentalUuidApi::class)
 class TaskManagementScreen(
@@ -26,6 +26,7 @@ class TaskManagementScreen(
     private val getTaskByIdUseCase: GetTaskByIdUseCase,
     private val updateTaskUseCase: UpdateTaskUseCase,
     private val swimlanesRenderer: SwimlanesRenderer,
+    private val addAudit: AddAuditLogUseCase,
     private val consoleIO: ConsoleIO,
     private val sessionManager: SessionManager
 ) : BaseScreen(consoleIO) {
@@ -34,27 +35,15 @@ class TaskManagementScreen(
     override val name: String get() = "Task Screen"
 
     override fun showOptionService() {
-        consoleIO.showWithLine(
+        MenuRenderer.renderMenu(
             """
-            ╔══════════════════════════════════════════╗
-            ║             Task Management              ║
-            ╚══════════════════════════════════════════╝
-
-            ┌─── Available Options ────────────────────┐
-            │                                          │
-            │  1. Show All Tasks (Swimlanes)           │
-            │  2. Add Task                             │
-            │  3. Find Task by ID                      │
-            │  4. Delete Task                          │
-            │  5. Show All Tasks (List View)           │
-            │  6. Update Task                          │
-            │  0. Exit to Main Menu                    │
-            │                                          │
-            └──────────────────────────────────────────┘
-
-            """.trimIndent()
+        ╔══════════════════════════════════════╗
+        ║            Task Management           ║
+        ╚══════════════════════════════════════╝
+        """,
+            TaskBoardOption.entries,
+            consoleIO
         )
-        consoleIO.show("\uD83D\uDCA1 Please enter your choice: ")
     }
 
     override fun handleFeatureChoice() {
@@ -123,11 +112,25 @@ class TaskManagementScreen(
         try {
             addTaskUseCase.addTask(task)
             consoleIO.showWithLine("✅ Task added successfully.")
+            addAudit.addAuditLog(
+                Audit(
+                    id = Uuid.random(),
+                    userRole = currentUser.role,
+                    userName = currentUser.userName,
+                    action = ActionType.CREATE,
+                    entityType = EntityType.TASK,
+                    entityId = task.id.toString(),
+                    oldState = "",
+                    newState = "New Task",
+                    timeStamp = today
+                )
+            )
         } catch (e: Exception) {
             consoleIO.showWithLine("❌ Failed to add task: ${e.message}")
         }
     }
 
+    @OptIn(ExperimentalUuidApi::class)
     fun showAllTasksList() {
         consoleIO.showWithLine("\n\u001B[36m📋 All Tasks (List View):\u001B[0m")
         val tasks = getAllTasksUseCase.getAllTasks()
@@ -179,6 +182,7 @@ class TaskManagementScreen(
         }
     }
 
+    @OptIn(ExperimentalUuidApi::class)
     fun updateTaskById() {
         consoleIO.showWithLine("\n\u001B[36m🔄 Update Task\u001B[0m")
         consoleIO.show("Enter Task ID to update: ")
@@ -209,7 +213,19 @@ class TaskManagementScreen(
             val updatedTask = updateTaskUseCase.updateTask(taskToUpdate)
 
             consoleIO.showWithLine("✅ Task updated successfully:\n📌 Title: ${updatedTask.title}, 📝 Description: ${updatedTask.description}")
-
+            addAudit.addAuditLog(
+                Audit(
+                    id = Uuid.random(),
+                    userRole = sessionManager.getCurrentUser()!!.role,
+                    userName = sessionManager.getCurrentUser()!!.userName,
+                    action = ActionType.UPDATE,
+                    entityType = EntityType.TASK,
+                    entityId = updatedTask.id.toString(),
+                    oldState = "",
+                    newState = newTitle,
+                    timeStamp = Clock.System.todayIn(TimeZone.currentSystemDefault())
+                )
+            )
         } catch (e: Exception) {
             consoleIO.showWithLine("❌ Failed to update task: ${e.message}")
         }
@@ -223,6 +239,19 @@ class TaskManagementScreen(
         try {
             deleteTaskUseCase.deleteTask(id ?: "")
             consoleIO.showWithLine("✅ Task deleted successfully.")
+            addAudit.addAuditLog(
+                Audit(
+                    id = Uuid.random(),
+                    userRole = sessionManager.getCurrentUser()!!.role,
+                    userName = sessionManager.getCurrentUser()!!.userName,
+                    action = ActionType.DELETE,
+                    entityType = EntityType.TASK,
+                    entityId = id.toString(),
+                    oldState = "",
+                    newState = "",
+                    timeStamp = Clock.System.todayIn(TimeZone.currentSystemDefault())
+                )
+            )
         } catch (e: Exception) {
             consoleIO.showWithLine("❌ Error deleting task: ${e.message}")
         }
