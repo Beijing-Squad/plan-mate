@@ -1,7 +1,7 @@
 package data.parser
 
 import data.csvDataSource.csv.CsvParser
-import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalDateTime
 import logic.entities.Task
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
@@ -34,8 +34,8 @@ class TaskCsvParser : CsvParser<Task> {
             description = parts[3],
             createdBy = parts[4],
             stateId = parts[5],
-            createdAt = LocalDate.parse(parts[6]),
-            updatedAt = LocalDate.parse(parts[7])
+            createdAt = LocalDateTime.parse(parts[6]),
+            updatedAt = LocalDateTime.parse(parts[7])
         )
     }
 
