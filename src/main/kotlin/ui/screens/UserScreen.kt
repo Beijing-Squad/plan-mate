@@ -1,6 +1,7 @@
 package ui.screens
 
 import logic.entities.User
+import logic.useCases.authentication.SessionManagerUseCase
 import logic.entities.UserRole
 import logic.entities.exceptions.InvalidPasswordException
 import logic.entities.exceptions.InvalidUserNameException
@@ -11,8 +12,8 @@ import logic.useCases.user.GetUserByIdUseCase
 import logic.useCases.user.UpdateUserUseCase
 import ui.enums.UserBoardOption
 import ui.main.BaseScreen
-import ui.main.consoleIO.ConsoleIO
 import ui.main.MenuRenderer
+import ui.main.consoleIO.ConsoleIO
 import kotlin.uuid.ExperimentalUuidApi
 
 class UserScreen(
@@ -20,7 +21,7 @@ class UserScreen(
     private val getUserByUserId: GetUserByIdUseCase,
     private val updateUser: UpdateUserUseCase,
     private val consoleIO: ConsoleIO,
-    private val sessionManager: SessionManager
+    private val sessionManagerUseCase: SessionManagerUseCase
 ) : BaseScreen(consoleIO) {
     override val id: String
         get() = "5"
@@ -86,7 +87,7 @@ class UserScreen(
     @OptIn(ExperimentalUuidApi::class)
     private fun onClickUpdateUser() {
         consoleIO.showWithLine("\n\u001B[36m✏️ Update User\u001B[0m")
-        val userId = sessionManager.getCurrentUser()?.id.toString()
+        val userId = sessionManagerUseCase.getCurrentUser()?.id.toString()
 
         try {
             val user = userId.let { getUserByUserId.getUserByUserId(it) }

@@ -5,12 +5,12 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.todayIn
 import logic.entities.*
 import logic.useCases.audit.AddAuditLogUseCase
-import logic.useCases.authentication.SessionManager
+import logic.useCases.authentication.SessionManagerUseCase
 import logic.useCases.state.*
 import ui.enums.StateBoardOption
 import ui.main.BaseScreen
-import ui.main.consoleIO.ConsoleIO
 import ui.main.MenuRenderer
+import ui.main.consoleIO.ConsoleIO
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -23,7 +23,7 @@ class StateScreen(
     private val getStatesByProjectId: GetStatesByProjectIdUseCase,
     private val addAudit: AddAuditLogUseCase,
     private val consoleIO: ConsoleIO,
-    private val sessionManager: SessionManager
+    private val sessionManagerUseCase: SessionManagerUseCase
 ) : BaseScreen(consoleIO) {
 
     override val id = "2"
@@ -40,6 +40,7 @@ class StateScreen(
             consoleIO
         )
     }
+
     override fun handleFeatureChoice() {
         when (getInput()) {
             "1" -> onChooseAddState()
@@ -68,7 +69,7 @@ class StateScreen(
                 Audit(
                     id = Uuid.random(),
                     userRole = role,
-                    userName = sessionManager.getCurrentUser()!!.userName,
+                    userName = sessionManagerUseCase.getCurrentUser()!!.userName,
                     action = ActionType.UPDATE,
                     entityType = EntityType.PROJECT,
                     entityId = projectId,
@@ -110,7 +111,7 @@ class StateScreen(
                 Audit(
                     id = Uuid.random(),
                     userRole = role,
-                    userName = sessionManager.getCurrentUser()!!.userName,
+                    userName = sessionManagerUseCase.getCurrentUser()!!.userName,
                     action = ActionType.UPDATE,
                     entityType = EntityType.PROJECT,
                     entityId = projectId,
@@ -166,7 +167,7 @@ class StateScreen(
     }
 
     private fun getRoleInput(): UserRole {
-        return sessionManager.getCurrentUser()?.role ?: UserRole.MATE
+        return sessionManagerUseCase.getCurrentUser()?.role ?: UserRole.MATE
     }
 
 

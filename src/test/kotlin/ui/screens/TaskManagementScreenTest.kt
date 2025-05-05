@@ -5,7 +5,7 @@ import fake.createState
 import fake.createTask
 import io.mockk.*
 import logic.useCases.audit.AddAuditLogUseCase
-import logic.useCases.authentication.SessionManager
+import logic.useCases.authentication.SessionManagerUseCase
 import logic.useCases.state.GetAllStatesUseCase
 import logic.useCases.task.*
 import org.junit.jupiter.api.BeforeEach
@@ -26,7 +26,7 @@ class TaskManagementScreenTest {
     private val getTaskByIdUseCase = mockk<GetTaskByIdUseCase>()
     private val swimlanesRenderer = mockk<SwimlanesRenderer>(relaxed = true)
     private val consoleIO = mockk<ConsoleIO>(relaxed = true)
-    private val sessionManager = mockk<SessionManager>(relaxed = true)
+    private val sessionManagerUseCase = mockk<SessionManagerUseCase>(relaxed = true)
     private val addAuditLogUseCase: AddAuditLogUseCase = mockk(relaxed = true)
 
     @BeforeEach
@@ -41,7 +41,7 @@ class TaskManagementScreenTest {
             swimlanesRenderer,
             addAuditLogUseCase,
             consoleIO,
-            sessionManager
+            sessionManagerUseCase
         )
     }
 
