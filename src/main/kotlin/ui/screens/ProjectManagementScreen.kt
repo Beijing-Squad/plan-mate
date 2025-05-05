@@ -1,8 +1,6 @@
 package ui.screens
 
-import kotlinx.datetime.Clock
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.todayIn
+import kotlinx.datetime.*
 import logic.entities.*
 import logic.useCases.audit.AddAuditLogUseCase
 import logic.useCases.authentication.SessionManagerUseCase
@@ -115,7 +113,7 @@ class ProjectManagementScreen(
                                     entityId = updated.id.toString(),
                                     oldState = updated.name,
                                     newState = updated.description,
-                                    timeStamp = Clock.System.todayIn(TimeZone.currentSystemDefault())
+                                    timeStamp = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
                                 )
                             )
                         }
@@ -158,7 +156,7 @@ class ProjectManagementScreen(
                         entityId = newProject.id.toString(),
                         oldState = name,
                         newState = newProject.description,
-                        timeStamp = now
+                        timeStamp = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
                     )
                 )
             },
@@ -186,7 +184,7 @@ class ProjectManagementScreen(
                             entityId = id,
                             oldState = "",
                             newState = "",
-                            timeStamp = Clock.System.todayIn(TimeZone.currentSystemDefault())
+                            timeStamp = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
                         )
                     )
                 }
