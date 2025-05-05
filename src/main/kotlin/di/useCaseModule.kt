@@ -28,20 +28,20 @@ val useCaseModule = module {
     single { RegisterUserAuthenticationUseCase(get(), get(), get()) }
     single { SessionManager() }
     // state use cases
-    single { AddStateUseCase(get(),get()) }
-    single { DeleteStateUseCase(get()) }
+    single { AddStateUseCase(get(), get()) }
+    single { DeleteStateUseCase(get(), get()) }
     single { GetStateByIdUseCase(get()) }
     single { GetStatesByProjectIdUseCase(get()) }
     single { GetAllStatesUseCase(get()) }
-    single { UpdateStateUseCase(get()) }
+    single { UpdateStateUseCase(get(), get()) }
 
     single { GetAllUsersUseCase(get()) }
     single { GetUserByUserIdUseCase(get()) }
     single { UpdateUserUseCase(get(), get(), get()) }
-    single { AddAuditLogUseCase(get())}
-    single { GetAllAuditLogsUseCase(get())}
-    single { GetAuditLogsByProjectIdUseCase(get())}
-    single { GetAuditLogsByTaskIdUseCase(get())}
+    single { AddAuditLogUseCase(get()) }
+    single { GetAllAuditLogsUseCase(get()) }
+    single { GetAuditLogsByProjectIdUseCase(get()) }
+    single { GetAuditLogsByTaskIdUseCase(get()) }
 
     // task use cases
     single { AddTaskUseCase(get()) }
