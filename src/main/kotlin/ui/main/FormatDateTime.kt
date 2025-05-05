@@ -6,5 +6,5 @@ fun LocalDateTime.format(): String {
     val hourString = hour.toString().padStart(2, '0')
     val minuteString = minute.toString().padStart(2, '0')
 
-    return "$year-$monthString-$dayString , $hourString:$minuteString"
+    return "$year-$monthString-$dayString,$hourString:$minuteString"
 }
