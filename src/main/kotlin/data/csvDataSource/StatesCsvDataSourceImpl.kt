@@ -49,11 +49,11 @@ class StatesCsvDataSourceImpl(
     }
 
     @OptIn(ExperimentalUuidApi::class)
-    override fun updateState(newState: State): State {
-        return getStateById(newState.id).let { currentState ->
+    override fun updateState(state: State): State {
+        return getStateById(state.id).let { currentState ->
             val updatedState = currentState.copy(
-                name = newState.name,
-                projectId = newState.projectId
+                name = state.name,
+                projectId = state.projectId
             )
             val updatedStates = states.map { if (it == currentState) updatedState else it }
             csvDataSource.updateFile(updatedStates)
