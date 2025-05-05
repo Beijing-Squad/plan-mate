@@ -1,31 +1,31 @@
 package logic.useCases.state
 
 import logic.entities.State
-import logic.entities.UserRole
+import logic.entities.exceptions.InvalidStateNameException
 import logic.entities.exceptions.ProjectNotFoundException
 import logic.entities.exceptions.StateAlreadyExistException
-import logic.entities.exceptions.StateUnauthorizedUserException
-import logic.repository.ProjectsRepository
 import logic.repository.StatesRepository
+import logic.useCases.project.GetAllProjectsUseCase
 import kotlin.uuid.ExperimentalUuidApi
 
 class AddStateUseCase(
     private val statesRepository: StatesRepository,
-    private val ProjectRepository: ProjectsRepository
+    private val getAllProjectsUseCase: GetAllProjectsUseCase,
 ) {
     @OptIn(ExperimentalUuidApi::class)
-    fun addState(state: State, role: UserRole): Boolean {
-        if (role != UserRole.ADMIN){
-            throw StateUnauthorizedUserException("user should be Admin")
+    fun addState(state: State): Boolean {
+        val isStateExist = statesRepository.getAllStates().any {
+            it.id == state.id
         }
-        if (ProjectRepository.getAllProjects().any { it.id.toString() != state.projectId }){
-            throw ProjectNotFoundException("the project id with this state not found")
-        }
-        val allStats = statesRepository.getAllStates()
-        if (allStats.any { it.id == state.id }) {
-            throw StateAlreadyExistException("State with id ${state.id} already exists")
+        val isProjectExist = getAllProjectsUseCase.getAllProjects().any {
+            it.id.toString() == state.projectId
         }
 
+        if (state.name.isBlank()) throw InvalidStateNameException()
+
+        if (isStateExist) throw StateAlreadyExistException()
+
+        if (!isProjectExist) throw ProjectNotFoundException()
 
         return statesRepository.addState(state)
     }

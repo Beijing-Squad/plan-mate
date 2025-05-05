@@ -8,11 +8,9 @@ class GetStatesByProjectIdUseCase(
     private val statesRepository: StatesRepository
 ) {
     fun getStatesByProjectId(projectId: String): List<State> {
+        require(statesRepository.getStatesByProjectId(projectId).isNotEmpty()) {
+            throw StateNotFoundException("No States Found")
+        }
         return statesRepository.getStatesByProjectId(projectId)
-            .also {
-                if (it.isEmpty()) {
-                    throw StateNotFoundException("the state with this $projectId project id not found")
-                }
-            }
     }
 }

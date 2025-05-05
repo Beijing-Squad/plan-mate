@@ -9,8 +9,7 @@ class GetStateByIdUseCase(
     private val statesRepository: StatesRepository
 ) {
     @OptIn(ExperimentalUuidApi::class)
-    fun getStateById(stateId: String): State? {
+    fun getStateById(stateId: String): State {
         return statesRepository.getStateById(stateId)
-            ?: throw StateNotFoundException("state not found")
     }
 }
