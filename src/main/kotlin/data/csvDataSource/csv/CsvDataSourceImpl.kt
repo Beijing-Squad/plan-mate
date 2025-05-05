@@ -2,6 +2,7 @@ package data.csvDataSource.csv
 
 import logic.entities.exceptions.CsvReadException
 import logic.entities.exceptions.CsvWriteException
+import logic.entities.exceptions.ProjectNotFoundException
 
 class CsvDataSourceImpl<T>(
     private var csvFileReader: CsvReader,
@@ -48,6 +49,16 @@ class CsvDataSourceImpl<T>(
             updateFile(updatedItems)
         } catch (e: Exception) {
             throw CsvWriteException("Error deleting item from CSV: ${e.message}")
+        }
+    }
+
+    fun getById(id: String): T {
+       return try {
+            val allItems = loadAllDataFromFile()
+            allItems.find { csvDataParser.getId(it) == id }
+                ?: throw ProjectNotFoundException("Item with ID: $id was not found.")
+        } catch (e: Exception) {
+            throw CsvReadException("Error reading CSV file for item with ID: $id, reason: ${e.message}")
         }
     }
 }

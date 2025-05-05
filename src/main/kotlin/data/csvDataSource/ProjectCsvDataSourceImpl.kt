@@ -17,4 +17,5 @@ class ProjectCsvDataSourceImpl(
 
     override fun updateProject(newProjects: List<Project>) = csvDataSource.updateFile(newProjects)
 
+    override fun getProjectById(projectId: String): Project = csvDataSource.getById(projectId)
 }

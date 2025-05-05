@@ -11,4 +11,5 @@ interface ProjectsRepository{
 
     fun updateProject(newProjects: List<Project>)
 
+    fun getProjectById(projectId: String): Project
 }
