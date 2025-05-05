@@ -16,6 +16,12 @@ dependencies {
     implementation("io.insert-koin:koin-core:4.0.3")
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.2")
 
+    // Kotlin coroutine dependency
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
+
+    // MongoDB Kotlin driver dependency
+    implementation("org.mongodb:mongodb-driver-kotlin-coroutine:4.10.1")
+
     testImplementation("com.google.truth:truth:1.4.4")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.12.0")
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.12.0")
