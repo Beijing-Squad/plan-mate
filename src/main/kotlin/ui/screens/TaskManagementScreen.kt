@@ -4,6 +4,9 @@ import format
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import logic.entities.ActionType
+import logic.entities.Audit
+import logic.entities.EntityType
 import logic.entities.Task
 import logic.useCases.audit.AddAuditLogUseCase
 import logic.useCases.authentication.SessionManager
@@ -122,7 +125,7 @@ class TaskManagementScreen(
                     entityId = task.id.toString(),
                     oldState = "",
                     newState = "New Task",
-                    timeStamp = today
+                    timeStamp = now
                 )
             )
         } catch (e: Exception) {
@@ -187,6 +190,7 @@ class TaskManagementScreen(
         consoleIO.showWithLine("\n\u001B[36m🔄 Update Task\u001B[0m")
         consoleIO.show("Enter Task ID to update: ")
         val id = consoleIO.read()
+        val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
 
         if (id.isNullOrBlank()) {
             consoleIO.showWithLine("❌ Task ID is required.")
@@ -207,7 +211,7 @@ class TaskManagementScreen(
             val taskToUpdate = existingTask.copy(
                 title = newTitle,
                 description = newDescription,
-                updatedAt = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+                updatedAt = now
             )
 
             val updatedTask = updateTaskUseCase.updateTask(taskToUpdate)
@@ -223,7 +227,7 @@ class TaskManagementScreen(
                     entityId = updatedTask.id.toString(),
                     oldState = "",
                     newState = newTitle,
-                    timeStamp = Clock.System.todayIn(TimeZone.currentSystemDefault())
+                    timeStamp = now
                 )
             )
         } catch (e: Exception) {
@@ -235,6 +239,7 @@ class TaskManagementScreen(
         consoleIO.showWithLine("\n\u001B[36m🗑️ Delete Task\u001B[0m")
         consoleIO.show("\u001B[32mEnter Task ID to delete: \u001B[0m")
         val id = consoleIO.read()
+        val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
 
         try {
             deleteTaskUseCase.deleteTask(id ?: "")
@@ -249,7 +254,7 @@ class TaskManagementScreen(
                     entityId = id.toString(),
                     oldState = "",
                     newState = "",
-                    timeStamp = Clock.System.todayIn(TimeZone.currentSystemDefault())
+                    timeStamp = now
                 )
             )
         } catch (e: Exception) {
