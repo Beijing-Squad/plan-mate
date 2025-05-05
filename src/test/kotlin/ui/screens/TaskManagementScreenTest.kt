@@ -5,8 +5,8 @@ import fake.createState
 import fake.createTask
 import format
 import io.mockk.*
-import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
+import logic.useCases.audit.AddAuditLogUseCase
 import logic.useCases.authentication.SessionManager
 import logic.useCases.state.GetAllStatesUseCase
 import logic.useCases.task.*
@@ -27,6 +27,7 @@ class TaskManagementScreenTest {
     private val deleteTaskUseCase = mockk<DeleteTaskUseCase>(relaxed = true)
     private val getTaskByIdUseCase = mockk<GetTaskByIdUseCase>()
     private val swimlanesRenderer = mockk<SwimlanesRenderer>(relaxed = true)
+    private val addAudit = mockk<AddAuditLogUseCase>(relaxed = true)
     private val consoleIO = mockk<ConsoleIO>(relaxed = true)
     private val sessionManager = mockk<SessionManager>(relaxed = true)
 
@@ -40,6 +41,7 @@ class TaskManagementScreenTest {
             getTaskByIdUseCase,
             updateTaskUseCase,
             swimlanesRenderer,
+            addAudit,
             consoleIO,
             sessionManager
         )
@@ -117,7 +119,7 @@ class TaskManagementScreenTest {
             updatedAt = LocalDateTime(2023, 1, 1, 0, 0)
         )
 
-        val updatedTask = expectedTaskToUpdate.copy()
+        val updatedTask = expectedTaskToUpdate
         every { updateTaskUseCase.updateTask(match {
             it.id == oldTask.id &&
                     it.title == "New" &&
