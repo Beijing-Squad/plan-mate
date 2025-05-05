@@ -7,7 +7,8 @@ import logic.entities.exceptions.UserNotFoundException
 import kotlin.uuid.ExperimentalUuidApi
 
 class UserCsvDataSourceImpl(
-    private val csvDataSource: CsvDataSourceImpl<User>
+    private val csvDataSource: CsvDataSourceImpl<User>,
+    private val authenticationCsvDataSourceImpl: AuthenticationCsvDataSourceImpl
 ) : UserDataSource {
 
     private val users = csvDataSource.loadAllDataFromFile().toMutableList()
@@ -29,9 +30,11 @@ class UserCsvDataSourceImpl(
 
     @OptIn(ExperimentalUuidApi::class)
     override fun updateUser(user: User): User {
+        authenticationCsvDataSourceImpl.validateUsername(user.userName)
+        authenticationCsvDataSourceImpl.validatePassword(user.password)
         val currentUser = getUserByUserId(user.id.toString())
         val userUpdated = currentUser
-            .copy(userName = user.userName, password = user.password)
+            .copy(userName = user.userName, password = authenticationCsvDataSourceImpl.hashPassword(user.password))
         users[users.indexOf(currentUser)] = userUpdated
         csvDataSource.updateFile(users)
         return userUpdated

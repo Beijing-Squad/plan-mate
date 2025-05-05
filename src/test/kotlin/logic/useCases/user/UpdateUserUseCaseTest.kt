@@ -15,15 +15,12 @@ import kotlin.uuid.ExperimentalUuidApi
 class UpdateUserUseCaseTest {
     private lateinit var updateUser: UpdateUserUseCase
     private lateinit var userRepository: UserRepository
-    private lateinit var validationUserUseCase: ValidationUserUseCase
 
     @BeforeEach
     fun setUp() {
         userRepository = mockk(relaxed = true)
-        validationUserUseCase = mockk(relaxed = true)
         updateUser = UpdateUserUseCase(
-            userRepository,
-            validationUserUseCase
+            userRepository
         )
     }
 
@@ -42,33 +39,7 @@ class UpdateUserUseCaseTest {
         assertThat(actual).isEqualTo(userUpdated)
     }
 
-    @Test
-    fun `should throw InvalidUserNameException when username is invalid`() {
-        // Given
-        val user = createUser(userName = EMPTY_STRING)
-        every { validationUserUseCase.isUserNameBlank(any()) } returns true
-        every { validationUserUseCase.isPasswordBlack(any()) } returns false
-
-        // When && Then
-        assertThrows<InvalidUserNameException> {
-            updateUser.updateUser(user)
-        }
-    }
-
-    @Test
-    fun `should throw InvalidPasswordException when password is invalid`() {
-        // Given
-        val user = createUser(userName = "mohammed", password = EMPTY_STRING)
-        every { validationUserUseCase.isUserNameBlank(any()) } returns false
-        every { validationUserUseCase.isPasswordBlack(any()) } returns true
-
-        // When && Then
-        assertThrows<InvalidPasswordException> {
-            updateUser.updateUser(user)
-        }
-    }
-
-    private companion object{
+    private companion object {
         const val EMPTY_STRING = ""
     }
 }

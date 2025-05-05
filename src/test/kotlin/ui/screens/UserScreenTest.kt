@@ -9,7 +9,7 @@ import logic.entities.User
 import logic.entities.UserRole
 import logic.entities.exceptions.InvalidPasswordException
 import logic.entities.exceptions.InvalidUserNameException
-import logic.useCases.authentication.SessionManager
+import logic.useCases.authentication.SessionManagerUseCase
 import logic.useCases.user.GetAllUsersUseCase
 import logic.useCases.user.GetUserByIdUseCase
 import logic.useCases.user.UpdateUserUseCase
@@ -25,14 +25,13 @@ class UserScreenTest {
     private lateinit var getUserByIdUseCase: GetUserByIdUseCase
     private lateinit var consoleIO: ConsoleIO
     private lateinit var userScreen: UserScreen
-    private lateinit var sessionManager: SessionManager
+    private lateinit var sessionManager: SessionManagerUseCase
 
     @BeforeEach
     fun setUp() {
         getUserByIdUseCase = GetUserByIdUseCase(mockk())
         updateUsersUseCase = UpdateUserUseCase(
-            mockk(relaxed = true),
-            mockk(relaxed = true),
+            mockk(relaxed = true)
         )
         sessionManager = mockk(relaxed = true)
         getAllUsersUseCase = GetAllUsersUseCase(mockk())

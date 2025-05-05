@@ -60,7 +60,7 @@ val dataSourceModule = module {
 
     // Implementations
     single { ProjectCsvDataSourceImpl(get(named("projectDataSource"))) } bind ProjectDataSource::class
-    single { UserCsvDataSourceImpl(get(named("userDataSource"))) } bind UserDataSource::class
+    single { UserCsvDataSourceImpl(get(named("userDataSource")),get()) } bind UserDataSource::class
     single { TasksCsvDataSourceImpl(get(named("taskDataSource"))) } bind TasksDataSource::class
     single { StatesCsvDataSourceImpl(get(named("stateDataSource"))) } bind StatesDataSource::class
     single { AuditCsvDataSourceImpl(get(named("auditDataSource"))) } bind AuditDataSource::class

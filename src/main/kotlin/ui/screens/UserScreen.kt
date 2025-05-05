@@ -1,12 +1,11 @@
 package ui.screens
 
 import logic.entities.User
-import logic.useCases.authentication.SessionManagerUseCase
 import logic.entities.UserRole
 import logic.entities.exceptions.InvalidPasswordException
 import logic.entities.exceptions.InvalidUserNameException
 import logic.entities.exceptions.UnauthorizedUserException
-import logic.useCases.authentication.SessionManager
+import logic.useCases.authentication.SessionManagerUseCase
 import logic.useCases.user.GetAllUsersUseCase
 import logic.useCases.user.GetUserByIdUseCase
 import logic.useCases.user.UpdateUserUseCase
@@ -44,13 +43,14 @@ class UserScreen(
     override fun handleFeatureChoice() {
         when (getInput()) {
             "1" -> {
-                val currentUser = sessionManager.getCurrentUser()!!
-                if (currentUser.role == UserRole.ADMIN){
+                val currentUser = sessionManagerUseCase.getCurrentUser()!!
+                if (currentUser.role == UserRole.ADMIN) {
                     onClickGetAllUsers()
-                } else{
+                } else {
                     consoleIO.showWithLine("\u001B[31m❌ You don't have permission\u001B[0m")
                 }
             }
+
             "2" -> onClickGetUserByID()
             "3" -> onClickUpdateUser()
             "0" -> return

@@ -17,12 +17,14 @@ class UserCsvDataSourceImplTest {
 
     private lateinit var userCsvDataSourceImpl: UserDataSource
     private lateinit var csvDataSourceImpl: CsvDataSourceImpl<User>
+    private lateinit var authDataSourceImpl: AuthenticationCsvDataSourceImpl
     private lateinit var testUsers: List<User>
 
 
     @BeforeEach
     fun setUp() {
         csvDataSourceImpl = mockk()
+        authDataSourceImpl = mockk()
         testUsers = listOf(
             createUser(
                 userName = "mohammed1234",
@@ -48,7 +50,7 @@ class UserCsvDataSourceImplTest {
     fun `should return all users when data source has users`() {
         // Given
         every { csvDataSourceImpl.loadAllDataFromFile() } returns testUsers
-        userCsvDataSourceImpl = UserCsvDataSourceImpl(csvDataSourceImpl)
+        userCsvDataSourceImpl = UserCsvDataSourceImpl(csvDataSourceImpl,authDataSourceImpl)
 
         // When
         val result = userCsvDataSourceImpl.getAllUsers()
@@ -61,7 +63,7 @@ class UserCsvDataSourceImplTest {
     fun `should return empty list when data source has no users`() {
         // Given
         every { csvDataSourceImpl.loadAllDataFromFile() } returns emptyList()
-        userCsvDataSourceImpl = UserCsvDataSourceImpl(csvDataSourceImpl)
+        userCsvDataSourceImpl = UserCsvDataSourceImpl(csvDataSourceImpl,authDataSourceImpl)
 
         // When
         val result = userCsvDataSourceImpl.getAllUsers()
@@ -75,7 +77,7 @@ class UserCsvDataSourceImplTest {
     fun `should return user when user id is founded`() {
         // Given
         every { csvDataSourceImpl.loadAllDataFromFile() } returns testUsers
-        userCsvDataSourceImpl = UserCsvDataSourceImpl(csvDataSourceImpl)
+        userCsvDataSourceImpl = UserCsvDataSourceImpl(csvDataSourceImpl,authDataSourceImpl)
         val firstUser = testUsers.first()
 
         // When
@@ -90,7 +92,7 @@ class UserCsvDataSourceImplTest {
     fun `should throw UserNotFoundException when user id is not found`() {
         // Given
         every { csvDataSourceImpl.loadAllDataFromFile() } returns testUsers
-        userCsvDataSourceImpl = UserCsvDataSourceImpl(csvDataSourceImpl)
+        userCsvDataSourceImpl = UserCsvDataSourceImpl(csvDataSourceImpl,authDataSourceImpl)
         val nonExistentUserId = "non-existent-id"
 
         // When/Then
