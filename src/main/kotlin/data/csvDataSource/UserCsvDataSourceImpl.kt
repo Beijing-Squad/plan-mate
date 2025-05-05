@@ -36,10 +36,10 @@ class UserCsvDataSourceImpl(
         validationUserDataSource.validateUsername(user.userName)
         validationUserDataSource.validatePassword(user.password)
         val currentUser = getUserByUserId(user.id.toString())
-        val userUpdated = currentUser
+        val updatedUser = currentUser
             .copy(userName = user.userName, password = mD5HashPasswordImpl.hashPassword(user.password))
-        users[users.indexOf(currentUser)] = userUpdated
+        users[users.indexOf(currentUser)] = updatedUser
         csvDataSource.updateFile(users)
-        return userUpdated
+        return updatedUser
     }
 }
