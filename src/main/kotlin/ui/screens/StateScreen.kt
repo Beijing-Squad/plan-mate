@@ -2,13 +2,13 @@ package ui.screens
 
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
-import kotlinx.datetime.todayIn
+import kotlinx.datetime.toLocalDateTime
 import logic.entities.*
 import logic.entities.exceptions.InvalidStateNameException
 import logic.entities.exceptions.ProjectNotFoundException
 import logic.entities.exceptions.StateAlreadyExistException
 import logic.useCases.audit.AddAuditLogUseCase
-import logic.useCases.authentication.SessionManager
+import logic.useCases.authentication.SessionManagerUseCase
 import logic.useCases.state.*
 import ui.enums.StateBoardOption
 import ui.main.BaseScreen
@@ -26,7 +26,7 @@ class StateScreen(
     private val getStatesByProjectId: GetStatesByProjectIdUseCase,
     private val addAudit: AddAuditLogUseCase,
     private val consoleIO: ConsoleIO,
-    private val sessionManager: SessionManager
+    private val sessionManagerUseCase: SessionManagerUseCase
 ) : BaseScreen(consoleIO) {
 
     override val id = "2"
@@ -74,13 +74,13 @@ class StateScreen(
                 Audit(
                     id = Uuid.random(),
                     userRole = UserRole.ADMIN,
-                    userName = sessionManager.getCurrentUser()!!.userName,
+                    userName = sessionManagerUseCase.getCurrentUser()!!.userName,
                     action = ActionType.UPDATE,
                     entityType = EntityType.PROJECT,
                     entityId = projectId,
                     oldState = "",
                     newState = name,
-                    timeStamp = Clock.System.todayIn(TimeZone.currentSystemDefault())
+                    timeStamp = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
                 )
             )
 
@@ -120,13 +120,13 @@ class StateScreen(
                 Audit(
                     id = Uuid.random(),
                     userRole = UserRole.ADMIN,
-                    userName = sessionManager.getCurrentUser()!!.userName,
+                    userName = sessionManagerUseCase.getCurrentUser()!!.userName,
                     action = ActionType.UPDATE,
                     entityType = EntityType.PROJECT,
                     entityId = projectId,
                     oldState = "",
                     newState = name,
-                    timeStamp = Clock.System.todayIn(TimeZone.currentSystemDefault())
+                    timeStamp = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
                 )
             )
 

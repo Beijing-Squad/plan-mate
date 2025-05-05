@@ -8,7 +8,7 @@ import logic.useCases.project.*
 import logic.useCases.authentication.LoginUserAuthenticationUseCase
 import logic.useCases.authentication.MD5PasswordUseCase
 import logic.useCases.authentication.RegisterUserAuthenticationUseCase
-import logic.useCases.authentication.SessionManager
+import logic.useCases.authentication.SessionManagerUseCase
 import logic.useCases.user.GetAllUsersUseCase
 import logic.useCases.user.GetUserByUserIdUseCase
 import logic.useCases.user.UpdateUserUseCase
@@ -27,6 +27,9 @@ val useCaseModule = module {
     single { LoginUserAuthenticationUseCase(get(), get(), get()) }
     single { RegisterUserAuthenticationUseCase(get(), get(), get()) }
     single { SessionManager() }
+    single { SessionManagerUseCase() }
+
+
     // state use cases
     single { AddStateUseCase(get(), get()) }
     single { DeleteStateUseCase(get(), get()) }

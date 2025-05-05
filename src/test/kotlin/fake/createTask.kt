@@ -1,6 +1,7 @@
 package fake
 
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalDateTime
 import logic.entities.Task
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
@@ -12,8 +13,8 @@ fun createTask(
     description: String = "defaultDescription",
     createdBy: String = "defaultCreator",
     stateId: String = "defaultStateId",
-    createdAt: LocalDate = LocalDate(2023, 1, 1),
-    updatedAt: LocalDate = LocalDate(2023, 1, 1)
+    createdAt: LocalDateTime = LocalDateTime(2023, 1, 1,0,0),
+    updatedAt: LocalDateTime = LocalDateTime(2023, 1, 1,0,0)
 ): Task {
     return Task(
         id = Uuid.random(),
