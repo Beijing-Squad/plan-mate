@@ -10,9 +10,7 @@ import logic.useCases.authentication.SessionManagerUseCase
 import logic.useCases.project.*
 import logic.useCases.state.*
 import logic.useCases.task.*
-import logic.useCases.user.GetAllUsersUseCase
-import logic.useCases.user.GetUserByIdUseCase
-import logic.useCases.user.UpdateUserUseCase
+import logic.useCases.user.*
 import org.koin.dsl.module
 
 val useCaseModule = module {
