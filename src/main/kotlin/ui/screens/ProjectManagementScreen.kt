@@ -43,23 +43,28 @@ class ProjectManagementScreen(
             consoleIO
         )
     }
-    override fun handleFeatureChoice() {
-        when (getInput()) {
-            "1" -> listAllProjects()
-            "2" -> findProjectById()
-            "3" -> updateProject()
-            "4" -> addProject()
-            "5" -> deleteProject()
-            "0" -> return
-            else -> consoleIO.showWithLine("\u001B[31m❌ Invalid Option\u001B[0m")
 
+    override fun handleFeatureChoice() {
+        while (true) {
+            showOptionService()
+            when (getInput()) {
+                "1" -> listAllProjects()
+                "2" -> findProjectById()
+                "3" -> updateProject()
+                "4" -> addProject()
+                "5" -> deleteProject()
+                "0" -> {
+                    consoleIO.showWithLine("\u001B[34m🔙 Returning to Main Menu...\u001B[0m")
+                    break
+                }
+                else -> consoleIO.showWithLine("\u001B[31m❌ Invalid Option\u001B[0m")
+
+            }
         }
     }
-
-    private fun listAllProjects() {
-        val result = getAllProjectsUseCase.getAllProjects(userRole)
-        result.fold(
-            onSuccess = { projects ->
+        private fun listAllProjects() {
+            try {
+                val projects = getAllProjectsUseCase.getAllProjects()
                 if (projects.isEmpty()) {
                     consoleIO.showWithLine("\u001B[33m⚠️ No projects found.\u001B[0m")
                 } else {
@@ -67,113 +72,109 @@ class ProjectManagementScreen(
                         showProjectInfo(project)
                     }
                 }
-            },
-            onFailure = { error ->
-                consoleIO.showWithLine("\u001B[31m❌ ${error.message}\u001B[0m")
+            } catch (e: Exception) {
+                consoleIO.showWithLine("\u001B[31m❌ ${e.message}\u001B[0m")
             }
-        )
-    }
+        }
 
-    private fun findProjectById() {
-        consoleIO.show("\u001B[32mEnter project ID: \u001B[0m")
-        val id = getInput() ?: return
-        val result = getProjectByIdUseCase.getProjectById(id, userRole)
-        result.fold(
-            onSuccess = { project -> showProjectInfo(project) },
-            onFailure = { error -> consoleIO.showWithLine("\u001B[31m❌ ${error.message}\u001B[0m") }
-        )
-    }
+        private fun findProjectById() {
+            try {
+                consoleIO.show("\u001B[32mEnter project ID: \u001B[0m")
+                val id = getInput() ?: return
+                val project = getProjectByIdUseCase.getProjectById(id)
+                showProjectInfo(project)
+            } catch (e: Exception) {
+                consoleIO.showWithLine("\u001B[31m❌ ${e.message}\u001B[0m")
+            }
+        }
 
-    private fun updateProject() {
-        consoleIO.show("\u001B[32mEnter project ID to update: \u001B[0m")
-        val id = getInput() ?: return
-        val existing = getProjectByIdUseCase.getProjectById(id, userRole)
-        existing.fold(
-            onSuccess = { project ->
+        private fun updateProject() {
+            try {
+                consoleIO.show("\u001B[32mEnter project ID to update: \u001B[0m")
+                val id = getInput() ?: return
+                val project = getProjectByIdUseCase.getProjectById(id)
+
                 consoleIO.show("\u001B[32mEnter new name: \u001B[0m")
                 val name = getInput() ?: return
                 consoleIO.show("\u001B[32mEnter new description: \u001B[0m")
                 val desc = getInput() ?: return
+
                 val updated = project.copy(
                     name = name,
                     description = desc,
                     updatedAt = Clock.System.todayIn(TimeZone.currentSystemDefault())
                 )
-                val result = updateProjectUseCase.updateProject(updated, userRole)
-                result.fold(
-                    onSuccess = {
-                        consoleIO.showWithLine("\u001B[32m✅ Project updated successfully.\u001B[0m")
-                        sessionManager.getCurrentUser()?.userName?.let { userName ->
-                            addAudit.addAuditLog(
-                                Audit(
-                                    id = Uuid.random(),
-                                    userRole = userRole,
-                                    userName = userName,
-                                    action = ActionType.UPDATE,
-                                    entityType = EntityType.PROJECT,
-                                    entityId = updated.id.toString(),
-                                    oldState = updated.name,
-                                    newState = updated.description,
-                                    timeStamp = Clock.System.todayIn(TimeZone.currentSystemDefault())
-                                )
-                            )
-                        }
-                    },
-                    onFailure = { error ->
-                        consoleIO.showWithLine("\u001B[31m❌ ${error.message}\u001B[0m")
-                    }
-                )
-            },
-            onFailure = { error -> consoleIO.showWithLine("\u001B[31m❌ ${error.message}\u001B[0m") }
-        )
-    }
 
-    private fun addProject() {
-        consoleIO.show("\u001B[32mEnter project name: \u001B[0m")
-        val name = getInput() ?: return
-        consoleIO.show("\u001B[32mEnter description: \u001B[0m")
-        val desc = getInput() ?: return
-        consoleIO.show("\u001B[32mEnter created by (user ID): \u001B[0m")
-        val createdBy = getInput() ?: return
-        val now = Clock.System.todayIn(TimeZone.currentSystemDefault())
-        val newProject = Project(
-            name = name,
-            description = desc,
-            createdBy = createdBy,
-            createdAt = now,
-            updatedAt = now
-        )
-        val result = addProjectUseCase.addProject(newProject, userRole)
-        result.fold(
-            onSuccess = {
+                updateProjectUseCase.updateProject(updated)
+                consoleIO.showWithLine("\u001B[32m✅ Project updated successfully.\u001B[0m")
+
+                sessionManager.getCurrentUser()?.userName?.let { userName ->
+                    addAudit.addAuditLog(
+                        Audit(
+                            id = Uuid.random(),
+                            userRole = userRole,
+                            userName = userName,
+                            action = ActionType.UPDATE,
+                            entityType = EntityType.PROJECT,
+                            entityId = updated.id.toString(),
+                            oldState = updated.name,
+                            newState = updated.description,
+                            timeStamp = Clock.System.todayIn(TimeZone.currentSystemDefault())
+                        )
+                    )
+                }
+            } catch (e: Exception) {
+                consoleIO.showWithLine("\u001B[31m❌ ${e.message}\u001B[0m")
+            }
+        }
+
+        private fun addProject() {
+            try {
+                consoleIO.show("\u001B[32mEnter project name: \u001B[0m")
+                val name = getInput() ?: return
+                consoleIO.show("\u001B[32mEnter description: \u001B[0m")
+                val desc = getInput() ?: return
+                consoleIO.show("\u001B[32mEnter created by (user ID): \u001B[0m")
+                val createdBy = getInput() ?: return
+
+                val now = Clock.System.todayIn(TimeZone.currentSystemDefault())
+                val newProject = Project(
+                    name = name,
+                    description = desc,
+                    createdBy = createdBy,
+                    createdAt = now,
+                    updatedAt = now
+                )
+
+                addProjectUseCase.addProject(newProject)
                 consoleIO.showWithLine("\u001B[32m✅ Project added successfully.\u001B[0m")
+
                 addAudit.addAuditLog(
                     Audit(
                         id = Uuid.random(),
                         userRole = userRole,
-                        userName = newProject.createdBy,
+                        userName = createdBy,
                         action = ActionType.CREATE,
                         entityType = EntityType.PROJECT,
                         entityId = newProject.id.toString(),
                         oldState = name,
-                        newState = newProject.description,
+                        newState = desc,
                         timeStamp = now
                     )
                 )
-            },
-            onFailure = { error ->
-                consoleIO.showWithLine("\u001B[31m❌ ${error.message}\u001B[0m")
+            } catch (e: Exception) {
+                consoleIO.showWithLine("\u001B[31m❌ ${e.message}\u001B[0m")
             }
-        )
-    }
+        }
 
-    private fun deleteProject() {
-        consoleIO.show("\u001B[32mEnter project ID to delete: \u001B[0m")
-        val id = getInput() ?: return
-        val result = deleteProjectUseCase.deleteProject(id, userRole)
-        result.fold(
-            onSuccess = {
+        private fun deleteProject() {
+            try {
+                consoleIO.show("\u001B[32mEnter project ID to delete: \u001B[0m")
+                val id = getInput() ?: return
+
+                deleteProjectUseCase.deleteProject(id)
                 consoleIO.showWithLine("\u001B[32m✅ Project deleted successfully.\u001B[0m")
+
                 sessionManager.getCurrentUser()?.userName?.let { userName ->
                     addAudit.addAuditLog(
                         Audit(
@@ -189,16 +190,14 @@ class ProjectManagementScreen(
                         )
                     )
                 }
-            },
-            onFailure = { error ->
-                consoleIO.showWithLine("\u001B[31m❌ ${error.message}\u001B[0m")
+            } catch (e: Exception) {
+                consoleIO.showWithLine("\u001B[31m❌ ${e.message}\u001B[0m")
             }
-        )
-    }
+        }
 
-    private fun showProjectInfo(project: Project) {
-        consoleIO.showWithLine(
-            """
+        private fun showProjectInfo(project: Project) {
+            consoleIO.showWithLine(
+                """
             \u001B[36m╭────────────────────────────╮
             │ ID: ${project.id}
             │ Name: ${project.name}
@@ -208,8 +207,6 @@ class ProjectManagementScreen(
             │ Updated At: ${project.updatedAt}
             ╰────────────────────────────╯\u001B[0m
             """.trimIndent()
-        )
+            )
+        }
     }
-
-
-}

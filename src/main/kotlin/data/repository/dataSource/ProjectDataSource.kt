@@ -9,7 +9,7 @@ interface ProjectDataSource {
 
     fun deleteProject(projectId: String)
 
-    fun updateProject(newProjects: List<Project>)
+    fun updateProject(newProjects: Project)
 
     fun getProjectById(projectId: String): Project
 }

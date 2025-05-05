@@ -13,7 +13,7 @@ class ProjectsRepositoryImpl(
 
     override fun deleteProject(projectId: String) = projectDataSource.deleteProject(projectId)
 
-    override fun updateProject(newProjects: List<Project>) = projectDataSource.updateProject(newProjects)
+    override fun updateProject(newProjects: Project) = projectDataSource.updateProject(newProjects)
 
     override fun getProjectById(projectId: String): Project = projectDataSource.getProjectById(projectId)
 }
