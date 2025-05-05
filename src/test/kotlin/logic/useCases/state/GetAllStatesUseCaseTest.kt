@@ -5,8 +5,10 @@ import fake.createProject
 import fake.createState
 import io.mockk.every
 import io.mockk.mockk
+import logic.entities.exceptions.StateNotFoundException
 import logic.repository.StatesRepository
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.assertThrows
 import kotlin.test.Test
 import kotlin.uuid.ExperimentalUuidApi
 
@@ -26,12 +28,10 @@ class GetAllStatesUseCaseTest {
     fun `should return all states successfully`() {
         // Given
         val createdBy = "adminUser01"
-
         val projects = listOf(
             createProject(name = "PlanMate Core Features", createdBy = createdBy),
             createProject(name = "PlanMate Extended", createdBy = createdBy)
         )
-
         val states = listOf(
             createState(id = "1", name = "In Progress", projectId = projects[0].id.toString()),
             createState(id = "2", name = "Done", projectId = projects[1].id.toString())
@@ -47,19 +47,18 @@ class GetAllStatesUseCaseTest {
     }
 
     @Test
-    fun `should return empty list when no states exist`() {
+    fun `should throw exception when not found states`() {
         // Given
         every { statesRepository.getAllStates() } returns emptyList()
 
-        // When
-        val actualStates = getAllStatesUseCase.getAllStates()
-
-        // Then
-        assertThat(actualStates).isEmpty()
+        // When && Then
+        assertThrows<StateNotFoundException> {
+            getAllStatesUseCase.getAllStates()
+        }
     }
 
     @Test
-    fun `should return correct number of states`() {
+    fun `should return the correct states`() {
         // Given
         val states = listOf(
             createState(id = "1", name = "In Progress", projectId = "1"),
@@ -73,18 +72,6 @@ class GetAllStatesUseCaseTest {
         val actualStates = getAllStatesUseCase.getAllStates()
 
         // Then
-        assertThat(actualStates.size).isEqualTo(3)
-    }
-
-    @Test
-    fun `should not return null when repository returns empty list`() {
-        // Given
-        every { statesRepository.getAllStates() } returns emptyList()
-
-        // When
-        val actualStates = getAllStatesUseCase.getAllStates()
-
-        // Then
-        assertThat(actualStates).isNotNull()
+        assertThat(actualStates).isEqualTo(states)
     }
 }
