@@ -9,14 +9,14 @@ import logic.entities.Audit
 import logic.entities.EntityType
 import logic.entities.Task
 import logic.useCases.audit.AddAuditLogUseCase
-import logic.useCases.authentication.SessionManager
+import logic.useCases.authentication.SessionManagerUseCase
 import logic.useCases.state.GetAllStatesUseCase
 import logic.useCases.task.*
 import ui.console.SwimlanesRenderer
 import ui.enums.TaskBoardOption
 import ui.main.BaseScreen
-import ui.main.consoleIO.ConsoleIO
 import ui.main.MenuRenderer
+import ui.main.consoleIO.ConsoleIO
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -31,7 +31,7 @@ class TaskManagementScreen(
     private val swimlanesRenderer: SwimlanesRenderer,
     private val addAudit: AddAuditLogUseCase,
     private val consoleIO: ConsoleIO,
-    private val sessionManager: SessionManager
+    private val sessionManagerUseCase: SessionManagerUseCase
 ) : BaseScreen(consoleIO) {
 
     override val id: String get() = "3"
@@ -74,7 +74,7 @@ class TaskManagementScreen(
 
     @OptIn(ExperimentalUuidApi::class)
     fun addTask() {
-        val currentUser = sessionManager.getCurrentUser()
+        val currentUser = sessionManagerUseCase.getCurrentUser()
 
         consoleIO.show("Enter Task Title: ")
         val title = consoleIO.read()
@@ -220,8 +220,8 @@ class TaskManagementScreen(
             addAudit.addAuditLog(
                 Audit(
                     id = Uuid.random(),
-                    userRole = sessionManager.getCurrentUser()!!.role,
-                    userName = sessionManager.getCurrentUser()!!.userName,
+                    userRole = sessionManagerUseCase.getCurrentUser()!!.role,
+                    userName = sessionManagerUseCase.getCurrentUser()!!.userName,
                     action = ActionType.UPDATE,
                     entityType = EntityType.TASK,
                     entityId = updatedTask.id.toString(),
@@ -247,8 +247,8 @@ class TaskManagementScreen(
             addAudit.addAuditLog(
                 Audit(
                     id = Uuid.random(),
-                    userRole = sessionManager.getCurrentUser()!!.role,
-                    userName = sessionManager.getCurrentUser()!!.userName,
+                    userRole = sessionManagerUseCase.getCurrentUser()!!.role,
+                    userName = sessionManagerUseCase.getCurrentUser()!!.userName,
                     action = ActionType.DELETE,
                     entityType = EntityType.TASK,
                     entityId = id.toString(),

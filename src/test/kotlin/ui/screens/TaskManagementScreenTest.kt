@@ -7,7 +7,7 @@ import format
 import io.mockk.*
 import kotlinx.datetime.LocalDateTime
 import logic.useCases.audit.AddAuditLogUseCase
-import logic.useCases.authentication.SessionManager
+import logic.useCases.authentication.SessionManagerUseCase
 import logic.useCases.state.GetAllStatesUseCase
 import logic.useCases.task.*
 import org.junit.jupiter.api.BeforeEach
@@ -27,9 +27,9 @@ class TaskManagementScreenTest {
     private val deleteTaskUseCase = mockk<DeleteTaskUseCase>(relaxed = true)
     private val getTaskByIdUseCase = mockk<GetTaskByIdUseCase>()
     private val swimlanesRenderer = mockk<SwimlanesRenderer>(relaxed = true)
-    private val addAudit = mockk<AddAuditLogUseCase>(relaxed = true)
     private val consoleIO = mockk<ConsoleIO>(relaxed = true)
-    private val sessionManager = mockk<SessionManager>(relaxed = true)
+    private val sessionManagerUseCase = mockk<SessionManagerUseCase>(relaxed = true)
+    private val addAuditLogUseCase: AddAuditLogUseCase = mockk(relaxed = true)
 
     @BeforeEach
     fun setUp() {
@@ -41,9 +41,9 @@ class TaskManagementScreenTest {
             getTaskByIdUseCase,
             updateTaskUseCase,
             swimlanesRenderer,
-            addAudit,
+            addAuditLogUseCase,
             consoleIO,
-            sessionManager
+            sessionManagerUseCase
         )
     }
 
@@ -172,7 +172,6 @@ class TaskManagementScreenTest {
         every { consoleIO.read() } returnsMany listOf(task.id.toString(), "New Title", "New Desc")
         every { getTaskByIdUseCase.getTaskById(task.id.toString()) } returns task
 
-        // Now we expect the exception when passing a Task object
         every { updateTaskUseCase.updateTask(any()) } throws RuntimeException("Unexpected error")
 
         // When
@@ -291,4 +290,5 @@ class TaskManagementScreenTest {
             })
         }
     }
+
 }
