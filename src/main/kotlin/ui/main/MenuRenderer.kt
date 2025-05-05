@@ -21,4 +21,3 @@ object MenuRenderer {
         consoleIO.show("\uD83D\uDCA1 Please enter your choice: ")
     }
 }
-

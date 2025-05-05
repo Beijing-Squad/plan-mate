@@ -6,7 +6,7 @@ import io.mockk.mockk
 import io.mockk.verify
 import io.mockk.verifyOrder
 import logic.entities.User
-import logic.useCases.authentication.SessionManager
+import logic.useCases.authentication.SessionManagerUseCase
 import logic.useCases.user.GetAllUsersUseCase
 import logic.useCases.user.GetUserByUserIdUseCase
 import logic.useCases.user.UpdateUserUseCase
@@ -22,17 +22,16 @@ class UserScreenTest {
     private lateinit var getUserByUserIdUseCase: GetUserByUserIdUseCase
     private lateinit var consoleIO: ConsoleIO
     private lateinit var userScreen: UserScreen
-    private lateinit var sessionManager: SessionManager
+    private lateinit var sessionManagerUseCase: SessionManagerUseCase
 
     @BeforeEach
     fun setUp() {
         getUserByUserIdUseCase = GetUserByUserIdUseCase(mockk())
         updateUsersUseCase = UpdateUserUseCase(
             mockk(relaxed = true),
-            mockk(relaxed = true),
             mockk(relaxed = true)
         )
-        sessionManager = mockk(relaxed = true)
+        sessionManagerUseCase = mockk(relaxed = true)
         getAllUsersUseCase = GetAllUsersUseCase(mockk())
         consoleIO = mockk(relaxed = true)
         userScreen = UserScreen(
@@ -40,7 +39,7 @@ class UserScreenTest {
             getUserByUserIdUseCase,
             updateUsersUseCase,
             consoleIO,
-            sessionManager
+            sessionManagerUseCase
         )
     }
 
@@ -191,7 +190,7 @@ class UserScreenTest {
         )
 
         every { getUserByUserIdUseCase.getUserByUserId(userId.toString()) } returns mockUser
-        every { sessionManager.getCurrentUser() } returns mockUser
+        every { sessionManagerUseCase.getCurrentUser() } returns mockUser
 
         // When
         userScreen.handleFeatureChoice()
