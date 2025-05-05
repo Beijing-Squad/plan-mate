@@ -2,7 +2,7 @@ package logic.useCases.authentication
 
 import logic.entities.User
 
-class SessionManager {
+class SessionManagerUseCase {
     private var currentUser: User? = null
 
     fun getCurrentUser(): User? {
@@ -11,5 +11,9 @@ class SessionManager {
 
     fun setCurrentUser(user: User) {
         currentUser = user
+    }
+
+    fun clearCurrentUser() {
+        currentUser = null
     }
 }
