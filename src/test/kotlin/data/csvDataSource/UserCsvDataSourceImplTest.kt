@@ -2,6 +2,8 @@ package data.csvDataSource
 
 import com.google.common.truth.Truth.assertThat
 import data.csvDataSource.csv.CsvDataSourceImpl
+import data.repository.PasswordHashingDataSource
+import data.repository.ValidationUserDataSource
 import data.repository.dataSource.UserDataSource
 import fake.createUser
 import io.mockk.every
@@ -17,14 +19,16 @@ class UserCsvDataSourceImplTest {
 
     private lateinit var userCsvDataSourceImpl: UserDataSource
     private lateinit var csvDataSourceImpl: CsvDataSourceImpl<User>
-    private lateinit var authDataSourceImpl: AuthenticationCsvDataSourceImpl
+    private lateinit var validationUserDataSource: ValidationUserDataSource
+    private lateinit var passwordHashingDataSource: PasswordHashingDataSource
     private lateinit var testUsers: List<User>
 
 
     @BeforeEach
     fun setUp() {
         csvDataSourceImpl = mockk()
-        authDataSourceImpl = mockk()
+        validationUserDataSource = mockk()
+        passwordHashingDataSource = mockk()
         testUsers = listOf(
             createUser(
                 userName = "mohammed1234",
@@ -50,7 +54,7 @@ class UserCsvDataSourceImplTest {
     fun `should return all users when data source has users`() {
         // Given
         every { csvDataSourceImpl.loadAllDataFromFile() } returns testUsers
-        userCsvDataSourceImpl = UserCsvDataSourceImpl(csvDataSourceImpl,authDataSourceImpl)
+        userCsvDataSourceImpl = UserCsvDataSourceImpl(csvDataSourceImpl,validationUserDataSource,passwordHashingDataSource)
 
         // When
         val result = userCsvDataSourceImpl.getAllUsers()
@@ -63,7 +67,7 @@ class UserCsvDataSourceImplTest {
     fun `should return empty list when data source has no users`() {
         // Given
         every { csvDataSourceImpl.loadAllDataFromFile() } returns emptyList()
-        userCsvDataSourceImpl = UserCsvDataSourceImpl(csvDataSourceImpl,authDataSourceImpl)
+        userCsvDataSourceImpl = UserCsvDataSourceImpl(csvDataSourceImpl,validationUserDataSource,passwordHashingDataSource)
 
         // When
         val result = userCsvDataSourceImpl.getAllUsers()
@@ -77,7 +81,7 @@ class UserCsvDataSourceImplTest {
     fun `should return user when user id is founded`() {
         // Given
         every { csvDataSourceImpl.loadAllDataFromFile() } returns testUsers
-        userCsvDataSourceImpl = UserCsvDataSourceImpl(csvDataSourceImpl,authDataSourceImpl)
+        userCsvDataSourceImpl = UserCsvDataSourceImpl(csvDataSourceImpl,validationUserDataSource,passwordHashingDataSource)
         val firstUser = testUsers.first()
 
         // When
@@ -92,7 +96,7 @@ class UserCsvDataSourceImplTest {
     fun `should throw UserNotFoundException when user id is not found`() {
         // Given
         every { csvDataSourceImpl.loadAllDataFromFile() } returns testUsers
-        userCsvDataSourceImpl = UserCsvDataSourceImpl(csvDataSourceImpl,authDataSourceImpl)
+        userCsvDataSourceImpl = UserCsvDataSourceImpl(csvDataSourceImpl,validationUserDataSource,passwordHashingDataSource)
         val nonExistentUserId = "non-existent-id"
 
         // When/Then
