@@ -4,16 +4,15 @@ import logic.entities.User
 import logic.entities.UserRole
 import logic.useCases.authentication.LoginUserAuthenticationUseCase
 import logic.useCases.authentication.RegisterUserAuthenticationUseCase
-import logic.useCases.authentication.SessionManager
+import logic.useCases.authentication.SessionManagerUseCase
 import org.koin.mp.KoinPlatform.getKoin
-import ui.main.PlanMateConsoleUi
 import ui.main.consoleIO.ConsoleIO
 import kotlin.system.exitProcess
 
 class AuthenticationScreen(
     private val registerUseCase: RegisterUserAuthenticationUseCase,
     private val loginUseCase: LoginUserAuthenticationUseCase,
-    private val sessionManager: SessionManager,
+    private val sessionManagerUseCase: SessionManagerUseCase,
     private val consoleIO: ConsoleIO
 ) {
 
@@ -30,6 +29,7 @@ class AuthenticationScreen(
                     val user = login()
                     if (user != null) return user
                 }
+
                 "2" -> register()
                 "0" -> exitProcess(0)
                 else -> consoleIO.showWithLine("❌ Invalid option. Please try again.")
@@ -46,9 +46,20 @@ class AuthenticationScreen(
 
         return try {
             val user = loginUseCase.execute(username, password)
-            consoleIO.showWithLine("✅ Login successful. Welcome, ${sessionManager.getCurrentUser()?.userName}!")
-            val planMateConsoleUi: PlanMateConsoleUi = getKoin().get()
-            planMateConsoleUi.start()
+            consoleIO.showWithLine("✅ Login successful. Welcome, ${sessionManagerUseCase.getCurrentUser()?.userName}!")
+
+            when (user.role) {
+                UserRole.ADMIN -> {
+                    val adminScreen: AdminScreen = getKoin().get()
+                    adminScreen.start()
+                }
+
+                UserRole.MATE -> {
+                    val mateScreen: MateScreen = getKoin().get()
+                    mateScreen.start()
+                }
+            }
+
             user
         } catch (e: Exception) {
             consoleIO.showWithLine("❌ ${e.message}")
