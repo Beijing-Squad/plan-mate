@@ -1,6 +1,6 @@
 package fake
 
-import kotlinx.datetime.LocalDate
+import kotlinx.datetime.*
 import logic.entities.Project
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
@@ -10,8 +10,8 @@ fun createProject(
     name: String = "defaultProjectName",
     description: String = "defaultDescription",
     createdBy: String = "defaultCreator",
-    createdAt: LocalDate = LocalDate(2023, 1, 1),
-    updatedAt: LocalDate = LocalDate(2023, 1, 1)
+    createdAt: LocalDateTime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()),
+    updatedAt: LocalDateTime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
 ): Project {
     return Project(
         id = Uuid.random(),

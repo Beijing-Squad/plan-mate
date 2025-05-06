@@ -23,7 +23,7 @@ class AuditCsvParser : CsvParser<Audit> {
             item.entityType.name,
             item.action.name,
             item.actionDetails,
-            item.timeStamp.toString()
+            item.timeStamp.date.toString()
         ).joinToString(",")
     }
 

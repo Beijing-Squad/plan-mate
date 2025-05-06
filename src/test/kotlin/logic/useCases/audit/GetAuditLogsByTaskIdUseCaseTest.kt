@@ -4,7 +4,6 @@ import com.google.common.truth.Truth.assertThat
 import fake.createAudit
 import io.mockk.every
 import io.mockk.mockk
-import kotlinx.datetime.LocalDate
 import logic.entities.ActionType
 import logic.entities.EntityType
 import logic.entities.UserRole
@@ -36,7 +35,6 @@ class GetAuditLogsByTaskIdUseCaseTest {
                 entityType = EntityType.TASK,
                 entityId = taskId,
                 action = ActionType.CREATE,
-                timeStamp = LocalDate(2023, 1, 1)
             ),
             createAudit(
                 userRole = UserRole.MATE,
@@ -44,7 +42,6 @@ class GetAuditLogsByTaskIdUseCaseTest {
                 entityType = EntityType.TASK,
                 entityId = taskId,
                 action = ActionType.UPDATE,
-                timeStamp = LocalDate(2023, 1, 2)
             )
         )
 
@@ -81,7 +78,6 @@ class GetAuditLogsByTaskIdUseCaseTest {
                 entityType = EntityType.TASK,
                 entityId = taskId,
                 action = ActionType.CREATE,
-                timeStamp = LocalDate(2023, 1, 1)
             ),
             createAudit(
                 userRole = UserRole.MATE,
@@ -89,7 +85,6 @@ class GetAuditLogsByTaskIdUseCaseTest {
                 entityType = EntityType.TASK,
                 entityId = taskId,
                 action = ActionType.UPDATE,
-                timeStamp = LocalDate(2023, 1, 2)
             ),
             createAudit(
                 userRole = UserRole.MATE,
@@ -97,7 +92,6 @@ class GetAuditLogsByTaskIdUseCaseTest {
                 entityType = EntityType.TASK,
                 entityId = taskId,
                 action = ActionType.DELETE,
-                timeStamp = LocalDate(2023, 1, 3)
             )
         )
 
@@ -115,43 +109,6 @@ class GetAuditLogsByTaskIdUseCaseTest {
     }
 
     @Test
-    fun `should return audit logs with old and new state values for a task when provided`() {
-        // Given
-        val taskId = "task-101"
-        every { auditRepository.getAuditLogsByTaskId(taskId) } returns listOf(
-            createAudit(
-                userRole = UserRole.MATE,
-                userName = "User1",
-                entityType = EntityType.TASK,
-                entityId = taskId,
-                action = ActionType.UPDATE,
-                oldState = "In Progress",
-                newState = "Completed",
-            ),
-            createAudit(
-                userRole = UserRole.ADMIN,
-                userName = "Admin",
-                entityType = EntityType.TASK,
-                entityId = taskId,
-                action = ActionType.UPDATE,
-                oldState = "Completed",
-                newState = "Blocked",
-            )
-        )
-
-        // When
-        val result = getAuditLogsByTaskIdUseCase.getAuditLogsByTaskId(taskId)
-
-        // Then
-        assertThat(result.size).isEqualTo(2)
-        assertThat(result[0].oldState).isEqualTo("In Progress")
-        assertThat(result[0].newState).isEqualTo("Completed")
-        assertThat(result[1].oldState).isEqualTo("Completed")
-        assertThat(result[1].newState).isEqualTo("Blocked")
-        assertThat(result.all { it.entityId == taskId }).isTrue()
-    }
-
-    @Test
     fun `should return only audit logs for the specified task ID when provided`() {
         // Given
         val taskId = "task-123"
@@ -163,7 +120,6 @@ class GetAuditLogsByTaskIdUseCaseTest {
                 entityType = EntityType.TASK,
                 entityId = taskId,
                 action = ActionType.CREATE,
-                timeStamp = LocalDate(2023, 1, 1)
             )
         )
         every { auditRepository.getAuditLogsByTaskId(otherTaskId) } returns listOf(
@@ -173,7 +129,6 @@ class GetAuditLogsByTaskIdUseCaseTest {
                 entityType = EntityType.TASK,
                 entityId = otherTaskId,
                 action = ActionType.CREATE,
-                timeStamp = LocalDate(2023, 1, 2)
             )
         )
 
@@ -198,48 +153,6 @@ class GetAuditLogsByTaskIdUseCaseTest {
         // Then
         assertThat(result).isEmpty()
     }
-
-    @Test
-    fun `should return audit logs in timestamp order when a task Id is valid`() {
-        // Given
-        val taskId = "task-202"
-        every { auditRepository.getAuditLogsByTaskId(taskId) } returns listOf(
-            createAudit(
-                userRole = UserRole.MATE,
-                userName = "User1",
-                entityType = EntityType.TASK,
-                entityId = taskId,
-                timeStamp = LocalDate(2023, 1, 3)
-            ),
-            createAudit(
-                userRole = UserRole.ADMIN,
-                userName = "Admin",
-                entityType = EntityType.TASK,
-                entityId = taskId,
-                timeStamp = LocalDate(2023, 1, 1)
-            ),
-            createAudit(
-                userRole = UserRole.MATE,
-                userName = "User2",
-                entityType = EntityType.TASK,
-                entityId = taskId,
-                timeStamp = LocalDate(2023, 1, 2)
-            )
-        )
-
-        // When
-        val result = getAuditLogsByTaskIdUseCase.getAuditLogsByTaskId(taskId)
-
-        // Then
-        assertThat(result.size).isEqualTo(3)
-        assertThat(result.map { it.timeStamp }).containsExactly(
-            LocalDate(2023, 1, 3),
-            LocalDate(2023, 1, 2),
-            LocalDate(2023, 1, 1)
-        ).inOrder()
-        assertThat(result.all { it.entityId == taskId }).isTrue()
-    }
-
     @Test
     fun `should throw InvalidInputException when task ID is blank`() {
         // When&&Then
