@@ -210,17 +210,17 @@ class TaskManagementScreen(
             val newDescriptionInput = consoleIO.read()
             val newDescription = newDescriptionInput?.takeIf { it.isNotBlank() } ?: existingTask.description
 
-            val updatedTask = existingTask.copy(
+            val taskToUpdate = existingTask.copy(
                 title = newTitle,
                 description = newDescription,
                 updatedAt = now
             )
 
-           updateTaskUseCase.updateTask(updatedTask)
+            val updatedTask = updateTaskUseCase.updateTask(taskToUpdate)
 
-            consoleIO.showWithLine("✅ Task updated successfully:\n")
+            consoleIO.showWithLine("✅ Task updated successfully:\n📌 Title: ${updatedTask.title}, 📝 Description: ${updatedTask.description}")
             sessionManagerUseCase.getCurrentUser()?.userName?.let { userName ->
-                val actionDetails = "Admin $userName updated task ${updatedTask.id} with name '$newTitle' at ${now.format()}"
+                val actionDetails = "Admin $userName updated task ${taskToUpdate.id} with name '$newTitle' at ${now.format()}"
                 addAudit.addAuditLog(
                     Audit(
                         id = Uuid.random(),
