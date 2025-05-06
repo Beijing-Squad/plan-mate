@@ -25,7 +25,7 @@ class TaskStatesCsvDataSourceImpl(
     @OptIn(ExperimentalUuidApi::class)
     override fun deleteState(state: State): Boolean {
         return try {
-            csvDataSource.deleteById(state.id)
+            csvDataSource.deleteById(state.id.toString())
             true
         } catch (e: StateException) {
             false
@@ -39,7 +39,7 @@ class TaskStatesCsvDataSourceImpl(
     @OptIn(ExperimentalUuidApi::class)
     override fun getStateById(stateId: String): State {
         return getAllStates()
-            .find { it.id == stateId }
+            .find { it.id.toString() == stateId }
             ?: throw StateNotFoundException()
     }
 
@@ -50,7 +50,7 @@ class TaskStatesCsvDataSourceImpl(
 
     @OptIn(ExperimentalUuidApi::class)
     override fun updateState(state: State): State {
-        return getStateById(state.id).let { currentState ->
+        return getStateById(state.id.toString()).let { currentState ->
             val updatedState = currentState.copy(
                 name = state.name,
                 projectId = state.projectId

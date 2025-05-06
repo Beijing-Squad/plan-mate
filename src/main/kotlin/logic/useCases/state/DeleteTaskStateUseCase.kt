@@ -10,7 +10,7 @@ class DeleteTaskStateUseCase(
 ) {
     @OptIn(ExperimentalUuidApi::class)
     fun deleteState(state: State): Boolean {
-        val existedState = getTaskStateByIdUseCase.getStateById(state.id)
+        val existedState = getTaskStateByIdUseCase.getStateById(state.id.toString())
         return statesRepository.deleteState(existedState)
     }
 }

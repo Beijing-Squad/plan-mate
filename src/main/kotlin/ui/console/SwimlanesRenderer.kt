@@ -3,6 +3,7 @@ package ui.console
 import logic.entities.State
 import logic.entities.Task
 import ui.main.consoleIO.ConsoleIO
+import kotlin.uuid.ExperimentalUuidApi
 
 class SwimlanesRenderer(
     private val consoleIO: ConsoleIO
@@ -12,6 +13,7 @@ class SwimlanesRenderer(
         lines.forEach { consoleIO.showWithLine(it) }
     }
 
+    @OptIn(ExperimentalUuidApi::class)
     private fun renderToLines(tasks: List<Task>, states: List<State>): List<String> {
         if (states.isEmpty()) {
             return listOf("⚠️ No states available.")
@@ -22,7 +24,7 @@ class SwimlanesRenderer(
 
         val lines = mutableListOf<String>()
         val tasksByState = states.associate { state ->
-            state.id to tasks.filter { it.stateId == state.id }
+            state.id to tasks.filter { it.stateId == state.id.toString() }
         }
 
         val columnWidth = 20

@@ -10,7 +10,7 @@ class UpdateTaskStateUseCase(
 ) {
     @OptIn(ExperimentalUuidApi::class)
     fun updateState(state: State): State {
-        getTaskStateByIdUseCase.getStateById(state.id)
+        getTaskStateByIdUseCase.getStateById(state.id.toString())
 
         return statesRepository.updateState(state)
     }
