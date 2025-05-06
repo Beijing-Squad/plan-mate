@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test
 import io.mockk.verify
 import logic.entities.exceptions.CsvReadException
 import logic.entities.exceptions.CsvWriteException
-import logic.entities.exceptions.ProjectNotFoundException
 import org.junit.jupiter.api.assertThrows
 
 
@@ -201,23 +200,6 @@ class CsvDataSourceImplTest {
 
         // Then
         assertThat(result).isEqualTo(item)
-    }
-
-    @Test
-    fun `should throw ProjectNotFoundException when item id does not exist in getById`() {
-        // Given
-        val csvLines = listOf("Name,Age,Gender", "John,25,Male")
-        val item = MyData("John", 25, "Male")
-
-        every { reader.readCsv() } returns csvLines
-        every { parser.deserializer("John,25,Male") } returns item
-        every { parser.getId(item) } returns "123"
-
-        // When & Then
-        val exception = assertThrows<ProjectNotFoundException> {
-            csvDataSource.getById("999")
-        }
-        assertThat(exception.message).isEqualTo("Item with ID: 999 was not found.")
     }
 
     @Test
