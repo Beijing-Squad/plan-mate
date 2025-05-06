@@ -2,6 +2,8 @@ package data.csvDataSource
 
 import com.google.common.truth.Truth.assertThat
 import data.csvDataSource.csv.CsvDataSourceImpl
+import data.repository.PasswordHashingDataSource
+import data.repository.ValidationUserDataSource
 import data.repository.dataSource.UserDataSource
 import fake.createUser
 import io.mockk.clearAllMocks
@@ -22,6 +24,8 @@ class AuthenticationCsvDataSourceImplTest {
 
     private val csvDataSource = mockk<CsvDataSourceImpl<User>>(relaxed = true)
     private val userDataSource = mockk<UserDataSource>()
+    private lateinit var validationUserDataSource: ValidationUserDataSource
+    private lateinit var passwordHashingDataSource: PasswordHashingDataSource
     private lateinit var authDataSource: AuthenticationCsvDataSourceImpl
 
     private val testUser = createUser(
@@ -33,7 +37,9 @@ class AuthenticationCsvDataSourceImplTest {
     @BeforeEach
     fun setUp() {
         clearAllMocks()
-        authDataSource = AuthenticationCsvDataSourceImpl(csvDataSource, userDataSource)
+        validationUserDataSource = mockk(relaxed = true)
+        passwordHashingDataSource = mockk(relaxed = true)
+        authDataSource = AuthenticationCsvDataSourceImpl(csvDataSource, userDataSource,validationUserDataSource,passwordHashingDataSource)
     }
 
     @Test
@@ -63,19 +69,28 @@ class AuthenticationCsvDataSourceImplTest {
 
     @Test
     fun `getAuthenticatedUser should throw InvalidUserNameException when username is blank`() {
+        // Given
+        every { validationUserDataSource.validateUsername("") } throws InvalidUserNameException("Invalid username")
+
         // When/Then
         assertThrows<InvalidUserNameException> {
             authDataSource.getAuthenticatedUser("", "password123")
         }
+        verify(exactly = 1) { validationUserDataSource.validateUsername("") }
         verify(exactly = 0) { userDataSource.getAllUsers() }
     }
 
+
     @Test
     fun `getAuthenticatedUser should throw InvalidPasswordException when password is blank`() {
+        // Given
+        every { validationUserDataSource.validatePassword("") } throws InvalidPasswordException("Invalid password")
+
         // When/Then
         assertThrows<InvalidPasswordException> {
             authDataSource.getAuthenticatedUser("mohamed", "")
         }
+        verify(exactly = 1) { validationUserDataSource.validatePassword("") }
         verify(exactly = 0) { userDataSource.getAllUsers() }
     }
 
@@ -123,17 +138,4 @@ class AuthenticationCsvDataSourceImplTest {
         verify(exactly = 1) { csvDataSource.appendToFile(any()) }
     }
 
-
-    @Test
-    fun `hashPassword should correctly hash password using MD5`() {
-        // Given
-        val password = "password123"
-        val expectedHash = "482c811da5d5b4bc6d497ffa98491e38"
-
-        // When
-        val result = authDataSource.hashPassword(password)
-
-        // Then
-        assertThat(result).isEqualTo(expectedHash)
-    }
 }
