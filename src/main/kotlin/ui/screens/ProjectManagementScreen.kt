@@ -2,10 +2,11 @@ package ui.screens
 
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import kotlinx.datetime.todayIn
 import logic.entities.*
 import logic.useCases.audit.AddAuditLogUseCase
-import logic.useCases.authentication.SessionManager
+import logic.useCases.authentication.SessionManagerUseCase
 import logic.useCases.project.*
 import ui.enums.ProjectBoardOption
 import ui.main.BaseScreen
@@ -26,7 +27,7 @@ class ProjectManagementScreen(
     private val consoleIO: ConsoleIO
 ) : BaseScreen(consoleIO) {
 
-    private val sessionManager = SessionManager()
+    private val sessionManager = SessionManagerUseCase()
     override val id: String
         get() = "1"
     override val name: String
@@ -119,7 +120,7 @@ class ProjectManagementScreen(
                             entityId = updated.id.toString(),
                             oldState = updated.name,
                             newState = updated.description,
-                            timeStamp = Clock.System.todayIn(TimeZone.currentSystemDefault())
+                            timeStamp = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
                         )
                     )
                 }
@@ -159,7 +160,7 @@ class ProjectManagementScreen(
                         entityId = newProject.id.toString(),
                         oldState = name,
                         newState = desc,
-                        timeStamp = now
+                        timeStamp = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
                     )
                 )
             } catch (e: Exception) {
@@ -186,7 +187,7 @@ class ProjectManagementScreen(
                             entityId = id,
                             oldState = "",
                             newState = "",
-                            timeStamp = Clock.System.todayIn(TimeZone.currentSystemDefault())
+                            timeStamp = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
                         )
                     )
                 }
