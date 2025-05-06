@@ -37,8 +37,6 @@ class AuditScreenTest {
             userName = "Adel",
             action = ActionType.UPDATE,
             entityType = EntityType.TASK,
-            oldState = "Review",
-            newState = "Done",
         ),
         createAudit(
             userRole = UserRole.ADMIN,

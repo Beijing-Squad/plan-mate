@@ -47,8 +47,6 @@ class AddAuditLogUseCaseTest {
             action = ActionType.UPDATE,
             entityType = EntityType.TASK,
             entityId = "TASK-123",
-            oldState = "In Progress",
-            newState = "Completed",
         )
 
         // When
@@ -92,8 +90,6 @@ class AddAuditLogUseCaseTest {
             action = ActionType.UPDATE,
             entityType = EntityType.TASK,
             entityId = "TASK-456",
-            oldState = "To Do",
-            newState = "In Progress",
         )
 
         // When
@@ -116,8 +112,6 @@ class AddAuditLogUseCaseTest {
             action = ActionType.CREATE,
             entityType = EntityType.TASK,
             entityId = "TASK-789",
-            oldState = null,
-            newState = null,
         )
 
         // When

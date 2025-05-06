@@ -15,8 +15,7 @@ fun createAudit(
     entityId: String = "defaultEntityId",
     entityType: EntityType = EntityType.PROJECT,
     action: ActionType = ActionType.CREATE,
-    oldState: String? = null,
-    newState: String? = null,
+    actionDetails : String = "",
     timeStamp: LocalDateTime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
 ): Audit {
     return Audit(
@@ -26,8 +25,7 @@ fun createAudit(
         entityId = entityId,
         entityType = entityType,
         action = action,
-        oldState = oldState,
-        newState = newState,
+        actionDetails = actionDetails,
         timeStamp = timeStamp
     )
 }

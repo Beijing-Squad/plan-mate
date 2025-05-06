@@ -108,8 +108,6 @@ class AuditCsvDataSourceImplTest {
             entityType = EntityType.TASK,
             entityId = "TASK-123",
             action = ActionType.UPDATE,
-            oldState = "In Progress",
-            newState = "Completed",
         )
 
         // When
@@ -212,8 +210,6 @@ class AuditCsvDataSourceImplTest {
                 entityType = EntityType.TASK,
                 entityId = taskId,
                 action = ActionType.UPDATE,
-                oldState = "In Progress",
-                newState = "Completed",
             ),
             createAudit(
                 userRole = UserRole.ADMIN,

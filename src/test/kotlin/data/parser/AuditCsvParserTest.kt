@@ -41,8 +41,6 @@ class AuditCsvParserTest {
             entityId = "task-1",
             entityType = EntityType.TASK,
             action = ActionType.CREATE,
-            oldState = null,
-            newState = "new",
             timeStamp = fixedTime
         ).copy(id = fixedId)
 
@@ -69,8 +67,6 @@ class AuditCsvParserTest {
             assertThat(entityId).isEqualTo("task-95")
             assertThat(entityType).isEqualTo(EntityType.TASK)
             assertThat(action).isEqualTo(ActionType.CREATE)
-            assertThat(oldState).isNull()
-            assertThat(newState).isEqualTo("new")
             assertThat(timeStamp).isEqualTo(LocalDateTime(2024, 4, 1, 0, 0))
         }
     }

@@ -45,11 +45,11 @@ class GetTaskStateByIdUseCaseTest {
         )
 
         every { statesRepository.getAllStates() } returns states
-        every { statesRepository.getStateById(state.id) } throws StateNotFoundException()
+        every { statesRepository.getStateById(state.id.toString()) } throws StateNotFoundException()
 
         // When & Then
         assertThrows<StateNotFoundException> {
-            getTaskStateByIdUseCase.getStateById(state.id)
+            getTaskStateByIdUseCase.getStateById(state.id.toString())
         }
     }
 }

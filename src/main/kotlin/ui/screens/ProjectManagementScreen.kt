@@ -32,6 +32,7 @@ class ProjectManagementScreen(
         get() = "1"
     override val name: String
         get() = "Project Screen"
+    private val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
 
     override fun showOptionService() {
         MenuRenderer.renderMenu(
@@ -105,7 +106,7 @@ class ProjectManagementScreen(
             val updated = project.copy(
                 name = name,
                 description = desc,
-                updatedAt = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+                updatedAt = now
             )
 
             updateProjectUseCase.updateProject(updated)
@@ -122,7 +123,7 @@ class ProjectManagementScreen(
                         entityType = EntityType.PROJECT,
                         entityId = updated.id.toString(),
                         actionDetails = actionDetails,
-                        timeStamp = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+                        timeStamp = now
                     )
                 )
             }
@@ -139,7 +140,6 @@ class ProjectManagementScreen(
             val desc = getInput() ?: return
             consoleIO.show("\u001B[32mEnter created by (user ID): \u001B[0m")
             val createdBy = getInput() ?: return
-            val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
             val newProject = Project(
                 name = name,
                 description = desc,
@@ -163,7 +163,7 @@ class ProjectManagementScreen(
                         entityType = EntityType.PROJECT,
                         entityId = newProject.id.toString(),
                         actionDetails = actionDetails,
-                        timeStamp = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+                        timeStamp = now
                     )
                 )
             }
