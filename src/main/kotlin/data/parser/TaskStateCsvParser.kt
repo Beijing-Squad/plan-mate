@@ -3,7 +3,7 @@ package data.parser
 import data.csvDataSource.csv.CsvParser
 import logic.entities.State
 
-class StateCsvParser : CsvParser<State> {
+class TaskStateCsvParser : CsvParser<State> {
     override fun header(): String = "id,name,projectId"
 
     override fun serializer(item: State): String {

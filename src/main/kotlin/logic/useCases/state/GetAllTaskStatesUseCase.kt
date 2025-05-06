@@ -4,7 +4,7 @@ import logic.entities.State
 import logic.entities.exceptions.StateNotFoundException
 import logic.repository.StatesRepository
 
-class GetAllStatesUseCase(
+class GetAllTaskStatesUseCase(
     private val statesRepository: StatesRepository
 ) {
     fun getAllStates(): List<State>{

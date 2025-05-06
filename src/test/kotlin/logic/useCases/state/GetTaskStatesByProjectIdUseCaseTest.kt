@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import kotlin.uuid.ExperimentalUuidApi
 
-class GetStatesByProjectIdUseCaseTest {
+class GetTaskStatesByProjectIdUseCaseTest {
 
     private lateinit var getStatesByProjectIdUseCase: GetStatesByProjectIdUseCase
     private lateinit var stateRepository: StatesRepository

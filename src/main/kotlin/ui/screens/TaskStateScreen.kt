@@ -17,12 +17,12 @@ import ui.main.consoleIO.ConsoleIO
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
-class StateScreen(
-    private val addStateUseCase: AddStateUseCase,
-    private val deleteStateUseCase: DeleteStateUseCase,
-    private val updateStateUseCase: UpdateStateUseCase,
-    private val getAllStates: GetAllStatesUseCase,
-    private val getStateById: GetStateByIdUseCase,
+class TaskStateScreen(
+    private val addTaskStateUseCase: AddTaskStateUseCase,
+    private val deleteTaskStateUseCase: DeleteTaskStateUseCase,
+    private val updateTaskStateUseCase: UpdateTaskStateUseCase,
+    private val getAllStates: GetAllTaskStatesUseCase,
+    private val getStateById: GetTaskStateByIdUseCase,
     private val getStatesByProjectId: GetStatesByProjectIdUseCase,
     private val addAudit: AddAuditLogUseCase,
     private val consoleIO: ConsoleIO,
@@ -68,7 +68,7 @@ class StateScreen(
             val name = getInputWithLabel("📛 Enter State Name: ")
             val projectId = getInputWithLabel("📁 Enter Project ID: ")
             val state = State(name = name, projectId = projectId)
-            val result = addStateUseCase.addState(state)
+            val result = addTaskStateUseCase.addState(state)
 
             addAudit.addAuditLog(
                 Audit(
@@ -100,7 +100,7 @@ class StateScreen(
         try {
             val id = getInputWithLabel("🆔 Enter State ID to delete: ")
             val state = State(id = id, name = "", projectId = "")
-            val result = deleteStateUseCase.deleteState(state)
+            val result = deleteTaskStateUseCase.deleteState(state)
             showResult(result, "deleted")
         } catch (e: Exception) {
             consoleIO.showWithLine("❌ ${e.message}")
@@ -114,7 +114,7 @@ class StateScreen(
             val name = getInputWithLabel("📛 Enter New State Name: ")
             val projectId = getInputWithLabel("📁 Enter New Project ID: ")
             val state = State(id = id, name = name, projectId = projectId)
-            val updated = updateStateUseCase.updateState(state)
+            val updated = updateTaskStateUseCase.updateState(state)
 
             addAudit.addAuditLog(
                 Audit(

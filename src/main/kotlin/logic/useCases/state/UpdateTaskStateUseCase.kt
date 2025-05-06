@@ -4,13 +4,13 @@ import logic.entities.State
 import logic.repository.StatesRepository
 import kotlin.uuid.ExperimentalUuidApi
 
-class UpdateStateUseCase(
+class UpdateTaskStateUseCase(
     private val statesRepository: StatesRepository,
-    private val getStateByIdUseCase: GetStateByIdUseCase
+    private val getTaskStateByIdUseCase: GetTaskStateByIdUseCase
 ) {
     @OptIn(ExperimentalUuidApi::class)
     fun updateState(state: State): State {
-        getStateByIdUseCase.getStateById(state.id)
+        getTaskStateByIdUseCase.getStateById(state.id)
 
         return statesRepository.updateState(state)
     }

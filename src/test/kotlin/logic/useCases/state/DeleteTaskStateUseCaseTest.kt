@@ -12,17 +12,17 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.uuid.ExperimentalUuidApi
 
-class DeleteStateUseCaseTest {
+class DeleteTaskStateUseCaseTest {
 
     private lateinit var statesRepository: StatesRepository
-    private lateinit var deleteStateUseCase: DeleteStateUseCase
-    private lateinit var getStateByIdUseCase: GetStateByIdUseCase
+    private lateinit var deleteTaskStateUseCase: DeleteTaskStateUseCase
+    private lateinit var getTaskStateByIdUseCase: GetTaskStateByIdUseCase
 
     @BeforeEach
     fun setup() {
         statesRepository = mockk(relaxed = true)
-        getStateByIdUseCase = GetStateByIdUseCase(statesRepository)
-        deleteStateUseCase = DeleteStateUseCase(statesRepository, getStateByIdUseCase)
+        getTaskStateByIdUseCase = GetTaskStateByIdUseCase(statesRepository)
+        deleteTaskStateUseCase = DeleteTaskStateUseCase(statesRepository, getTaskStateByIdUseCase)
     }
 
     @OptIn(ExperimentalUuidApi::class)
@@ -31,11 +31,11 @@ class DeleteStateUseCaseTest {
         // Given
         val project = createProject(name = "PlanMate Core Features", createdBy = "adminUser01")
         val state = createState(id = "1", name = "In Progress", projectId = project.id.toString())
-        every { getStateByIdUseCase.getStateById(state.id) } returns state
+        every { getTaskStateByIdUseCase.getStateById(state.id) } returns state
         every { statesRepository.deleteState(state) } returns true
 
         // When
-        val result = deleteStateUseCase.deleteState(state)
+        val result = deleteTaskStateUseCase.deleteState(state)
 
         // Then
         assertEquals(true, result)
@@ -54,7 +54,7 @@ class DeleteStateUseCaseTest {
 
         // When & Then
         assertThrows<StateNotFoundException> {
-            deleteStateUseCase.deleteState(state)
+            deleteTaskStateUseCase.deleteState(state)
         }
     }
 }

@@ -8,7 +8,7 @@ import logic.repository.StatesRepository
 import logic.useCases.project.GetAllProjectsUseCase
 import kotlin.uuid.ExperimentalUuidApi
 
-class AddStateUseCase(
+class AddTaskStateUseCase(
     private val statesRepository: StatesRepository,
     private val getAllProjectsUseCase: GetAllProjectsUseCase,
 ) {

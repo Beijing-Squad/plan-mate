@@ -11,16 +11,16 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import kotlin.test.assertEquals
 
-class StatesCsvDataSourceImplTest {
+class TaskStatesCsvDataSourceImplTest {
 
     private lateinit var csvDataSource: CsvDataSourceImpl<State>
-    private lateinit var statesCsvDataSource: StatesCsvDataSourceImpl
+    private lateinit var statesCsvDataSource: TaskStatesCsvDataSourceImpl
 
     @BeforeEach
     fun setup() {
         csvDataSource = mockk(relaxed = true)
         every { csvDataSource.loadAllDataFromFile() } returns mutableListOf()
-        statesCsvDataSource = StatesCsvDataSourceImpl(csvDataSource)
+        statesCsvDataSource = TaskStatesCsvDataSourceImpl(csvDataSource)
     }
 
     @Test
@@ -69,7 +69,7 @@ class StatesCsvDataSourceImplTest {
         val oldState = createState(id = "1", name = "Todo", projectId = "p1")
         val stateList = mutableListOf(oldState)
         every { csvDataSource.loadAllDataFromFile() } returns stateList
-        statesCsvDataSource = StatesCsvDataSourceImpl(csvDataSource)
+        statesCsvDataSource = TaskStatesCsvDataSourceImpl(csvDataSource)
         every { csvDataSource.updateFile(any()) } just Runs
 
         val updatedState = oldState.copy(name = "InProgress", projectId = "p2")
@@ -89,7 +89,7 @@ class StatesCsvDataSourceImplTest {
         val updatedState = originalState.copy(name = "InProgress")
         val stateList = mutableListOf(originalState)
         every { csvDataSource.loadAllDataFromFile() } returns stateList
-        statesCsvDataSource = StatesCsvDataSourceImpl(csvDataSource)
+        statesCsvDataSource = TaskStatesCsvDataSourceImpl(csvDataSource)
         every { csvDataSource.updateFile(any()) } throws CsvWriteException("Failed")
 
         // When & Then
@@ -106,7 +106,7 @@ class StatesCsvDataSourceImplTest {
         val stateList = mutableListOf(state)
         every { csvDataSource.loadAllDataFromFile() } returns stateList
 
-        statesCsvDataSource = StatesCsvDataSourceImpl(csvDataSource)
+        statesCsvDataSource = TaskStatesCsvDataSourceImpl(csvDataSource)
 
         // When
         val result = statesCsvDataSource.deleteState(state)

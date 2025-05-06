@@ -4,7 +4,7 @@ import data.repository.dataSource.StatesDataSource
 import logic.entities.State
 import logic.repository.StatesRepository
 
-class StatesRepositoryImpl(
+class TaskStatesRepositoryImpl(
     private val stateDataSource: StatesDataSource
 ) : StatesRepository{
 

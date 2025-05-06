@@ -7,7 +7,7 @@ import logic.entities.exceptions.StateException
 import logic.entities.exceptions.StateNotFoundException
 import kotlin.uuid.ExperimentalUuidApi
 
-class StatesCsvDataSourceImpl(
+class TaskStatesCsvDataSourceImpl(
     private val csvDataSource: CsvDataSourceImpl<State>
 ) : StatesDataSource {
     private val states = getAllStates().toMutableList()

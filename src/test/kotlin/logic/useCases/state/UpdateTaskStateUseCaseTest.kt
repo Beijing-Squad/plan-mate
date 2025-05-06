@@ -12,18 +12,18 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import kotlin.uuid.ExperimentalUuidApi
 
-class UpdateStateUseCaseTest {
+class UpdateTaskStateUseCaseTest {
     private lateinit var statesRepository: StatesRepository
-    private lateinit var getStateByIdUseCase: GetStateByIdUseCase
-    private lateinit var updateStateUseCase: UpdateStateUseCase
+    private lateinit var getTaskStateByIdUseCase: GetTaskStateByIdUseCase
+    private lateinit var updateTaskStateUseCase: UpdateTaskStateUseCase
 
     @BeforeEach
     fun setup() {
         statesRepository = mockk(relaxed = true)
-        getStateByIdUseCase = GetStateByIdUseCase(statesRepository)
-        updateStateUseCase = UpdateStateUseCase(
+        getTaskStateByIdUseCase = GetTaskStateByIdUseCase(statesRepository)
+        updateTaskStateUseCase = UpdateTaskStateUseCase(
             statesRepository,
-            getStateByIdUseCase
+            getTaskStateByIdUseCase
         )
     }
 
@@ -42,11 +42,11 @@ class UpdateStateUseCaseTest {
             projectId = state.projectId
         )
 
-        every { getStateByIdUseCase.getStateById(newState.id) } returns state
+        every { getTaskStateByIdUseCase.getStateById(newState.id) } returns state
         every { statesRepository.updateState(newState) } returns newState
 
         // when
-        val result = updateStateUseCase.updateState(newState)
+        val result = updateTaskStateUseCase.updateState(newState)
 
         //Then
         assertThat(result).isEqualTo(newState)
@@ -62,7 +62,7 @@ class UpdateStateUseCaseTest {
 
         // When & Then
         assertThrows<StateNotFoundException> {
-            updateStateUseCase.updateState(newState)
+            updateTaskStateUseCase.updateState(newState)
         }
     }
 }

@@ -8,11 +8,11 @@ import org.junit.jupiter.api.Test
 
 class StateCsvParserTest {
 
-    private lateinit var parser: StateCsvParser
+    private lateinit var parser: TaskStateCsvParser
 
     @BeforeEach
     fun setup() {
-        parser = StateCsvParser()
+        parser = TaskStateCsvParser()
     }
 
     @Test

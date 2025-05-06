@@ -1,11 +1,10 @@
 package logic.useCases.state
 
 import logic.entities.State
-import logic.entities.exceptions.StateNotFoundException
 import logic.repository.StatesRepository
 import kotlin.uuid.ExperimentalUuidApi
 
-class GetStateByIdUseCase(
+class GetTaskStateByIdUseCase(
     private val statesRepository: StatesRepository
 ) {
     @OptIn(ExperimentalUuidApi::class)

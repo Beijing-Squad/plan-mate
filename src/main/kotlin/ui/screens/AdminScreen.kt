@@ -5,7 +5,7 @@ import ui.main.consoleIO.ConsoleIO
 
 class AdminScreen(
     private val projectManagementScreen: ProjectManagementScreen,
-    private val stateScreen: StateScreen,
+    private val taskStateScreen: TaskStateScreen,
     private val taskManagementScreen: TaskManagementScreen,
     private val auditScreen: AuditScreen,
     private val userScreen: UserScreen,
@@ -22,7 +22,7 @@ class AdminScreen(
         consoleIO.showWithLine("║          ADMIN CONTROL PANEL                  ║")
         consoleIO.showWithLine("╚═══════════════════════════════════════════════╝")
         consoleIO.showWithLine("${projectManagementScreen.id}. ${projectManagementScreen.name}")
-        consoleIO.showWithLine("${stateScreen.id}. ${stateScreen.name}")
+        consoleIO.showWithLine("${taskStateScreen.id}. ${taskStateScreen.name}")
         consoleIO.showWithLine("${taskManagementScreen.id}. ${taskManagementScreen.name}")
         consoleIO.showWithLine("${auditScreen.id}. ${auditScreen.name}")
         consoleIO.showWithLine("${userScreen.id}. ${userScreen.name}")
@@ -36,8 +36,8 @@ class AdminScreen(
                 projectManagementScreen.execute(); true
             }
 
-            stateScreen.id -> {
-                stateScreen.execute(); true
+            taskStateScreen.id -> {
+                taskStateScreen.execute(); true
             }
 
             taskManagementScreen.id -> {

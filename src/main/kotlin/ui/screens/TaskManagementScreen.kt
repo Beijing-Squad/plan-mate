@@ -10,7 +10,7 @@ import logic.entities.EntityType
 import logic.entities.Task
 import logic.useCases.audit.AddAuditLogUseCase
 import logic.useCases.authentication.SessionManagerUseCase
-import logic.useCases.state.GetAllStatesUseCase
+import logic.useCases.state.GetAllTaskStatesUseCase
 import logic.useCases.task.*
 import ui.console.SwimlanesRenderer
 import ui.enums.TaskBoardOption
@@ -23,7 +23,7 @@ import kotlin.uuid.Uuid
 @OptIn(ExperimentalUuidApi::class)
 class TaskManagementScreen(
     private val getAllTasksUseCase: GetAllTasksUseCase,
-    private val getAllStatesUseCase: GetAllStatesUseCase,
+    private val getAllTaskStatesUseCase: GetAllTaskStatesUseCase,
     private val addTaskUseCase: AddTaskUseCase,
     private val deleteTaskUseCase: DeleteTaskUseCase,
     private val getTaskByIdUseCase: GetTaskByIdUseCase,
@@ -68,7 +68,7 @@ class TaskManagementScreen(
     fun showTasksInSwimlanes() {
         consoleIO.showWithLine("\n\u001B[36m📋 All Tasks (Swimlanes View):\u001B[0m")
         val tasks = getAllTasksUseCase.getAllTasks()
-        val states = getAllStatesUseCase.getAllStates()
+        val states = getAllTaskStatesUseCase.getAllStates()
         swimlanesRenderer.render(tasks, states)
     }
 

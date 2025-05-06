@@ -4,7 +4,7 @@ import data.csvDataSource.*
 import data.csvDataSource.csv.CsvDataSourceImpl
 import data.parser.AuditCsvParser
 import data.parser.ProjectCsvParser
-import data.parser.StateCsvParser
+import data.parser.TaskStateCsvParser
 import data.parser.TaskCsvParser
 import data.parser.UserCsvParser
 import data.repository.PasswordHashingDataSource
@@ -42,7 +42,7 @@ val dataSourceModule = module {
         CsvDataSourceImpl<State>(
             get(named("stateReader")),
             get(named("stateWriter")),
-            get<StateCsvParser>()
+            get<TaskStateCsvParser>()
         )
     }
     single(named("auditDataSource")) {
@@ -66,7 +66,7 @@ val dataSourceModule = module {
     single { ProjectCsvDataSourceImpl(get(named("projectDataSource"))) } bind ProjectDataSource::class
     single { UserCsvDataSourceImpl(get(named("userDataSource")),get(),get()) } bind UserDataSource::class
     single { TasksCsvDataSourceImpl(get(named("taskDataSource"))) } bind TasksDataSource::class
-    single { StatesCsvDataSourceImpl(get(named("stateDataSource"))) } bind StatesDataSource::class
+    single { TaskStatesCsvDataSourceImpl(get(named("stateDataSource"))) } bind StatesDataSource::class
     single { AuditCsvDataSourceImpl(get(named("auditDataSource"))) } bind AuditDataSource::class
     single { AuthenticationCsvDataSourceImpl(get(named("authenticationDataSource")),get(),get(),get())
     }bind AuthenticationDataSource::class
