@@ -91,8 +91,6 @@ class StateScreen(
         try {
             val id = getInputWithLabel("🆔 Enter State ID to delete: ")
             val role = getRoleInput()
-            val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
-
             val state = State(id = id, name = "", projectId = "")
             val result = deleteStateUseCase.deleteState(state, role)
             showResult(result, "deleted")
