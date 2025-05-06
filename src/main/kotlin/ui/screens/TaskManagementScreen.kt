@@ -115,19 +115,21 @@ class TaskManagementScreen(
         try {
             addTaskUseCase.addTask(task)
             consoleIO.showWithLine("✅ Task added successfully.")
-            addAudit.addAuditLog(
-                Audit(
-                    id = Uuid.random(),
-                    userRole = currentUser.role,
-                    userName = currentUser.userName,
-                    action = ActionType.CREATE,
-                    entityType = EntityType.TASK,
-                    entityId = task.id.toString(),
-                    oldState = "",
-                    newState = "New Task",
-                    timeStamp = now
+            sessionManagerUseCase.getCurrentUser()?.userName?.let { userName ->
+                val actionDetails = "Admin $userName created task ${task.id} with name '$title' at ${now.format()}"
+                addAudit.addAuditLog(
+                    Audit(
+                        id = Uuid.random(),
+                        userRole = currentUser.role,
+                        userName = currentUser.userName,
+                        action = ActionType.CREATE,
+                        entityType = EntityType.TASK,
+                        entityId = task.id.toString(),
+                        actionDetails = actionDetails,
+                        timeStamp = now
+                    )
                 )
-            )
+            }
         } catch (e: Exception) {
             consoleIO.showWithLine("❌ Failed to add task: ${e.message}")
         }
@@ -217,19 +219,21 @@ class TaskManagementScreen(
             val updatedTask = updateTaskUseCase.updateTask(taskToUpdate)
 
             consoleIO.showWithLine("✅ Task updated successfully:\n📌 Title: ${updatedTask.title}, 📝 Description: ${updatedTask.description}")
-            addAudit.addAuditLog(
-                Audit(
-                    id = Uuid.random(),
-                    userRole = sessionManagerUseCase.getCurrentUser()!!.role,
-                    userName = sessionManagerUseCase.getCurrentUser()!!.userName,
-                    action = ActionType.UPDATE,
-                    entityType = EntityType.TASK,
-                    entityId = updatedTask.id.toString(),
-                    oldState = "",
-                    newState = newTitle,
-                    timeStamp = now
+            sessionManagerUseCase.getCurrentUser()?.userName?.let { userName ->
+                val actionDetails = "Admin $userName updated task ${taskToUpdate.id} with name '$newTitle' at ${now.format()}"
+                addAudit.addAuditLog(
+                    Audit(
+                        id = Uuid.random(),
+                        userRole = sessionManagerUseCase.getCurrentUser()!!.role,
+                        userName = sessionManagerUseCase.getCurrentUser()!!.userName,
+                        action = ActionType.UPDATE,
+                        entityType = EntityType.TASK,
+                        entityId = updatedTask.id.toString(),
+                        actionDetails = actionDetails,
+                        timeStamp = now
+                    )
                 )
-            )
+            }
         } catch (e: Exception) {
             consoleIO.showWithLine("❌ Failed to update task: ${e.message}")
         }
@@ -240,23 +244,25 @@ class TaskManagementScreen(
         consoleIO.show("\u001B[32mEnter Task ID to delete: \u001B[0m")
         val id = consoleIO.read()
         val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
-
+        val title = getTaskByIdUseCase.getTaskById(id ?: "").title
         try {
             deleteTaskUseCase.deleteTask(id ?: "")
             consoleIO.showWithLine("✅ Task deleted successfully.")
-            addAudit.addAuditLog(
-                Audit(
-                    id = Uuid.random(),
-                    userRole = sessionManagerUseCase.getCurrentUser()!!.role,
-                    userName = sessionManagerUseCase.getCurrentUser()!!.userName,
-                    action = ActionType.DELETE,
-                    entityType = EntityType.TASK,
-                    entityId = id.toString(),
-                    oldState = "",
-                    newState = "",
-                    timeStamp = now
+            sessionManagerUseCase.getCurrentUser()?.userName?.let { userName ->
+                val actionDetails = "Admin $userName deleted task $id with name '$title' at ${now.format()}"
+                addAudit.addAuditLog(
+                    Audit(
+                        id = Uuid.random(),
+                        userRole = sessionManagerUseCase.getCurrentUser()!!.role,
+                        userName = sessionManagerUseCase.getCurrentUser()!!.userName,
+                        action = ActionType.DELETE,
+                        entityType = EntityType.TASK,
+                        entityId = id.toString(),
+                        actionDetails = actionDetails,
+                        timeStamp = now
+                    )
                 )
-            )
+            }
         } catch (e: Exception) {
             consoleIO.showWithLine("❌ Error deleting task: ${e.message}")
         }
