@@ -28,16 +28,5 @@ class TasksCsvDataSourceImpl(
 
     override fun deleteTask(taskId: String)  = csvDataSource.deleteById(taskId)
 
-    override fun updateTask(updatedTask: Task): Task {
-
-        val tasks = csvDataSource.loadAllDataFromFile().toMutableList()
-
-        val taskIndex = tasks.indexOfFirst { it.id.toString() == updatedTask.id.toString() }
-        if (updatedTask.title.isEmpty()) throw InvalidInputException("Task title cannot be empty")
-        if (taskIndex == -1) throw TaskNotFoundException("Task with ID ${updatedTask.id} not found")
-
-        tasks[taskIndex] = updatedTask
-        csvDataSource.updateFile(tasks)
-        return updatedTask
-    }
+    override fun updateTask(updatedTask: Task)  = csvDataSource.updateItem(updatedTask)
 }
