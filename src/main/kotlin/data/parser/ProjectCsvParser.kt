@@ -16,8 +16,8 @@ class ProjectCsvParser : CsvParser<Project> {
             item.name,
             item.description,
             item.createdBy,
-            item.createdAt.toString(),
-            item.updatedAt.toString()
+            item.createdAt.date.toString(),
+            item.updatedAt.date.toString()
         ).joinToString(",")
     }
 
