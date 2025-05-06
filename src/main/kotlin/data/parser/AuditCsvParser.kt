@@ -24,7 +24,7 @@ class AuditCsvParser : CsvParser<Audit> {
             item.action.name,
             item.oldState ?: "",
             item.newState ?: "",
-            item.timeStamp.toString()
+            item.timeStamp.date.toString()
         ).joinToString(",")
     }
 
@@ -40,6 +40,7 @@ class AuditCsvParser : CsvParser<Audit> {
             oldState = parts[6].ifEmpty { null },
             newState = parts[7].ifEmpty { null },
             timeStamp = LocalDateTime.parse(parts[8])
+
         )
     }
 

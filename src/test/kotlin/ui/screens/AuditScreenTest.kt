@@ -5,7 +5,6 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import io.mockk.verifyOrder
-import kotlinx.datetime.LocalDate
 import logic.entities.ActionType
 import logic.entities.EntityType
 import logic.entities.UserRole
@@ -32,7 +31,6 @@ class AuditScreenTest {
             userName = "Adel",
             action = ActionType.CREATE,
             entityType = EntityType.PROJECT,
-            timeStamp = LocalDate(2025, 4, 29)
         ),
         createAudit(
             userRole = UserRole.ADMIN,
@@ -41,14 +39,12 @@ class AuditScreenTest {
             entityType = EntityType.TASK,
             oldState = "Review",
             newState = "Done",
-            timeStamp = LocalDate(2025, 4, 29)
         ),
         createAudit(
             userRole = UserRole.ADMIN,
             userName = "Adel",
             action = ActionType.UPDATE,
             entityType = EntityType.PROJECT,
-            timeStamp = LocalDate(2025, 4, 29)
         )
     )
 
