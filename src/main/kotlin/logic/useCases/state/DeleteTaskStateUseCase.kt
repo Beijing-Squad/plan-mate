@@ -1,16 +1,16 @@
 package logic.useCases.state
 
-import logic.entities.State
+import logic.entities.TaskState
 import logic.repository.StatesRepository
 import kotlin.uuid.ExperimentalUuidApi
 
-class DeleteStateUseCase(
+class DeleteTaskStateUseCase(
     private val statesRepository: StatesRepository,
-    private val getStateByIdUseCase: GetStateByIdUseCase
+    private val getTaskStateByIdUseCase: GetTaskStateByIdUseCase
 ) {
     @OptIn(ExperimentalUuidApi::class)
-    fun deleteState(state: State): Boolean {
-        val existedState = getStateByIdUseCase.getStateById(state.id)
+    fun deleteState(taskState: TaskState): Boolean {
+        val existedState = getTaskStateByIdUseCase.getStateById(taskState.id.toString())
         return statesRepository.deleteState(existedState)
     }
 }

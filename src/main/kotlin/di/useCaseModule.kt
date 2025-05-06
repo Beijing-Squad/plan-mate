@@ -24,12 +24,12 @@ val useCaseModule = module {
     single { RegisterUserAuthenticationUseCase(get()) }
     single { SessionManagerUseCase() }
     // state use cases
-    single { AddStateUseCase(get(), get()) }
-    single { DeleteStateUseCase(get(),get()) }
-    single { GetStateByIdUseCase(get()) }
+    single { AddTaskStateUseCase(get(), get()) }
+    single { DeleteTaskStateUseCase(get(), get()) }
+    single { GetTaskStateByIdUseCase(get()) }
     single { GetStatesByProjectIdUseCase(get()) }
-    single { GetAllStatesUseCase(get()) }
-    single { UpdateStateUseCase(get(),get()) }
+    single { GetAllTaskStatesUseCase(get()) }
+    single { UpdateTaskStateUseCase(get(), get()) }
 
     single { GetAllUsersUseCase(get()) }
     single { GetUserByIdUseCase(get()) }

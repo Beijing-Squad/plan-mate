@@ -4,7 +4,6 @@ import format
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import kotlinx.datetime.todayIn
 import logic.entities.*
 import logic.useCases.audit.AddAuditLogUseCase
 import logic.useCases.authentication.SessionManagerUseCase
@@ -175,36 +174,36 @@ class ProjectManagementScreen(
         }
     }
 
-        private fun deleteProject() {
-            try {
-                consoleIO.show("\u001B[32mEnter project ID to delete: \u001B[0m")
-                val id = getInput() ?: return
-                val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
-                deleteProjectUseCase.deleteProject(id)
-                consoleIO.showWithLine("\u001B[32m✅ Project deleted successfully.\u001B[0m")
-                sessionManager.getCurrentUser()?.userName?.let { userName ->
-                    val actionDetails = "Admin $userName deleted project $id with name '$name' at ${now.format()}"
-                    addAudit.addAuditLog(
-                        Audit(
-                            id = Uuid.random(),
-                            userRole = UserRole.ADMIN,
-                            userName = userName,
-                            action = ActionType.DELETE,
-                            entityType = EntityType.PROJECT,
-                            entityId = id,
-                            actionDetails = actionDetails,
-                            timeStamp = now
-                        )
+    private fun deleteProject() {
+        try {
+            consoleIO.show("\u001B[32mEnter project ID to delete: \u001B[0m")
+            val id = getInput() ?: return
+            val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+            deleteProjectUseCase.deleteProject(id)
+            consoleIO.showWithLine("\u001B[32m✅ Project deleted successfully.\u001B[0m")
+            sessionManager.getCurrentUser()?.userName?.let { userName ->
+                val actionDetails = "Admin $userName deleted project $id with name '$name' at ${now.format()}"
+                addAudit.addAuditLog(
+                    Audit(
+                        id = Uuid.random(),
+                        userRole = UserRole.ADMIN,
+                        userName = userName,
+                        action = ActionType.DELETE,
+                        entityType = EntityType.PROJECT,
+                        entityId = id,
+                        actionDetails = actionDetails,
+                        timeStamp = now
                     )
-                }
-            } catch (e: Exception) {
-                consoleIO.showWithLine("\u001B[31m❌ ${e.message}\u001B[0m")
+                )
             }
+        } catch (e: Exception) {
+            consoleIO.showWithLine("\u001B[31m❌ ${e.message}\u001B[0m")
         }
+    }
 
-        private fun showProjectInfo(project: Project) {
-            consoleIO.showWithLine(
-                """
+    private fun showProjectInfo(project: Project) {
+        consoleIO.showWithLine(
+            """
             \u001B[36m╭────────────────────────────╮
             │ ID: ${project.id}
             │ Name: ${project.name}
@@ -214,6 +213,6 @@ class ProjectManagementScreen(
             │ Updated At: ${project.updatedAt}
             ╰────────────────────────────╯\u001B[0m
             """.trimIndent()
-            )
-        }
+        )
     }
+}

@@ -17,9 +17,9 @@ import org.junit.jupiter.api.assertThrows
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
-class AddStateUseCaseTest {
+class AddTaskStateUseCaseTest {
     private lateinit var statesRepository: StatesRepository
-    private lateinit var addStateUseCase: AddStateUseCase
+    private lateinit var addTaskStateUseCase: AddTaskStateUseCase
     private lateinit var projectsRepository: ProjectsRepository
     private lateinit var getAllProjectsUseCase: GetAllProjectsUseCase
 
@@ -28,7 +28,7 @@ class AddStateUseCaseTest {
         statesRepository = mockk()
         projectsRepository = mockk()
         getAllProjectsUseCase = GetAllProjectsUseCase(projectsRepository)
-        addStateUseCase = AddStateUseCase(
+        addTaskStateUseCase = AddTaskStateUseCase(
             statesRepository,
             getAllProjectsUseCase,
         )
@@ -48,7 +48,7 @@ class AddStateUseCaseTest {
         every { statesRepository.addState(newState) } returns true
 
         // When
-        val result = addStateUseCase.addState(newState)
+        val result = addTaskStateUseCase.addState(newState)
 
         // Then
         assertThat(result).isTrue()
@@ -68,7 +68,7 @@ class AddStateUseCaseTest {
 
         // When & Then
         assertThrows<InvalidStateNameException> {
-            addStateUseCase.addState(newState)
+            addTaskStateUseCase.addState(newState)
         }
     }
 
@@ -83,7 +83,7 @@ class AddStateUseCaseTest {
 
         // When & Then
         assertThrows<ProjectNotFoundException> {
-            addStateUseCase.addState(newState)
+            addTaskStateUseCase.addState(newState)
         }
     }
 
@@ -101,7 +101,7 @@ class AddStateUseCaseTest {
 
         // When & Then
         assertThrows<StateAlreadyExistException> {
-            addStateUseCase.addState(existingState)
+            addTaskStateUseCase.addState(existingState)
         }
     }
 }

@@ -18,12 +18,12 @@ import ui.main.consoleIO.ConsoleIO
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
-class StateScreen(
-    private val addStateUseCase: AddStateUseCase,
-    private val deleteStateUseCase: DeleteStateUseCase,
-    private val updateStateUseCase: UpdateStateUseCase,
-    private val getAllStates: GetAllStatesUseCase,
-    private val getStateById: GetStateByIdUseCase,
+class TaskStateScreen(
+    private val addTaskStateUseCase: AddTaskStateUseCase,
+    private val deleteTaskStateUseCase: DeleteTaskStateUseCase,
+    private val updateTaskStateUseCase: UpdateTaskStateUseCase,
+    private val getAllStates: GetAllTaskStatesUseCase,
+    private val getStateById: GetTaskStateByIdUseCase,
     private val getStatesByProjectId: GetStatesByProjectIdUseCase,
     private val addAudit: AddAuditLogUseCase,
     private val consoleIO: ConsoleIO,
@@ -68,59 +68,14 @@ class StateScreen(
         try {
             val name = getInputWithLabel("📛 Enter State Name: ")
             val projectId = getInputWithLabel("📁 Enter Project ID: ")
-            val state = State(name = name, projectId = projectId)
-            val result = addStateUseCase.addState(state)
+            val taskState = TaskState(name = name, projectId = projectId)
+            val result = addTaskStateUseCase.addState(taskState)
             val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+
             sessionManagerUseCase.getCurrentUser()?.userName?.let { userName ->
                 val actionDetails =
-                    "Admin $userName added new state ${state.id} with name '$name' at ${now.format()}"
-                addAudit.addAuditLog(
-                    Audit(
-                        id = Uuid.random(),
-                        userRole = UserRole.ADMIN,
-                        userName = sessionManagerUseCase.getCurrentUser()!!.userName,
-                        action = ActionType.UPDATE,
-                        entityType = EntityType.PROJECT,
-                        entityId = projectId,
-                        actionDetails = actionDetails,
-                        timeStamp = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
-                    )
-                )
-            }
-            showResult(result, "added")
-        } catch (e: StateAlreadyExistException) {
-            consoleIO.showWithLine("⚠️ ${e.message}")
-        } catch (e: InvalidStateNameException) {
-            consoleIO.showWithLine("⚠️ ${e.message}")
-        } catch (e: ProjectNotFoundException) {
-            consoleIO.showWithLine("⚠️ ${e.message}")
-        } catch (e: Exception) {
-            consoleIO.showWithLine("❌ Unexpected error: ${e.message}")
-        }
-    }
+                    "Admin $userName added new state ${taskState.id} with name '$name' at ${now.format()}"
 
-    private fun onChooseDeleteState() {
-        try {
-            val id = getInputWithLabel("🆔 Enter State ID to delete: ")
-            val state = State(id = id, name = "", projectId = "")
-            val result = deleteStateUseCase.deleteState(state)
-            showResult(result, "deleted")
-        } catch (e: Exception) {
-            consoleIO.showWithLine("❌ ${e.message}")
-        }
-    }
-
-    @OptIn(ExperimentalUuidApi::class)
-    private fun onChooseUpdateState() {
-        try {
-            val id = getInputWithLabel("🆔 Enter State ID to update: ")
-            val name = getInputWithLabel("📛 Enter New State Name: ")
-            val projectId = getInputWithLabel("📁 Enter New Project ID: ")
-            val state = State(id = id, name = name, projectId = projectId)
-            val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
-            val updated = updateStateUseCase.updateState(state)
-            sessionManagerUseCase.getCurrentUser()?.userName?.let { userName ->
-                val actionDetails = "Admin $userName updated state ${state.id} with name '$name' at ${now.format()}"
                 addAudit.addAuditLog(
                     Audit(
                         id = Uuid.random(),
@@ -134,7 +89,56 @@ class StateScreen(
                     )
                 )
             }
-            consoleIO.showWithLine("✅ State updated:\n$updated")
+
+            showResult(result, "added")
+        } catch (e: StateAlreadyExistException) {
+            consoleIO.showWithLine("⚠️ ${e.message}")
+        } catch (e: InvalidStateNameException) {
+            consoleIO.showWithLine("⚠️ ${e.message}")
+        } catch (e: ProjectNotFoundException) {
+            consoleIO.showWithLine("⚠️ ${e.message}")
+        } catch (e: Exception) {
+            consoleIO.showWithLine("❌ Unexpected error: ${e.message}")
+        }
+    }
+
+    @OptIn(ExperimentalUuidApi::class)
+    private fun onChooseDeleteState() {
+        try {
+            val id = Uuid.parse(getInputWithLabel("🆔 Enter State ID to delete: "))
+            val taskState = TaskState(id = id, name = "", projectId = "")
+            val result = deleteTaskStateUseCase.deleteState(taskState)
+            showResult(result, "deleted")
+        } catch (e: Exception) {
+            consoleIO.showWithLine("❌ ${e.message}")
+        }
+    }
+
+    @OptIn(ExperimentalUuidApi::class)
+    private fun onChooseUpdateState() {
+        try {
+            val id = Uuid.parse(getInputWithLabel("🆔 Enter State ID to update: "))
+            val name = getInputWithLabel("📛 Enter New State Name: ")
+            val projectId = getInputWithLabel("📁 Enter New Project ID: ")
+            val taskState = TaskState(id = id, name = name, projectId = projectId)
+            val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+            val updated = updateTaskStateUseCase.updateState(taskState)
+            sessionManagerUseCase.getCurrentUser()?.userName?.let { userName ->
+                val actionDetails = "Admin $userName updated state ${taskState.id} with name '$name' at ${now.format()}"
+                addAudit.addAuditLog(
+                    Audit(
+                        id = Uuid.random(),
+                        userRole = UserRole.ADMIN,
+                        userName = sessionManagerUseCase.getCurrentUser()!!.userName,
+                        action = ActionType.UPDATE,
+                        entityType = EntityType.PROJECT,
+                        entityId = projectId,
+                        actionDetails = actionDetails,
+                        timeStamp = now
+                    )
+                )
+            }
+            consoleIO.showWithLine("✅ State updated:\n${formatState(updated)}")
         } catch (e: Exception) {
             consoleIO.showWithLine("❌ ${e.message}")
         }
@@ -192,12 +196,13 @@ class StateScreen(
         }
     }
 
-    private fun formatState(state: State): String {
+    @OptIn(ExperimentalUuidApi::class)
+    private fun formatState(taskState: TaskState): String {
         return """
             ╔═══════════════════════════════════════════════════════╗
-            ║ 🆔 State ID  : ${state.id.padEnd(31)}   ║
-            ║ 📛 Name      : ${state.name.padEnd(39)}║
-            ║ 🗂️ Project ID: ${state.projectId.padEnd(39)}║
+            ║ 🆔 State ID  : ${taskState.id.toString().padEnd(31)}   ║
+            ║ 📛 Name      : ${taskState.name.padEnd(39)}║
+            ║ 🗂️ Project ID: ${taskState.projectId.padEnd(39)}║
             ╚═══════════════════════════════════════════════════════╝
         """.trimIndent()
     }

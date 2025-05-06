@@ -12,15 +12,15 @@ import org.junit.jupiter.api.assertThrows
 import kotlin.test.Test
 import kotlin.uuid.ExperimentalUuidApi
 
-class GetAllStatesUseCaseTest {
+class GetAllTaskStatesUseCaseTest {
 
     private lateinit var statesRepository: StatesRepository
-    private lateinit var getAllStatesUseCase: GetAllStatesUseCase
+    private lateinit var getAllTaskStatesUseCase: GetAllTaskStatesUseCase
 
     @BeforeEach
     fun setup() {
         statesRepository = mockk(relaxed = true)
-        getAllStatesUseCase = GetAllStatesUseCase(statesRepository)
+        getAllTaskStatesUseCase = GetAllTaskStatesUseCase(statesRepository)
     }
 
     @OptIn(ExperimentalUuidApi::class)
@@ -40,7 +40,7 @@ class GetAllStatesUseCaseTest {
         every { statesRepository.getAllStates() } returns states
 
         // When
-        val actualStates = getAllStatesUseCase.getAllStates()
+        val actualStates = getAllTaskStatesUseCase.getAllStates()
 
         // Then
         assertThat(actualStates).isEqualTo(states)
@@ -53,7 +53,7 @@ class GetAllStatesUseCaseTest {
 
         // When && Then
         assertThrows<StateNotFoundException> {
-            getAllStatesUseCase.getAllStates()
+            getAllTaskStatesUseCase.getAllStates()
         }
     }
 
@@ -69,7 +69,7 @@ class GetAllStatesUseCaseTest {
         every { statesRepository.getAllStates() } returns states
 
         // When
-        val actualStates = getAllStatesUseCase.getAllStates()
+        val actualStates = getAllTaskStatesUseCase.getAllStates()
 
         // Then
         assertThat(actualStates).isEqualTo(states)

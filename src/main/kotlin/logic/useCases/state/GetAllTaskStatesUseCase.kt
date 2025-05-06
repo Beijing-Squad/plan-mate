@@ -1,13 +1,13 @@
 package logic.useCases.state
 
-import logic.entities.State
+import logic.entities.TaskState
 import logic.entities.exceptions.StateNotFoundException
 import logic.repository.StatesRepository
 
-class GetAllStatesUseCase(
+class GetAllTaskStatesUseCase(
     private val statesRepository: StatesRepository
 ) {
-    fun getAllStates(): List<State>{
+    fun getAllStates(): List<TaskState>{
         require(statesRepository.getAllStates().isNotEmpty()) {
             throw StateNotFoundException("No States Found")
         }
