@@ -1,8 +1,7 @@
 package logic.entities
 
-import kotlin.uuid.ExperimentalUuidApi
 
-data class State @OptIn(ExperimentalUuidApi::class) constructor(
+data class State(
     val id: String,
     val name: String,
     val projectId: String

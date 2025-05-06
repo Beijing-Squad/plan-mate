@@ -3,15 +3,14 @@ package ui.screens
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import kotlinx.datetime.todayIn
 import logic.entities.*
 import logic.useCases.audit.AddAuditLogUseCase
 import logic.useCases.authentication.SessionManagerUseCase
 import logic.useCases.project.*
 import ui.enums.ProjectBoardOption
 import ui.main.BaseScreen
-import ui.main.consoleIO.ConsoleIO
 import ui.main.MenuRenderer
+import ui.main.consoleIO.ConsoleIO
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -105,7 +104,7 @@ class ProjectManagementScreen(
             val updated = project.copy(
                 name = name,
                 description = desc,
-                updatedAt = Clock.System.todayIn(TimeZone.currentSystemDefault())
+                updatedAt = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
             )
 
             updateProjectUseCase.updateProject(updated)
@@ -140,7 +139,7 @@ class ProjectManagementScreen(
             consoleIO.show("\u001B[32mEnter created by (user ID): \u001B[0m")
             val createdBy = getInput() ?: return
 
-            val now = Clock.System.todayIn(TimeZone.currentSystemDefault())
+            val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
             val newProject = Project(
                 name = name,
                 description = desc,
