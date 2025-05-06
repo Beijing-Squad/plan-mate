@@ -4,7 +4,7 @@ import logic.entities.User
 import logic.repository.UserRepository
 import kotlin.uuid.ExperimentalUuidApi
 
-class GetUserByUserIdUseCase(
+class GetUserByIdUseCase(
     private val userRepository: UserRepository
 ) {
     @OptIn(ExperimentalUuidApi::class)
