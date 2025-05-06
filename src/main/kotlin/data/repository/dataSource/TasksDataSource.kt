@@ -4,14 +4,14 @@ import logic.entities.Task
 
 interface TasksDataSource {
 
-    fun getAllTasks(): List<Task>
+    suspend fun getAllTasks(): List<Task>
 
-    fun getTaskById(taskId: String): Task
+    suspend fun getTaskById(taskId: String): Task
 
-    fun addTask(task: Task)
+    suspend fun addTask(task: Task)
 
-    fun deleteTask(taskId: String)
+    suspend fun deleteTask(taskId: String)
 
-    fun updateTask(updatedTask: Task): Task
+    suspend fun updateTask(updatedTask: Task): Task
 }
 
