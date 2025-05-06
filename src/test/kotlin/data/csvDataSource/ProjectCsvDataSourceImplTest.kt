@@ -70,23 +70,23 @@ class ProjectCsvDataSourceImplTest {
     @Test
     fun `should update a project by ID when it exists`() {
         // Given
-        val newProjects=listOf(createProject(),createProject())
+        val newProjects=createProject()
 
         // When
         projectCsvDataSource.updateProject(newProjects)
 
         // Then
         verify {
-            csvDataSource.updateFile(newProjects)
+            csvDataSource.updateItem(newProjects)
         }
     }
 
     @Test
     fun `should throw exception when updating project that does not exist`() {
         // Given
-        val newProjects = listOf(createProject(), createProject())
+        val newProjects = createProject()
         every {
-            csvDataSource.updateFile (newProjects)
+            csvDataSource.updateItem (newProjects)
         } throws CsvWriteException("Error saving to CSV file")
 
         // When & Then
