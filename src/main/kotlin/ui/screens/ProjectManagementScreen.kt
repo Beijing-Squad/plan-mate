@@ -1,16 +1,14 @@
 package ui.screens
 
-import kotlinx.datetime.Clock
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.todayIn
+import kotlinx.datetime.*
 import logic.entities.*
 import logic.useCases.audit.AddAuditLogUseCase
-import logic.useCases.authentication.SessionManager
+import logic.useCases.authentication.SessionManagerUseCase
 import logic.useCases.project.*
 import ui.enums.ProjectBoardOption
 import ui.main.BaseScreen
-import ui.main.consoleIO.ConsoleIO
 import ui.main.MenuRenderer
+import ui.main.consoleIO.ConsoleIO
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -26,7 +24,7 @@ class ProjectManagementScreen(
     private val consoleIO: ConsoleIO
 ) : BaseScreen(consoleIO) {
 
-    private val sessionManager = SessionManager()
+    private val sessionManagerUseCase = SessionManagerUseCase()
     override val id: String
         get() = "1"
     override val name: String
@@ -43,6 +41,7 @@ class ProjectManagementScreen(
             consoleIO
         )
     }
+
     override fun handleFeatureChoice() {
         when (getInput()) {
             "1" -> listAllProjects()
@@ -103,7 +102,7 @@ class ProjectManagementScreen(
                 result.fold(
                     onSuccess = {
                         consoleIO.showWithLine("\u001B[32m✅ Project updated successfully.\u001B[0m")
-                        sessionManager.getCurrentUser()?.userName?.let { userName ->
+                        sessionManagerUseCase.getCurrentUser()?.userName?.let { userName ->
                             addAudit.addAuditLog(
                                 Audit(
                                     id = Uuid.random(),
@@ -114,7 +113,7 @@ class ProjectManagementScreen(
                                     entityId = updated.id.toString(),
                                     oldState = updated.name,
                                     newState = updated.description,
-                                    timeStamp = Clock.System.todayIn(TimeZone.currentSystemDefault())
+                                    timeStamp = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
                                 )
                             )
                         }
@@ -157,7 +156,7 @@ class ProjectManagementScreen(
                         entityId = newProject.id.toString(),
                         oldState = name,
                         newState = newProject.description,
-                        timeStamp = now
+                        timeStamp = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
                     )
                 )
             },
@@ -174,7 +173,7 @@ class ProjectManagementScreen(
         result.fold(
             onSuccess = {
                 consoleIO.showWithLine("\u001B[32m✅ Project deleted successfully.\u001B[0m")
-                sessionManager.getCurrentUser()?.userName?.let { userName ->
+                sessionManagerUseCase.getCurrentUser()?.userName?.let { userName ->
                     addAudit.addAuditLog(
                         Audit(
                             id = Uuid.random(),
@@ -185,7 +184,7 @@ class ProjectManagementScreen(
                             entityId = id,
                             oldState = "",
                             newState = "",
-                            timeStamp = Clock.System.todayIn(TimeZone.currentSystemDefault())
+                            timeStamp = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
                         )
                     )
                 }
