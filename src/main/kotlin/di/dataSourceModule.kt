@@ -2,12 +2,17 @@ package di
 
 import data.csvDataSource.*
 import data.csvDataSource.csv.CsvDataSourceImpl
+import data.mongoDataSource.AuditMongoDataSourceImpl
+import data.mongoDataSource.ProjectMongoDataSourceImpl
+import data.mongoDataSource.StateMongoDataSourceImpl
+import data.mongoDataSource.TaskMongoDataSourceImpl
 import data.parser.AuditCsvParser
 import data.parser.ProjectCsvParser
 import data.parser.StateCsvParser
 import data.parser.TaskCsvParser
 import data.parser.UserCsvParser
 import data.repository.dataSource.*
+import data.repository.mongoDataSource.UserMongoDataSourceImpl
 import logic.entities.*
 import org.koin.core.qualifier.named
 import org.koin.dsl.bind
@@ -64,6 +69,13 @@ val dataSourceModule = module {
     single { TasksCsvDataSourceImpl(get(named("taskDataSource"))) } bind TasksDataSource::class
     single { StatesCsvDataSourceImpl(get(named("stateDataSource"))) } bind StatesDataSource::class
     single { AuditCsvDataSourceImpl(get(named("auditDataSource"))) } bind AuditDataSource::class
+
+    single { ProjectMongoDataSourceImpl(get(named("projectDataSource"))) } bind ProjectDataSource::class
+    single { UserMongoDataSourceImpl(get(named("userDataSource"))) } bind UserDataSource::class
+    single { TaskMongoDataSourceImpl(get(named("taskDataSource"))) } bind TasksDataSource::class
+    single { StateMongoDataSourceImpl(get(named("stateDataSource"))) } bind StatesDataSource::class
+    single { AuditMongoDataSourceImpl(get(named("auditDataSource"))) } bind AuditDataSource::class
+
     single { AuthenticationCsvDataSourceImpl(get(named("authenticationDataSource")),get())
     }bind AuthenticationDataSource::class
 }
