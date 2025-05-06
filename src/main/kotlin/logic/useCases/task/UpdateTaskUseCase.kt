@@ -9,7 +9,7 @@ import kotlin.uuid.ExperimentalUuidApi
 class UpdateTaskUseCase(
     private val tasksRepository: TasksRepository
 ) {
-    fun updateTask(task: Task): Task {
+    fun updateTask(task: Task) {
         return tasksRepository.updateTask(task)
     }
 }
