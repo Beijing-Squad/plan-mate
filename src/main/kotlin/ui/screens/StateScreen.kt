@@ -1,9 +1,13 @@
 package ui.screens
 
+import format
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import logic.entities.*
+import logic.entities.exceptions.InvalidStateNameException
+import logic.entities.exceptions.ProjectNotFoundException
+import logic.entities.exceptions.StateAlreadyExistException
 import logic.useCases.audit.AddAuditLogUseCase
 import logic.useCases.authentication.SessionManagerUseCase
 import logic.useCases.state.*
@@ -42,55 +46,64 @@ class StateScreen(
     }
 
     override fun handleFeatureChoice() {
-        when (getInput()) {
-            "1" -> onChooseAddState()
-            "2" -> onChooseDeleteState()
-            "3" -> onChooseUpdateState()
-            "4" -> onChooseGetAllStates()
-            "5" -> onChooseGetStateById()
-            "6" -> onChooseGetStatesByProjectId()
-            "0" -> return
-            else -> consoleIO.showWithLine("❌ Invalid Option")
+        while (true) {
+            when (getInput()) {
+                "1" -> onChooseAddState()
+                "2" -> onChooseDeleteState()
+                "3" -> onChooseUpdateState()
+                "4" -> onChooseGetAllStates()
+                "5" -> onChooseGetStateById()
+                "6" -> onChooseGetStatesByProjectId()
+                "0" -> return
+                else -> {
+                    consoleIO.showWithLine("❌ Invalid Option")
+                }
+            }
+            showOptionService()
         }
     }
 
     @OptIn(ExperimentalUuidApi::class)
     private fun onChooseAddState() {
         try {
-            val id = getInputWithLabel("🆔 Enter State ID: ")
             val name = getInputWithLabel("📛 Enter State Name: ")
             val projectId = getInputWithLabel("📁 Enter Project ID: ")
-            val role = getRoleInput()
-
-            val state = State(id = id, name = name, projectId = projectId)
-
-            val result = addStateUseCase.addState(state, role)
-            addAudit.addAuditLog(
-                Audit(
-                    id = Uuid.random(),
-                    userRole = role,
-                    userName = sessionManagerUseCase.getCurrentUser()!!.userName,
-                    action = ActionType.UPDATE,
-                    entityType = EntityType.PROJECT,
-                    entityId = projectId,
-                    oldState = "",
-                    newState = name,
-                    timeStamp = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+            val state = State(name = name, projectId = projectId)
+            val result = addStateUseCase.addState(state)
+            val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+            sessionManagerUseCase.getCurrentUser()?.userName?.let { userName ->
+                val actionDetails =
+                    "Admin $userName added new state ${state.id} with name '$name' at ${now.format()}"
+                addAudit.addAuditLog(
+                    Audit(
+                        id = Uuid.random(),
+                        userRole = UserRole.ADMIN,
+                        userName = sessionManagerUseCase.getCurrentUser()!!.userName,
+                        action = ActionType.UPDATE,
+                        entityType = EntityType.PROJECT,
+                        entityId = projectId,
+                        actionDetails = actionDetails,
+                        timeStamp = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+                    )
                 )
-            )
+            }
             showResult(result, "added")
+        } catch (e: StateAlreadyExistException) {
+            consoleIO.showWithLine("⚠️ ${e.message}")
+        } catch (e: InvalidStateNameException) {
+            consoleIO.showWithLine("⚠️ ${e.message}")
+        } catch (e: ProjectNotFoundException) {
+            consoleIO.showWithLine("⚠️ ${e.message}")
         } catch (e: Exception) {
-            consoleIO.showWithLine("❌ ${e.message}")
+            consoleIO.showWithLine("❌ Unexpected error: ${e.message}")
         }
     }
 
     private fun onChooseDeleteState() {
         try {
             val id = getInputWithLabel("🆔 Enter State ID to delete: ")
-            val role = getRoleInput()
-
             val state = State(id = id, name = "", projectId = "")
-            val result = deleteStateUseCase.deleteState(state, role)
+            val result = deleteStateUseCase.deleteState(state)
             showResult(result, "deleted")
         } catch (e: Exception) {
             consoleIO.showWithLine("❌ ${e.message}")
@@ -103,23 +116,24 @@ class StateScreen(
             val id = getInputWithLabel("🆔 Enter State ID to update: ")
             val name = getInputWithLabel("📛 Enter New State Name: ")
             val projectId = getInputWithLabel("📁 Enter New Project ID: ")
-            val role = getRoleInput()
-
             val state = State(id = id, name = name, projectId = projectId)
-            val updated = updateStateUseCase.updateState(state, role)
-            addAudit.addAuditLog(
-                Audit(
-                    id = Uuid.random(),
-                    userRole = role,
-                    userName = sessionManagerUseCase.getCurrentUser()!!.userName,
-                    action = ActionType.UPDATE,
-                    entityType = EntityType.PROJECT,
-                    entityId = projectId,
-                    oldState = "",
-                    newState = name,
-                    timeStamp = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+            val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+            val updated = updateStateUseCase.updateState(state)
+            sessionManagerUseCase.getCurrentUser()?.userName?.let { userName ->
+                val actionDetails = "Admin $userName updated state ${state.id} with name '$name' at ${now.format()}"
+                addAudit.addAuditLog(
+                    Audit(
+                        id = Uuid.random(),
+                        userRole = UserRole.ADMIN,
+                        userName = sessionManagerUseCase.getCurrentUser()!!.userName,
+                        action = ActionType.UPDATE,
+                        entityType = EntityType.PROJECT,
+                        entityId = projectId,
+                        actionDetails = actionDetails,
+                        timeStamp = now
+                    )
                 )
-            )
+            }
             consoleIO.showWithLine("✅ State updated:\n$updated")
         } catch (e: Exception) {
             consoleIO.showWithLine("❌ ${e.message}")
@@ -133,7 +147,7 @@ class StateScreen(
                 consoleIO.showWithLine("❌ No states found")
             } else {
                 consoleIO.showWithLine("\n📋 All States:\n")
-                states.forEach { consoleIO.showWithLine(it.toString()) }
+                states.forEach { consoleIO.showWithLine(formatState(it)) }
             }
         } catch (e: Exception) {
             consoleIO.showWithLine("❌ ${e.message}")
@@ -144,7 +158,7 @@ class StateScreen(
         try {
             val id = getInputWithLabel("🆔 Enter State ID: ")
             val state = getStateById.getStateById(id)
-            consoleIO.showWithLine("✅ State found:\n$state")
+            consoleIO.showWithLine("✅ State found:\n${formatState(state)}")
         } catch (e: Exception) {
             consoleIO.showWithLine("❌ ${e.message}")
         }
@@ -154,8 +168,12 @@ class StateScreen(
         try {
             val projectId = getInputWithLabel("📁 Enter Project ID: ")
             val states = getStatesByProjectId.getStatesByProjectId(projectId)
-            consoleIO.showWithLine("\n📁 States in project:\n")
-            states.forEach { consoleIO.showWithLine(it.toString()) }
+            if (states.isEmpty()) {
+                consoleIO.showWithLine("❌ No states found for this project.")
+            } else {
+                consoleIO.showWithLine("\n📁 States in project:\n")
+                states.forEach { consoleIO.showWithLine(formatState(it)) }
+            }
         } catch (e: Exception) {
             consoleIO.showWithLine("❌ ${e.message}")
         }
@@ -166,16 +184,21 @@ class StateScreen(
         return consoleIO.read()?.trim().orEmpty()
     }
 
-    private fun getRoleInput(): UserRole {
-        return sessionManagerUseCase.getCurrentUser()?.role ?: UserRole.MATE
-    }
-
-
     private fun showResult(result: Boolean, action: String) {
         if (result) {
             consoleIO.showWithLine("✅ State $action successfully!")
         } else {
             consoleIO.showWithLine("❌ Failed to $action state.")
         }
+    }
+
+    private fun formatState(state: State): String {
+        return """
+            ╔═══════════════════════════════════════════════════════╗
+            ║ 🆔 State ID  : ${state.id.padEnd(31)}   ║
+            ║ 📛 Name      : ${state.name.padEnd(39)}║
+            ║ 🗂️ Project ID: ${state.projectId.padEnd(39)}║
+            ╚═══════════════════════════════════════════════════════╝
+        """.trimIndent()
     }
 }

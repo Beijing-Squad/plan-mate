@@ -5,8 +5,8 @@ import fake.createProject
 import fake.createState
 import io.mockk.every
 import io.mockk.mockk
+import logic.entities.exceptions.MateUnauthorizedException
 import logic.entities.exceptions.StateNotFoundException
-import logic.entities.exceptions.StateUnauthorizedUserException
 import logic.repository.StatesRepository
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -72,15 +72,13 @@ class GetStatesByProjectIdUseCaseTest {
     @Test
     fun `should throw exception when user is not admin`() {
         // Given
-        val errorMessage = "Sorry the user should be admin"
         val projectId = createProject().id.toString()
 
-        every { stateRepository.getStatesByProjectId(projectId) } throws StateUnauthorizedUserException(errorMessage)
+        every { stateRepository.getStatesByProjectId(projectId) } throws MateUnauthorizedException()
 
         // When && Then
-        assertThrows<StateUnauthorizedUserException> {
+        assertThrows<MateUnauthorizedException> {
             getStatesByProjectIdUseCase.getStatesByProjectId(projectId)
         }
-
     }
 }

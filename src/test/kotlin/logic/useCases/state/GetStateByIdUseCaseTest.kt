@@ -38,16 +38,14 @@ class GetStateByIdUseCaseTest {
     @OptIn(ExperimentalUuidApi::class)
     @Test
     fun `should throw exception when state id does not exist`() {
-        val errorMessage = "Not found states with this project id"
         val state = createState(id = "999")
-
         val states = listOf(
             createState(),
             createState()
         )
 
         every { statesRepository.getAllStates() } returns states
-        every { statesRepository.getStateById(state.id) } returns null
+        every { statesRepository.getStateById(state.id) } throws StateNotFoundException()
 
         // When & Then
         assertThrows<StateNotFoundException> {

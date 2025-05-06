@@ -22,8 +22,7 @@ class AuditCsvParser : CsvParser<Audit> {
             item.entityId,
             item.entityType.name,
             item.action.name,
-            item.oldState ?: "",
-            item.newState ?: "",
+            item.actionDetails,
             item.timeStamp.toString()
         ).joinToString(",")
     }
@@ -37,8 +36,7 @@ class AuditCsvParser : CsvParser<Audit> {
             entityId = parts[3],
             entityType = EntityType.valueOf(parts[4]),
             action = ActionType.valueOf(parts[5]),
-            oldState = parts[6].ifEmpty { null },
-            newState = parts[7].ifEmpty { null },
+            actionDetails = parts[6],
             timeStamp = LocalDateTime.parse(parts[8])
         )
     }
