@@ -25,11 +25,11 @@ val useCaseModule = module {
     single { SessionManagerUseCase() }
     // state use cases
     single { AddStateUseCase(get(), get()) }
-    single { DeleteStateUseCase(get()) }
+    single { DeleteStateUseCase(get(),get()) }
     single { GetStateByIdUseCase(get()) }
     single { GetStatesByProjectIdUseCase(get()) }
     single { GetAllStatesUseCase(get()) }
-    single { UpdateStateUseCase(get()) }
+    single { UpdateStateUseCase(get(),get()) }
 
     single { GetAllUsersUseCase(get()) }
     single { GetUserByIdUseCase(get()) }

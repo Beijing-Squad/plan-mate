@@ -46,7 +46,7 @@ class StateScreen(
     }
 
     override fun handleFeatureChoice() {
-        while (true){
+        while (true) {
             when (getInput()) {
                 "1" -> onChooseAddState()
                 "2" -> onChooseDeleteState()
@@ -70,21 +70,23 @@ class StateScreen(
             val projectId = getInputWithLabel("📁 Enter Project ID: ")
             val state = State(name = name, projectId = projectId)
             val result = addStateUseCase.addState(state)
-
-            addAudit.addAuditLog(
-                Audit(
-                    id = Uuid.random(),
-                    userRole = UserRole.ADMIN,
-                    userName = sessionManagerUseCase.getCurrentUser()!!.userName,
-                    action = ActionType.UPDATE,
-                    entityType = EntityType.PROJECT,
-                    entityId = projectId,
-                    oldState = "",
-                    newState = name,
-                    timeStamp = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+            val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+            sessionManagerUseCase.getCurrentUser()?.userName?.let { userName ->
+                val actionDetails =
+                    "Admin $userName added new state ${state.id} with name '$name' at ${now.format()}"
+                addAudit.addAuditLog(
+                    Audit(
+                        id = Uuid.random(),
+                        userRole = UserRole.ADMIN,
+                        userName = sessionManagerUseCase.getCurrentUser()!!.userName,
+                        action = ActionType.UPDATE,
+                        entityType = EntityType.PROJECT,
+                        entityId = projectId,
+                        actionDetails = actionDetails,
+                        timeStamp = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+                    )
                 )
-            )
-
+            }
             showResult(result, "added")
         } catch (e: StateAlreadyExistException) {
             consoleIO.showWithLine("⚠️ ${e.message}")
@@ -115,13 +117,14 @@ class StateScreen(
             val name = getInputWithLabel("📛 Enter New State Name: ")
             val projectId = getInputWithLabel("📁 Enter New Project ID: ")
             val state = State(id = id, name = name, projectId = projectId)
-            val updated = updateStateUseCase.updateState(state, role)
+            val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+            val updated = updateStateUseCase.updateState(state)
             sessionManagerUseCase.getCurrentUser()?.userName?.let { userName ->
                 val actionDetails = "Admin $userName updated state ${state.id} with name '$name' at ${now.format()}"
                 addAudit.addAuditLog(
                     Audit(
                         id = Uuid.random(),
-                        userRole = role,
+                        userRole = UserRole.ADMIN,
                         userName = sessionManagerUseCase.getCurrentUser()!!.userName,
                         action = ActionType.UPDATE,
                         entityType = EntityType.PROJECT,
