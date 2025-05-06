@@ -2,7 +2,7 @@ package ui.screens
 
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
-import kotlinx.datetime.todayIn
+import kotlinx.datetime.toLocalDateTime
 import logic.entities.*
 import logic.useCases.audit.AddAuditLogUseCase
 import logic.useCases.authentication.SessionManagerUseCase
@@ -75,7 +75,7 @@ class StateScreen(
                     entityId = projectId,
                     oldState = "",
                     newState = name,
-                    timeStamp = Clock.System.todayIn(TimeZone.currentSystemDefault())
+                    timeStamp = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
                 )
             )
             showResult(result, "added")
@@ -117,7 +117,7 @@ class StateScreen(
                     entityId = projectId,
                     oldState = "",
                     newState = name,
-                    timeStamp = Clock.System.todayIn(TimeZone.currentSystemDefault())
+                    timeStamp = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
                 )
             )
             consoleIO.showWithLine("✅ State updated:\n$updated")
