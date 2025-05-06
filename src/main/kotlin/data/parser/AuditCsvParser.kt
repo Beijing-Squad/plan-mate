@@ -1,7 +1,7 @@
 package data.parser
 
 import data.csvDataSource.csv.CsvParser
-import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalDateTime
 import logic.entities.ActionType
 import logic.entities.Audit
 import logic.entities.EntityType
@@ -39,7 +39,7 @@ class AuditCsvParser : CsvParser<Audit> {
             action = ActionType.valueOf(parts[5]),
             oldState = parts[6].ifEmpty { null },
             newState = parts[7].ifEmpty { null },
-            timeStamp = LocalDate.parse(parts[8])
+            timeStamp = LocalDateTime.parse(parts[8])
         )
     }
 
