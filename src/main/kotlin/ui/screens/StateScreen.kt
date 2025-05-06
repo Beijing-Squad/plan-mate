@@ -1,5 +1,6 @@
 package ui.screens
 
+import format
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -61,23 +62,25 @@ class StateScreen(
             val name = getInputWithLabel("📛 Enter State Name: ")
             val projectId = getInputWithLabel("📁 Enter Project ID: ")
             val role = getRoleInput()
-
+            val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
             val state = State(id = id, name = name, projectId = projectId)
 
             val result = addStateUseCase.addState(state, role)
-            addAudit.addAuditLog(
-                Audit(
-                    id = Uuid.random(),
-                    userRole = role,
-                    userName = sessionManagerUseCase.getCurrentUser()!!.userName,
-                    action = ActionType.UPDATE,
-                    entityType = EntityType.PROJECT,
-                    entityId = projectId,
-                    oldState = "",
-                    newState = name,
-                    timeStamp = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+            sessionManagerUseCase.getCurrentUser()?.userName?.let { userName ->
+                val actionDetails = "Admin $userName added new state ${state.id} with name '$name' at ${now.format()}"
+                addAudit.addAuditLog(
+                    Audit(
+                        id = Uuid.random(),
+                        userRole = role,
+                        userName = sessionManagerUseCase.getCurrentUser()!!.userName,
+                        action = ActionType.UPDATE,
+                        entityType = EntityType.PROJECT,
+                        entityId = projectId,
+                        actionDetails = actionDetails,
+                        timeStamp = now
+                    )
                 )
-            )
+            }
             showResult(result, "added")
         } catch (e: Exception) {
             consoleIO.showWithLine("❌ ${e.message}")
@@ -88,6 +91,7 @@ class StateScreen(
         try {
             val id = getInputWithLabel("🆔 Enter State ID to delete: ")
             val role = getRoleInput()
+            val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
 
             val state = State(id = id, name = "", projectId = "")
             val result = deleteStateUseCase.deleteState(state, role)
@@ -104,22 +108,24 @@ class StateScreen(
             val name = getInputWithLabel("📛 Enter New State Name: ")
             val projectId = getInputWithLabel("📁 Enter New Project ID: ")
             val role = getRoleInput()
-
+            val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
             val state = State(id = id, name = name, projectId = projectId)
             val updated = updateStateUseCase.updateState(state, role)
-            addAudit.addAuditLog(
-                Audit(
-                    id = Uuid.random(),
-                    userRole = role,
-                    userName = sessionManagerUseCase.getCurrentUser()!!.userName,
-                    action = ActionType.UPDATE,
-                    entityType = EntityType.PROJECT,
-                    entityId = projectId,
-                    oldState = "",
-                    newState = name,
-                    timeStamp = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+            sessionManagerUseCase.getCurrentUser()?.userName?.let { userName ->
+                val actionDetails = "Admin $userName updated state ${state.id} with name '$name' at ${now.format()}"
+                addAudit.addAuditLog(
+                    Audit(
+                        id = Uuid.random(),
+                        userRole = role,
+                        userName = sessionManagerUseCase.getCurrentUser()!!.userName,
+                        action = ActionType.UPDATE,
+                        entityType = EntityType.PROJECT,
+                        entityId = projectId,
+                        actionDetails = actionDetails,
+                        timeStamp = now
+                    )
                 )
-            )
+            }
             consoleIO.showWithLine("✅ State updated:\n$updated")
         } catch (e: Exception) {
             consoleIO.showWithLine("❌ ${e.message}")
