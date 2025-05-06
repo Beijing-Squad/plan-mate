@@ -11,14 +11,14 @@ import org.junit.jupiter.api.assertThrows
 import kotlin.test.Test
 import kotlin.uuid.ExperimentalUuidApi
 
-class GetStateByIdUseCaseTest {
+class GetTaskStateByIdUseCaseTest {
     private lateinit var statesRepository: StatesRepository
-    private lateinit var getStateByIdUseCase: GetStateByIdUseCase
+    private lateinit var getTaskStateByIdUseCase: GetTaskStateByIdUseCase
 
     @BeforeEach
     fun setup() {
         statesRepository = mockk()
-        getStateByIdUseCase = GetStateByIdUseCase(statesRepository)
+        getTaskStateByIdUseCase = GetTaskStateByIdUseCase(statesRepository)
     }
 
     @Test
@@ -29,7 +29,7 @@ class GetStateByIdUseCaseTest {
         every { statesRepository.getStateById("456") } returns expectedState
 
         // When
-        val result = getStateByIdUseCase.getStateById(stateId = "456")
+        val result = getTaskStateByIdUseCase.getStateById(stateId = "456")
 
         // Then
         assertThat(result).isEqualTo(expectedState)
@@ -38,20 +38,18 @@ class GetStateByIdUseCaseTest {
     @OptIn(ExperimentalUuidApi::class)
     @Test
     fun `should throw exception when state id does not exist`() {
-        val errorMessage = "Not found states with this project id"
         val state = createState(id = "999")
-
         val states = listOf(
             createState(),
             createState()
         )
 
         every { statesRepository.getAllStates() } returns states
-        every { statesRepository.getStateById(state.id) } returns null
+        every { statesRepository.getStateById(state.id) } throws StateNotFoundException()
 
         // When & Then
         assertThrows<StateNotFoundException> {
-            getStateByIdUseCase.getStateById(state.id)
+            getTaskStateByIdUseCase.getStateById(state.id)
         }
     }
 }

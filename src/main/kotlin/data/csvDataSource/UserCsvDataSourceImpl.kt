@@ -1,14 +1,20 @@
 package data.csvDataSource
 
 import data.csvDataSource.csv.CsvDataSourceImpl
+import data.repository.PasswordHashingDataSource
+import data.repository.ValidationUserDataSource
 import data.repository.dataSource.UserDataSource
 import logic.entities.User
 import logic.entities.exceptions.UserNotFoundException
 import kotlin.uuid.ExperimentalUuidApi
 
 class UserCsvDataSourceImpl(
-    private val csvDataSource: CsvDataSourceImpl<User>
+    private val csvDataSource: CsvDataSourceImpl<User>,
+    private val validationUserDataSource: ValidationUserDataSource,
+    private val mD5HashPasswordImpl: PasswordHashingDataSource
 ) : UserDataSource {
+
+    private val users = csvDataSource.loadAllDataFromFile().toMutableList()
 
     override fun getAllUsers(): List<User> {
         return csvDataSource
@@ -27,13 +33,17 @@ class UserCsvDataSourceImpl(
 
     @OptIn(ExperimentalUuidApi::class)
     override fun updateUser(user: User): User {
-        val users = csvDataSource.loadAllDataFromFile().toMutableList()
+        validationUserDataSource.validateUsername(user.userName)
+        validationUserDataSource.validatePassword(user.password)
         val currentUser = getUserByUserId(user.id.toString())
-        val userUpdated = currentUser
-            .copy(userName = user.userName, password = user.password)
-        users[users.indexOf(currentUser)] = userUpdated
-        csvDataSource.updateFile(users)
-        return currentUser
+        val passwordToUse = if (user.password != currentUser.password) {
+            mD5HashPasswordImpl.hashPassword(user.password)
+        } else {
+            currentUser.password
+        }
+        val updatedUser = currentUser
+            .copy(userName = user.userName, password = passwordToUse)
+        csvDataSource.updateItem(updatedUser)
+        return updatedUser
     }
-
 }

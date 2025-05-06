@@ -1,5 +1,6 @@
 package ui.screens
 
+import format
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -111,6 +112,7 @@ class ProjectManagementScreen(
             consoleIO.showWithLine("\u001B[32m✅ Project updated successfully.\u001B[0m")
 
             sessionManager.getCurrentUser()?.userName?.let { userName ->
+                val actionDetails = "Admin $userName updated project ${updated.id} with name '$name' at ${now.format()}"
                 addAudit.addAuditLog(
                     Audit(
                         id = Uuid.random(),
@@ -119,8 +121,7 @@ class ProjectManagementScreen(
                         action = ActionType.UPDATE,
                         entityType = EntityType.PROJECT,
                         entityId = updated.id.toString(),
-                        oldState = updated.name,
-                        newState = updated.description,
+                        actionDetails = actionDetails,
                         timeStamp = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
                     )
                 )
@@ -138,7 +139,6 @@ class ProjectManagementScreen(
             val desc = getInput() ?: return
             consoleIO.show("\u001B[32mEnter created by (user ID): \u001B[0m")
             val createdBy = getInput() ?: return
-
             val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
             val newProject = Project(
                 name = name,
@@ -150,20 +150,23 @@ class ProjectManagementScreen(
 
             addProjectUseCase.addProject(newProject)
             consoleIO.showWithLine("\u001B[32m✅ Project added successfully.\u001B[0m")
+            sessionManager.getCurrentUser()?.userName?.let { userName ->
+                val actionDetails =
+                    "Admin $userName created project ${newProject.id} with name '$name' at ${now.format()}"
 
-            addAudit.addAuditLog(
-                Audit(
-                    id = Uuid.random(),
-                    userRole = userRole,
-                    userName = createdBy,
-                    action = ActionType.CREATE,
-                    entityType = EntityType.PROJECT,
-                    entityId = newProject.id.toString(),
-                    oldState = name,
-                    newState = desc,
-                    timeStamp = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+                addAudit.addAuditLog(
+                    Audit(
+                        id = Uuid.random(),
+                        userRole = userRole,
+                        userName = createdBy,
+                        action = ActionType.CREATE,
+                        entityType = EntityType.PROJECT,
+                        entityId = newProject.id.toString(),
+                        actionDetails = actionDetails,
+                        timeStamp = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+                    )
                 )
-            )
+            }
         } catch (e: Exception) {
             consoleIO.showWithLine("\u001B[31m❌ ${e.message}\u001B[0m")
         }
@@ -173,11 +176,11 @@ class ProjectManagementScreen(
         try {
             consoleIO.show("\u001B[32mEnter project ID to delete: \u001B[0m")
             val id = getInput() ?: return
-
+            val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
             deleteProjectUseCase.deleteProject(id)
             consoleIO.showWithLine("\u001B[32m✅ Project deleted successfully.\u001B[0m")
-
             sessionManager.getCurrentUser()?.userName?.let { userName ->
+                val actionDetails = "Admin $userName deleted project $id with name '$name' at ${now.format()}"
                 addAudit.addAuditLog(
                     Audit(
                         id = Uuid.random(),
@@ -186,9 +189,8 @@ class ProjectManagementScreen(
                         action = ActionType.DELETE,
                         entityType = EntityType.PROJECT,
                         entityId = id,
-                        oldState = "",
-                        newState = "",
-                        timeStamp = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+                        actionDetails = actionDetails,
+                        timeStamp = now
                     )
                 )
             }
@@ -196,6 +198,7 @@ class ProjectManagementScreen(
             consoleIO.showWithLine("\u001B[31m❌ ${e.message}\u001B[0m")
         }
     }
+
     private fun showProjectInfo(project: Project) {
         consoleIO.showWithLine(
             """

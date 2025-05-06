@@ -12,7 +12,6 @@ data class Audit(
     val entityId: String,
     val entityType: EntityType,
     val action: ActionType,
-    val oldState: String?,
-    val newState: String?,
+    val actionDetails : String?,
     val timeStamp: LocalDateTime
 )

@@ -4,15 +4,13 @@ import logic.useCases.audit.AddAuditLogUseCase
 import logic.useCases.audit.GetAllAuditLogsUseCase
 import logic.useCases.audit.GetAuditLogsByProjectIdUseCase
 import logic.useCases.audit.GetAuditLogsByTaskIdUseCase
-import logic.useCases.project.*
 import logic.useCases.authentication.LoginUserAuthenticationUseCase
 import logic.useCases.authentication.RegisterUserAuthenticationUseCase
 import logic.useCases.authentication.SessionManagerUseCase
-import logic.useCases.user.GetAllUsersUseCase
-import logic.useCases.user.GetUserByUserIdUseCase
-import logic.useCases.user.UpdateUserUseCase
+import logic.useCases.project.*
 import logic.useCases.state.*
 import logic.useCases.task.*
+import logic.useCases.user.*
 import org.koin.dsl.module
 
 val useCaseModule = module {
@@ -26,20 +24,21 @@ val useCaseModule = module {
     single { RegisterUserAuthenticationUseCase(get()) }
     single { SessionManagerUseCase() }
     // state use cases
-    single { AddStateUseCase(get(),get()) }
-    single { DeleteStateUseCase(get()) }
-    single { GetStateByIdUseCase(get()) }
+    single { AddTaskStateUseCase(get(), get()) }
+    single { DeleteTaskStateUseCase(get(), get()) }
+    single { GetTaskStateByIdUseCase(get()) }
     single { GetStatesByProjectIdUseCase(get()) }
-    single { GetAllStatesUseCase(get()) }
-    single { UpdateStateUseCase(get()) }
+    single { GetAllTaskStatesUseCase(get()) }
+    single { UpdateTaskStateUseCase(get(), get()) }
 
     single { GetAllUsersUseCase(get()) }
-    single { GetUserByUserIdUseCase(get()) }
-    single { UpdateUserUseCase(get(), get()) }
-    single { AddAuditLogUseCase(get())}
-    single { GetAllAuditLogsUseCase(get())}
-    single { GetAuditLogsByProjectIdUseCase(get())}
-    single { GetAuditLogsByTaskIdUseCase(get())}
+    single { GetUserByIdUseCase(get()) }
+    single { UpdateUserUseCase(get()) }
+
+    single { AddAuditLogUseCase(get()) }
+    single { GetAllAuditLogsUseCase(get()) }
+    single { GetAuditLogsByProjectIdUseCase(get()) }
+    single { GetAuditLogsByTaskIdUseCase(get()) }
 
     // task use cases
     single { AddTaskUseCase(get()) }
