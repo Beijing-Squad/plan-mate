@@ -6,7 +6,7 @@ import logic.repository.TasksRepository
 class GetAllTasksUseCase(
     private val tasksRepository: TasksRepository
 ) {
-    suspend fun getAllTasks(): List<Task> {
+     fun getAllTasks(): List<Task> {
         return tasksRepository.getAllTasks()
     }
 }

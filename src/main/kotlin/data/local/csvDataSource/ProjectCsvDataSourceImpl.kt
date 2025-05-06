@@ -1,6 +1,6 @@
-package data.csvDataSource
+package data.local.csvDataSource
 
-import data.csvDataSource.csv.CsvDataSourceImpl
+import data.local.csvDataSource.csv.CsvDataSourceImpl
 import data.repository.dataSource.ProjectDataSource
 import logic.entities.Project
 

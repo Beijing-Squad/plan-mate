@@ -1,6 +1,7 @@
 package data.parser
 
 import com.google.common.truth.Truth.assertThat
+import data.local.csvDataSource.parser.StateCsvParser
 import fake.createState
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test

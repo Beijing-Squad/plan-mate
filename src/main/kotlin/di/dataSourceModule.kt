@@ -1,16 +1,21 @@
 package di
 
-import data.csvDataSource.*
-import data.csvDataSource.csv.CsvDataSourceImpl
-import data.mongoDataSource.AuditMongoDataSourceImpl
-import data.mongoDataSource.ProjectMongoDataSourceImpl
-import data.mongoDataSource.StateMongoDataSourceImpl
-import data.mongoDataSource.TaskMongoDataSourceImpl
-import data.parser.AuditCsvParser
-import data.parser.ProjectCsvParser
-import data.parser.StateCsvParser
-import data.parser.TaskCsvParser
-import data.parser.UserCsvParser
+import data.local.csvDataSource.AuditCsvDataSourceImpl
+import data.local.csvDataSource.AuthenticationCsvDataSourceImpl
+import data.local.csvDataSource.ProjectCsvDataSourceImpl
+import data.local.csvDataSource.StatesCsvDataSourceImpl
+import data.local.csvDataSource.TasksCsvDataSourceImpl
+import data.local.csvDataSource.UserCsvDataSourceImpl
+import data.local.csvDataSource.csv.CsvDataSourceImpl
+import data.remote.mongoDataSource.AuditMongoDataSourceImpl
+import data.remote.mongoDataSource.ProjectMongoDataSourceImpl
+import data.remote.mongoDataSource.StateMongoDataSourceImpl
+import data.remote.mongoDataSource.TaskMongoDataSourceImpl
+import data.local.csvDataSource.parser.AuditCsvParser
+import data.local.csvDataSource.parser.ProjectCsvParser
+import data.local.csvDataSource.parser.StateCsvParser
+import data.local.csvDataSource.parser.TaskCsvParser
+import data.local.csvDataSource.parser.UserCsvParser
 import data.repository.dataSource.*
 import data.repository.mongoDataSource.UserMongoDataSourceImpl
 import logic.entities.*
@@ -76,6 +81,7 @@ val dataSourceModule = module {
     single { StateMongoDataSourceImpl(get(named("stateDataSource"))) } bind StatesDataSource::class
     single { AuditMongoDataSourceImpl(get(named("auditDataSource"))) } bind AuditDataSource::class
 
-    single { AuthenticationCsvDataSourceImpl(get(named("authenticationDataSource")),get())
+    single {
+        AuthenticationCsvDataSourceImpl(get(named("authenticationDataSource")), get())
     }bind AuthenticationDataSource::class
 }

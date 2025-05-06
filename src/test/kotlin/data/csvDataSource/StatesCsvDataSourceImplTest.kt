@@ -1,7 +1,8 @@
 package data.csvDataSource
 
 import com.google.common.truth.Truth.assertThat
-import data.csvDataSource.csv.CsvDataSourceImpl
+import data.local.csvDataSource.StatesCsvDataSourceImpl
+import data.local.csvDataSource.csv.CsvDataSourceImpl
 import fake.createState
 import io.mockk.*
 import logic.entities.State

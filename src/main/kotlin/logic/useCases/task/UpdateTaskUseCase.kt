@@ -6,7 +6,7 @@ import logic.repository.TasksRepository
 class UpdateTaskUseCase(
     private val tasksRepository: TasksRepository
 ) {
-    suspend fun updateTask(task: Task): Task {
+     fun updateTask(task: Task): Task {
         return tasksRepository.updateTask(task)
     }
 }

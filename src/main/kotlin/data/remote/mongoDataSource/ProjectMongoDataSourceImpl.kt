@@ -1,7 +1,7 @@
-package data.mongoDataSource
+package data.remote.mongoDataSource
 
 import com.mongodb.kotlin.client.coroutine.MongoDatabase
-import data.mongoDataSource.mongoConnection.MongoConnection
+import data.remote.mongoDataSource.mongoConnection.MongoConnection
 import data.repository.dataSource.ProjectDataSource
 import kotlinx.coroutines.CoroutineScope
 import logic.entities.Project
@@ -11,7 +11,6 @@ class ProjectMongoDataSourceImpl(
     private val dbScope: CoroutineScope = MongoConnection.dbScope
 ) : ProjectDataSource {
     private val collection = database.getCollection<Project>("projects")
-
 
     override fun getAllProjects(): List<Project> {
         TODO("Not yet implemented")

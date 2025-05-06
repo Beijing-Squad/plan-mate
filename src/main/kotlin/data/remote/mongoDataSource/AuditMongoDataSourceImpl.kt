@@ -1,7 +1,7 @@
-package data.mongoDataSource
+package data.remote.mongoDataSource
 
 import com.mongodb.kotlin.client.coroutine.MongoDatabase
-import data.mongoDataSource.mongoConnection.MongoConnection
+import data.remote.mongoDataSource.mongoConnection.MongoConnection
 import data.repository.dataSource.AuditDataSource
 import kotlinx.coroutines.CoroutineScope
 import logic.entities.Audit
@@ -12,6 +12,7 @@ class AuditMongoDataSourceImpl(
     private val dbScope: CoroutineScope = MongoConnection.dbScope
 ) : AuditDataSource {
     private val collection = database.getCollection<Project>("audits")
+
     override fun getAllAuditLogs(): List<Audit> {
         TODO("Not yet implemented")
     }

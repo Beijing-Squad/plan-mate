@@ -1,8 +1,7 @@
-package data.mongoDataSource
+package data.remote.mongoDataSource
 
 import com.mongodb.kotlin.client.coroutine.MongoDatabase
-import data.mongoDataSource.mongoConnection.MongoConnection
-import data.mongoDataSource.mongoConnection.MongoConnection.database
+import data.remote.mongoDataSource.mongoConnection.MongoConnection
 import data.repository.dataSource.TasksDataSource
 import kotlinx.coroutines.CoroutineScope
 import logic.entities.Project
@@ -14,6 +13,7 @@ class TaskMongoDataSourceImpl (
     ) : TasksDataSource
 {
     private val collection = database.getCollection<Project>("tasks")
+
     override suspend fun getAllTasks(): List<Task> {
         TODO("Not yet implemented")
     }

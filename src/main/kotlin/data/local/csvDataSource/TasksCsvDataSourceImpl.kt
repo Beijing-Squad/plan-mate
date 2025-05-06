@@ -1,6 +1,6 @@
-package data.csvDataSource
+package data.local.csvDataSource
 
-import data.csvDataSource.csv.CsvDataSourceImpl
+import data.local.csvDataSource.csv.CsvDataSourceImpl
 import data.repository.dataSource.TasksDataSource
 import logic.entities.Task
 import logic.entities.exceptions.InvalidInputException

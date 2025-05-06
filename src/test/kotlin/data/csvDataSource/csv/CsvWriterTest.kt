@@ -1,6 +1,7 @@
 package data.csvDataSource.csv
 
 import com.google.common.truth.Truth.assertThat
+import data.local.csvDataSource.csv.CsvWriter
 import logic.entities.exceptions.CsvFileExceptions
 import logic.entities.exceptions.EmptyHeaderException
 import org.junit.jupiter.api.AfterEach

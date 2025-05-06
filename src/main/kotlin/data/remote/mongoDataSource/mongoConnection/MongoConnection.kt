@@ -1,4 +1,4 @@
-package data.mongoDataSource.mongoConnection
+package data.remote.mongoDataSource.mongoConnection
 
 import com.mongodb.ConnectionString
 import com.mongodb.MongoClientSettings

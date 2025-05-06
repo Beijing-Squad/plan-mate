@@ -1,7 +1,7 @@
 package data.repository.mongoDataSource
 
 import com.mongodb.kotlin.client.coroutine.MongoDatabase
-import data.mongoDataSource.mongoConnection.MongoConnection
+import data.remote.mongoDataSource.mongoConnection.MongoConnection
 import data.repository.dataSource.UserDataSource
 import kotlinx.coroutines.CoroutineScope
 import logic.entities.User

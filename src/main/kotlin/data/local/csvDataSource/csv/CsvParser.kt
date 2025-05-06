@@ -1,4 +1,4 @@
-package data.csvDataSource.csv
+package data.local.csvDataSource.csv
 
 interface CsvParser<T> {
 
