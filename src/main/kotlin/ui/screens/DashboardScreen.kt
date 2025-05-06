@@ -46,6 +46,6 @@ abstract class DashboardScreen(
     protected fun logoutUser() {
         sessionManagerUseCase.clearCurrentUser()
         consoleIO.showWithLine("✅ Successfully logged out.")
-        authenticationScreen.start() // Redirect to authentication screen
+        authenticationScreen.start()
     }
 }
