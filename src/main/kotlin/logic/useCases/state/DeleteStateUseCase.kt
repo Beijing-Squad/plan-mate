@@ -1,29 +1,16 @@
 package logic.useCases.state
 
 import logic.entities.State
-import logic.entities.UserRole
-import logic.entities.exceptions.StateNotFoundException
-import logic.entities.exceptions.StateUnauthorizedUserException
 import logic.repository.StatesRepository
 import kotlin.uuid.ExperimentalUuidApi
 
 class DeleteStateUseCase(
-    private val statesRepository: StatesRepository
+    private val statesRepository: StatesRepository,
+    private val getStateByIdUseCase: GetStateByIdUseCase
 ) {
     @OptIn(ExperimentalUuidApi::class)
-    fun deleteState(state: State, role: UserRole): Boolean {
-
-        if (role != UserRole.ADMIN) {
-            throw StateUnauthorizedUserException("user should be Admin")
-        }
-
-        if (!isStateExist(state.id)) {
-            throw StateNotFoundException("the state with this id not found")
-        }
-
-        return statesRepository.deleteState(state)
+    fun deleteState(state: State): Boolean {
+        val existedState = getStateByIdUseCase.getStateById(state.id)
+        return statesRepository.deleteState(existedState)
     }
-
-    @OptIn(ExperimentalUuidApi::class)
-    fun isStateExist(stateId: String): Boolean = statesRepository.getAllStates().any { it.id == stateId }
 }

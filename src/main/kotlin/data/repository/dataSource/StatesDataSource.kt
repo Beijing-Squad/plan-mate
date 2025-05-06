@@ -8,7 +8,7 @@ interface StatesDataSource {
 
     fun getStatesByProjectId(projectId: String): List<State>
 
-    fun getStateById(stateId: String): State?
+    fun getStateById(stateId: String): State
 
     fun addState(state: State): Boolean
 

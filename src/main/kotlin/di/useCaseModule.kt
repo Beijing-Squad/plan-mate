@@ -6,6 +6,7 @@ import logic.useCases.audit.GetAuditLogsByProjectIdUseCase
 import logic.useCases.audit.GetAuditLogsByTaskIdUseCase
 import logic.useCases.project.*
 import logic.useCases.authentication.LoginUserAuthenticationUseCase
+import logic.useCases.authentication.MD5PasswordUseCase
 import logic.useCases.authentication.RegisterUserAuthenticationUseCase
 import logic.useCases.authentication.SessionManagerUseCase
 import logic.useCases.user.GetAllUsersUseCase
@@ -22,24 +23,28 @@ val useCaseModule = module {
     single { GetAllProjectsUseCase(get()) }
     single { GetProjectByIdUseCase(get()) }
     single { UpdateProjectUseCase(get()) }
-    single { LoginUserAuthenticationUseCase(get(), get()) }
-    single { RegisterUserAuthenticationUseCase(get()) }
+    single { MD5PasswordUseCase() }
+    single { LoginUserAuthenticationUseCase(get(), get(), get()) }
+    single { RegisterUserAuthenticationUseCase(get(), get(), get()) }
+    single { SessionManager() }
     single { SessionManagerUseCase() }
+
+
     // state use cases
-    single { AddStateUseCase(get(),get()) }
-    single { DeleteStateUseCase(get()) }
+    single { AddStateUseCase(get(), get()) }
+    single { DeleteStateUseCase(get(), get()) }
     single { GetStateByIdUseCase(get()) }
     single { GetStatesByProjectIdUseCase(get()) }
     single { GetAllStatesUseCase(get()) }
-    single { UpdateStateUseCase(get()) }
+    single { UpdateStateUseCase(get(), get()) }
 
     single { GetAllUsersUseCase(get()) }
     single { GetUserByUserIdUseCase(get()) }
-    single { UpdateUserUseCase(get(), get()) }
-    single { AddAuditLogUseCase(get())}
-    single { GetAllAuditLogsUseCase(get())}
-    single { GetAuditLogsByProjectIdUseCase(get())}
-    single { GetAuditLogsByTaskIdUseCase(get())}
+    single { UpdateUserUseCase(get(), get(), get()) }
+    single { AddAuditLogUseCase(get()) }
+    single { GetAllAuditLogsUseCase(get()) }
+    single { GetAuditLogsByProjectIdUseCase(get()) }
+    single { GetAuditLogsByTaskIdUseCase(get()) }
 
     // task use cases
     single { AddTaskUseCase(get()) }
