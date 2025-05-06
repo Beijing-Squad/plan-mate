@@ -35,9 +35,18 @@ class UserCsvDataSourceImpl(
     override fun updateUser(user: User): User {
         validationUserDataSource.validateUsername(user.userName)
         validationUserDataSource.validatePassword(user.password)
+        val userIndex = users.indexOfFirst { it.id.toString() == user.id.toString() }
+        if (userIndex == -1) {
+            throw UserNotFoundException("User not found when trying to update")
+        }
         val currentUser = getUserByUserId(user.id.toString())
+        val passwordToUse = if (user.password != currentUser.password) {
+            mD5HashPasswordImpl.hashPassword(user.password)
+        } else {
+            currentUser.password
+        }
         val updatedUser = currentUser
-            .copy(userName = user.userName, password = mD5HashPasswordImpl.hashPassword(user.password))
+            .copy(userName = user.userName, password = passwordToUse)
         users[users.indexOf(currentUser)] = updatedUser
         csvDataSource.updateFile(users)
         return updatedUser

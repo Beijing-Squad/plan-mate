@@ -56,7 +56,6 @@ class UserScreen(
             "0" -> return
             else -> consoleIO.showWithLine("\u001B[31m❌ Invalid Option\u001B[0m")
         }
-        execute()
     }
 
     @OptIn(ExperimentalUuidApi::class)
@@ -87,10 +86,10 @@ class UserScreen(
     @OptIn(ExperimentalUuidApi::class)
     private fun onClickUpdateUser() {
         consoleIO.showWithLine("\n\u001B[36m✏️ Update User\u001B[0m")
-        val userId = sessionManagerUseCase.getCurrentUser()?.id.toString()
+        val userId = sessionManagerUseCase.getCurrentUser()!!.id
 
         try {
-            val user = userId.let { getUserByUserId.getUserByUserId(it) }
+            val user =  getUserByUserId.getUserByUserId(userId.toString())
             showCurrentUserDetails(user)
             updateUserMenu(user)
         } catch (e: Exception) {
@@ -146,16 +145,14 @@ class UserScreen(
 
             if (newPassword.isNullOrBlank()) {
                 consoleIO.showWithLine("\u001B[31m❌ Password cannot be empty!\u001B[0m")
-                continue
-            }
-
-            if (newPassword != confirmPassword) {
+            }else if (newPassword != confirmPassword) {
                 consoleIO.showWithLine("\u001B[31m❌ Passwords do not match! Please try again.\u001B[0m")
-                continue
+            } else{
+                val freshUserData = getUserByUserId.getUserByUserId(user.id.toString())
+                updateUserInSystem(freshUserData.copy(userName = freshUserData.userName,password = newPassword))
+                return
             }
 
-            updateUserInSystem(user.copy(password = newPassword))
-            return
         }
     }
 
@@ -164,7 +161,8 @@ class UserScreen(
         consoleIO.show("\u001B[32mEnter new username: \u001B[0m")
         val newUsername = getInput()
         if (!newUsername.isNullOrBlank()) {
-            updateUserInSystem(user.copy(userName = newUsername))
+            val freshUserData = getUserByUserId.getUserByUserId(user.id.toString())
+            updateUserInSystem(freshUserData.copy(userName = newUsername, password = freshUserData.password))
             return
         } else {
             consoleIO.showWithLine("\u001B[31m❌ Username cannot be empty!\u001B[0m")
