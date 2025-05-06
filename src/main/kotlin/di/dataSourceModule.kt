@@ -39,7 +39,7 @@ val dataSourceModule = module {
         )
     }
     single(named("stateDataSource")) {
-        CsvDataSourceImpl<State>(
+        CsvDataSourceImpl<TaskState>(
             get(named("stateReader")),
             get(named("stateWriter")),
             get<TaskStateCsvParser>()

@@ -1,6 +1,6 @@
 package logic.useCases.state
 
-import logic.entities.State
+import logic.entities.TaskState
 import logic.entities.exceptions.InvalidStateNameException
 import logic.entities.exceptions.ProjectNotFoundException
 import logic.entities.exceptions.StateAlreadyExistException
@@ -13,20 +13,20 @@ class AddTaskStateUseCase(
     private val getAllProjectsUseCase: GetAllProjectsUseCase,
 ) {
     @OptIn(ExperimentalUuidApi::class)
-    fun addState(state: State): Boolean {
+    fun addState(taskState: TaskState): Boolean {
         val isStateExist = statesRepository.getAllStates().any {
-            it.id == state.id
+            it.id == taskState.id
         }
         val isProjectExist = getAllProjectsUseCase.getAllProjects().any {
-            it.id.toString() == state.projectId
+            it.id.toString() == taskState.projectId
         }
 
-        if (state.name.isBlank()) throw InvalidStateNameException()
+        if (taskState.name.isBlank()) throw InvalidStateNameException()
 
         if (isStateExist) throw StateAlreadyExistException()
 
         if (!isProjectExist) throw ProjectNotFoundException()
 
-        return statesRepository.addState(state)
+        return statesRepository.addState(taskState)
     }
 }

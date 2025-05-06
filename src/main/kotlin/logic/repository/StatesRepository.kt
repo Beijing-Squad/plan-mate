@@ -1,18 +1,18 @@
 package logic.repository
 
-import logic.entities.State
+import logic.entities.TaskState
 
 interface StatesRepository{
-    fun getAllStates(): List<State>
+    fun getAllStates(): List<TaskState>
 
-    fun getStatesByProjectId(projectId: String): List<State>
+    fun getStatesByProjectId(projectId: String): List<TaskState>
 
-    fun getStateById(stateId: String): State
+    fun getStateById(stateId: String): TaskState
 
-    fun addState(state: State): Boolean
+    fun addState(taskState: TaskState): Boolean
 
-    fun updateState(state: State): State
+    fun updateState(taskState: TaskState): TaskState
 
-    fun deleteState(state: State): Boolean
+    fun deleteState(taskState: TaskState): Boolean
 
 }

@@ -4,7 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import data.csvDataSource.csv.CsvDataSourceImpl
 import fake.createState
 import io.mockk.*
-import logic.entities.State
+import logic.entities.TaskState
 import logic.entities.exceptions.CsvWriteException
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -13,7 +13,7 @@ import kotlin.test.assertEquals
 
 class TaskStatesCsvDataSourceImplTest {
 
-    private lateinit var csvDataSource: CsvDataSourceImpl<State>
+    private lateinit var csvDataSource: CsvDataSourceImpl<TaskState>
     private lateinit var statesCsvDataSource: TaskStatesCsvDataSourceImpl
 
     @BeforeEach

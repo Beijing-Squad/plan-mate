@@ -2,20 +2,20 @@ package data.csvDataSource
 
 import data.csvDataSource.csv.CsvDataSourceImpl
 import data.repository.dataSource.StatesDataSource
-import logic.entities.State
+import logic.entities.TaskState
 import logic.entities.exceptions.StateException
 import logic.entities.exceptions.StateNotFoundException
 import kotlin.uuid.ExperimentalUuidApi
 
 class TaskStatesCsvDataSourceImpl(
-    private val csvDataSource: CsvDataSourceImpl<State>
+    private val csvDataSource: CsvDataSourceImpl<TaskState>
 ) : StatesDataSource {
     private val states = getAllStates().toMutableList()
 
     @OptIn(ExperimentalUuidApi::class)
-    override fun addState(state: State): Boolean {
+    override fun addState(taskState: TaskState): Boolean {
         return try {
-            csvDataSource.appendToFile(state)
+            csvDataSource.appendToFile(taskState)
             true
         } catch (e: StateException) {
             false
@@ -23,37 +23,37 @@ class TaskStatesCsvDataSourceImpl(
     }
 
     @OptIn(ExperimentalUuidApi::class)
-    override fun deleteState(state: State): Boolean {
+    override fun deleteState(taskState: TaskState): Boolean {
         return try {
-            csvDataSource.deleteById(state.id.toString())
+            csvDataSource.deleteById(taskState.id.toString())
             true
         } catch (e: StateException) {
             false
         }
     }
 
-    override fun getAllStates(): List<State> {
+    override fun getAllStates(): List<TaskState> {
         return csvDataSource.loadAllDataFromFile()
     }
 
     @OptIn(ExperimentalUuidApi::class)
-    override fun getStateById(stateId: String): State {
+    override fun getStateById(stateId: String): TaskState {
         return getAllStates()
             .find { it.id.toString() == stateId }
             ?: throw StateNotFoundException()
     }
 
-    override fun getStatesByProjectId(projectId: String): List<State> {
+    override fun getStatesByProjectId(projectId: String): List<TaskState> {
         return getAllStates()
             .filter { it.projectId == projectId }
     }
 
     @OptIn(ExperimentalUuidApi::class)
-    override fun updateState(state: State): State {
-        return getStateById(state.id.toString()).let { currentState ->
+    override fun updateState(taskState: TaskState): TaskState {
+        return getStateById(taskState.id.toString()).let { currentState ->
             val updatedState = currentState.copy(
-                name = state.name,
-                projectId = state.projectId
+                name = taskState.name,
+                projectId = taskState.projectId
             )
             val updatedStates = states.map { if (it == currentState) updatedState else it }
             csvDataSource.updateFile(updatedStates)

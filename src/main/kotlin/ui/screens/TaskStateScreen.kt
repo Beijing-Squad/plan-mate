@@ -68,13 +68,13 @@ class TaskStateScreen(
         try {
             val name = getInputWithLabel("📛 Enter State Name: ")
             val projectId = getInputWithLabel("📁 Enter Project ID: ")
-            val state = State(name = name, projectId = projectId)
-            val result = addTaskStateUseCase.addState(state)
+            val taskState = TaskState(name = name, projectId = projectId)
+            val result = addTaskStateUseCase.addState(taskState)
             val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
 
             sessionManagerUseCase.getCurrentUser()?.userName?.let { userName ->
                 val actionDetails =
-                    "Admin $userName added new state ${state.id} with name '$name' at ${now.format()}"
+                    "Admin $userName added new state ${taskState.id} with name '$name' at ${now.format()}"
 
                 addAudit.addAuditLog(
                     Audit(
@@ -106,8 +106,8 @@ class TaskStateScreen(
     private fun onChooseDeleteState() {
         try {
             val id = Uuid.parse(getInputWithLabel("🆔 Enter State ID to delete: "))
-            val state = State(id = id, name = "", projectId = "")
-            val result = deleteTaskStateUseCase.deleteState(state)
+            val taskState = TaskState(id = id, name = "", projectId = "")
+            val result = deleteTaskStateUseCase.deleteState(taskState)
             showResult(result, "deleted")
         } catch (e: Exception) {
             consoleIO.showWithLine("❌ ${e.message}")
@@ -120,11 +120,11 @@ class TaskStateScreen(
             val id = Uuid.parse(getInputWithLabel("🆔 Enter State ID to update: "))
             val name = getInputWithLabel("📛 Enter New State Name: ")
             val projectId = getInputWithLabel("📁 Enter New Project ID: ")
-            val state = State(id = id, name = name, projectId = projectId)
+            val taskState = TaskState(id = id, name = name, projectId = projectId)
             val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
-            val updated = updateTaskStateUseCase.updateState(state)
+            val updated = updateTaskStateUseCase.updateState(taskState)
             sessionManagerUseCase.getCurrentUser()?.userName?.let { userName ->
-                val actionDetails = "Admin $userName updated state ${state.id} with name '$name' at ${now.format()}"
+                val actionDetails = "Admin $userName updated state ${taskState.id} with name '$name' at ${now.format()}"
                 addAudit.addAuditLog(
                     Audit(
                         id = Uuid.random(),
@@ -197,12 +197,12 @@ class TaskStateScreen(
     }
 
     @OptIn(ExperimentalUuidApi::class)
-    private fun formatState(state: State): String {
+    private fun formatState(taskState: TaskState): String {
         return """
             ╔═══════════════════════════════════════════════════════╗
-            ║ 🆔 State ID  : ${state.id.toString().padEnd(31)}   ║
-            ║ 📛 Name      : ${state.name.padEnd(39)}║
-            ║ 🗂️ Project ID: ${state.projectId.padEnd(39)}║
+            ║ 🆔 State ID  : ${taskState.id.toString().padEnd(31)}   ║
+            ║ 📛 Name      : ${taskState.name.padEnd(39)}║
+            ║ 🗂️ Project ID: ${taskState.projectId.padEnd(39)}║
             ╚═══════════════════════════════════════════════════════╝
         """.trimIndent()
     }

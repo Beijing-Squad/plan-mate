@@ -1,15 +1,15 @@
 package data.parser
 
 import data.csvDataSource.csv.CsvParser
-import logic.entities.State
+import logic.entities.TaskState
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
-class TaskStateCsvParser : CsvParser<State> {
+class TaskStateCsvParser : CsvParser<TaskState> {
     override fun header(): String = "id,name,projectId"
 
     @OptIn(ExperimentalUuidApi::class)
-    override fun serializer(item: State): String {
+    override fun serializer(item: TaskState): String {
         return listOf(
             item.id,
             item.name,
@@ -18,9 +18,9 @@ class TaskStateCsvParser : CsvParser<State> {
     }
 
     @OptIn(ExperimentalUuidApi::class)
-    override fun deserializer(content: String): State {
+    override fun deserializer(content: String): TaskState {
         val parts = content.split(",")
-        return State(
+        return TaskState(
             id = Uuid.parse(parts[0]),
             name = parts[1],
             projectId = parts[2]
@@ -28,7 +28,7 @@ class TaskStateCsvParser : CsvParser<State> {
     }
 
     @OptIn(ExperimentalUuidApi::class)
-    override fun getId(item: State): String {
+    override fun getId(item: TaskState): String {
         return item.id.toString()
     }
 }
