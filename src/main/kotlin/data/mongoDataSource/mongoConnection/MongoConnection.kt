@@ -7,7 +7,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 
 object MongoConnection {
-    private const val CONNECTION_STRING = "mongodb+srv://radwamohamed5033:itGzVSNEk5JDnN95@cluster0.pcitphl.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+    private val CONNECTION_STRING: String = System.getProperty("MONGO_CONNECTION_STRING")
 
     val client = MongoClient.Factory.create(
         MongoClientSettings.builder()
