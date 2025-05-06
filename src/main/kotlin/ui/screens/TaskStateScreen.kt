@@ -84,9 +84,8 @@ class TaskStateScreen(
                         action = ActionType.UPDATE,
                         entityType = EntityType.PROJECT,
                         entityId = projectId,
-                        oldState = "",
-                        newState = name,
-                        timeStamp = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+                        actionDetails = actionDetails,
+                        timeStamp = now
                     )
                 )
             }
@@ -103,9 +102,10 @@ class TaskStateScreen(
         }
     }
 
+    @OptIn(ExperimentalUuidApi::class)
     private fun onChooseDeleteState() {
         try {
-            val id = getInputWithLabel("🆔 Enter State ID to delete: ")
+            val id = Uuid.parse(getInputWithLabel("🆔 Enter State ID to delete: "))
             val state = State(id = id, name = "", projectId = "")
             val result = deleteTaskStateUseCase.deleteState(state)
             showResult(result, "deleted")
@@ -196,10 +196,11 @@ class TaskStateScreen(
         }
     }
 
+    @OptIn(ExperimentalUuidApi::class)
     private fun formatState(state: State): String {
         return """
             ╔═══════════════════════════════════════════════════════╗
-            ║ 🆔 State ID  : ${state.id.padEnd(31)}   ║
+            ║ 🆔 State ID  : ${state.id.toString().padEnd(31)}   ║
             ║ 📛 Name      : ${state.name.padEnd(39)}║
             ║ 🗂️ Project ID: ${state.projectId.padEnd(39)}║
             ╚═══════════════════════════════════════════════════════╝
