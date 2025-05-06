@@ -106,7 +106,7 @@ class TaskManagementScreen(
             projectId = projectId,
             title = title,
             description = description ?: "",
-            createdBy = createdBy.toString(),
+            createdBy = createdBy,
             stateId = stateId,
             createdAt = now,
             updatedAt = now
