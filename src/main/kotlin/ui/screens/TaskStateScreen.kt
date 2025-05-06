@@ -1,5 +1,6 @@
 package ui.screens
 
+import format
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -45,7 +46,7 @@ class TaskStateScreen(
     }
 
     override fun handleFeatureChoice() {
-        while (true){
+        while (true) {
             when (getInput()) {
                 "1" -> onChooseAddState()
                 "2" -> onChooseDeleteState()
@@ -69,20 +70,26 @@ class TaskStateScreen(
             val projectId = getInputWithLabel("📁 Enter Project ID: ")
             val state = State(name = name, projectId = projectId)
             val result = addTaskStateUseCase.addState(state)
+            val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
 
-            addAudit.addAuditLog(
-                Audit(
-                    id = Uuid.random(),
-                    userRole = UserRole.ADMIN,
-                    userName = sessionManagerUseCase.getCurrentUser()!!.userName,
-                    action = ActionType.UPDATE,
-                    entityType = EntityType.PROJECT,
-                    entityId = projectId,
-                    oldState = "",
-                    newState = name,
-                    timeStamp = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+            sessionManagerUseCase.getCurrentUser()?.userName?.let { userName ->
+                val actionDetails =
+                    "Admin $userName added new state ${state.id} with name '$name' at ${now.format()}"
+
+                addAudit.addAuditLog(
+                    Audit(
+                        id = Uuid.random(),
+                        userRole = UserRole.ADMIN,
+                        userName = sessionManagerUseCase.getCurrentUser()!!.userName,
+                        action = ActionType.UPDATE,
+                        entityType = EntityType.PROJECT,
+                        entityId = projectId,
+                        oldState = "",
+                        newState = name,
+                        timeStamp = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+                    )
                 )
-            )
+            }
 
             showResult(result, "added")
         } catch (e: StateAlreadyExistException) {
@@ -110,26 +117,27 @@ class TaskStateScreen(
     @OptIn(ExperimentalUuidApi::class)
     private fun onChooseUpdateState() {
         try {
-            val id = getInputWithLabel("🆔 Enter State ID to update: ")
+            val id = Uuid.parse(getInputWithLabel("🆔 Enter State ID to update: "))
             val name = getInputWithLabel("📛 Enter New State Name: ")
             val projectId = getInputWithLabel("📁 Enter New Project ID: ")
             val state = State(id = id, name = name, projectId = projectId)
+            val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
             val updated = updateTaskStateUseCase.updateState(state)
-
-            addAudit.addAuditLog(
-                Audit(
-                    id = Uuid.random(),
-                    userRole = UserRole.ADMIN,
-                    userName = sessionManagerUseCase.getCurrentUser()!!.userName,
-                    action = ActionType.UPDATE,
-                    entityType = EntityType.PROJECT,
-                    entityId = projectId,
-                    oldState = "",
-                    newState = name,
-                    timeStamp = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+            sessionManagerUseCase.getCurrentUser()?.userName?.let { userName ->
+                val actionDetails = "Admin $userName updated state ${state.id} with name '$name' at ${now.format()}"
+                addAudit.addAuditLog(
+                    Audit(
+                        id = Uuid.random(),
+                        userRole = UserRole.ADMIN,
+                        userName = sessionManagerUseCase.getCurrentUser()!!.userName,
+                        action = ActionType.UPDATE,
+                        entityType = EntityType.PROJECT,
+                        entityId = projectId,
+                        actionDetails = actionDetails,
+                        timeStamp = now
+                    )
                 )
-            )
-
+            }
             consoleIO.showWithLine("✅ State updated:\n${formatState(updated)}")
         } catch (e: Exception) {
             consoleIO.showWithLine("❌ ${e.message}")
