@@ -37,12 +37,12 @@ class UpdateTaskStateUseCaseTest {
             projectId = project.id.toString()
         )
         val newState = createState(
-            id = state.id,
+            id = state.id.toString(),
             name = "done",
             projectId = state.projectId
         )
 
-        every { getTaskStateByIdUseCase.getStateById(newState.id) } returns state
+        every { getTaskStateByIdUseCase.getStateById(newState.id.toString()) } returns state
         every { statesRepository.updateState(newState) } returns newState
 
         // when
@@ -58,7 +58,7 @@ class UpdateTaskStateUseCaseTest {
         // Given
         val newState = createState()
 
-        every { statesRepository.getStateById(newState.id) } throws StateNotFoundException()
+        every { statesRepository.getStateById(newState.id.toString()) } throws StateNotFoundException()
 
         // When & Then
         assertThrows<StateNotFoundException> {

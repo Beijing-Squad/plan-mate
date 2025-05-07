@@ -14,23 +14,23 @@ class TaskMongoDataSourceImpl (
 {
     private val collection = database.getCollection<Project>("tasks")
 
-    override suspend fun getAllTasks(): List<Task> {
+    override  fun getAllTasks(): List<Task> {
         TODO("Not yet implemented")
     }
 
-    override suspend  fun getTaskById(taskId: String): Task {
+    override   fun getTaskById(taskId: String): Task {
         TODO("Not yet implemented")
     }
 
-    override suspend  fun addTask(task: Task) {
+    override   fun addTask(task: Task) {
         TODO("Not yet implemented")
     }
 
-    override suspend  fun deleteTask(taskId: String) {
+    override   fun deleteTask(taskId: String) {
         TODO("Not yet implemented")
     }
 
-    override suspend  fun updateTask(updatedTask: Task): Task {
+    override   fun updateTask(updatedTask: Task): Task {
         TODO("Not yet implemented")
     }
 }

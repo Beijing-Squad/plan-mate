@@ -148,7 +148,7 @@ class TaskManagementScreen(
         tasks.forEach { task ->
             consoleIO.showWithLine(
                 """
-            ╭────────────────────────────────────────╮            
+            ╭────────────────────────────────────────╮
             │ ID: ${task.id}
             │ Title: ${task.title}
             │ Description: ${task.description}
@@ -171,7 +171,7 @@ class TaskManagementScreen(
             val task = getTaskByIdUseCase.getTaskById(id ?: "")
             consoleIO.showWithLine(
                 """
-            ╭─────────────────────────────────────────╮           
+            ╭─────────────────────────────────────────╮
             │ ID: ${task.id}
             │ Title: ${task.title}
             │ Description: ${task.description}
