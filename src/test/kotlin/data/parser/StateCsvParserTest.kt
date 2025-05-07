@@ -48,7 +48,7 @@ class StateCsvParserTest {
     fun `should return correct id from State object`() {
         // Given
         val fixedId = Uuid.parse("123e4567-e89b-12d3-a456-426614174000")
-        val state = createState(id = fixedId.toString())
+        val state = createState(id = fixedId)
 
         // When
         val result = parser.getId(state)
@@ -61,7 +61,7 @@ class StateCsvParserTest {
     fun `should serialize TaskState correctly`() {
         // Given
         val state = createState(
-            id = "11111111-1111-1111-1111-111111111111",
+            id = Uuid.parse("11111111-1111-1111-1111-111111111111"),
             name = "InProgress",
             projectId = "project-123"
         )
@@ -77,7 +77,7 @@ class StateCsvParserTest {
     fun `serialize and deserialize should result in the same TaskState`() {
         // Given
         val original = createState(
-            id = "22222222-2222-2222-2222-222222222222",
+            id = Uuid.parse("22222222-2222-2222-2222-222222222222"),
             name = "Review",
             projectId = "project-456"
         )

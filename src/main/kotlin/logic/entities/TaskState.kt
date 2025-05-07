@@ -7,5 +7,5 @@ import kotlin.uuid.Uuid
 data class TaskState (
     val id: Uuid = Uuid.random(),
     val name: String,
-    val projectId: String
+    val projectId: Uuid
 )

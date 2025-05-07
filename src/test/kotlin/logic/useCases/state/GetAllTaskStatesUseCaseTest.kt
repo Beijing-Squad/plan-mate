@@ -33,8 +33,8 @@ class GetAllTaskStatesUseCaseTest {
             createProject(name = "PlanMate Extended", createdBy = createdBy)
         )
         val states = listOf(
-            createState(id = "1", name = "In Progress", projectId = projects[0].id.toString()),
-            createState(id = "2", name = "Done", projectId = projects[1].id.toString())
+            createState(name = "In Progress", projectId = projects[0].id.toString()),
+            createState(name = "Done", projectId = projects[1].id.toString())
         )
 
         every { statesRepository.getAllStates() } returns states
@@ -57,13 +57,14 @@ class GetAllTaskStatesUseCaseTest {
         }
     }
 
+    @OptIn(ExperimentalUuidApi::class)
     @Test
     fun `should return the correct states`() {
         // Given
         val states = listOf(
-            createState(id = "1", name = "In Progress", projectId = "1"),
-            createState(id = "2", name = "Done", projectId = "2"),
-            createState(id = "3", name = "Blocked", projectId = "3")
+            createState(name = "In Progress", projectId = "550e8400-e29b-41d4-a716-446655440000"),
+            createState(name = "Done", projectId = "550e8400-e29b-41d4-a716-446655440000"),
+            createState(name = "Blocked", projectId = "550e8400-e29b-41d4-a716-446655440000")
         )
 
         every { statesRepository.getAllStates() } returns states

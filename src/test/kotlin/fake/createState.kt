@@ -6,13 +6,13 @@ import kotlin.uuid.Uuid
 
 @OptIn(ExperimentalUuidApi::class)
 fun createState(
-    id: String = "DefaultStateId",
+    id: Uuid = Uuid.random(),
     name: String = "defaultStateName",
-    projectId: String = "defaultProjectId"
+    projectId: String = Uuid.random().toString()
 ): TaskState {
     return TaskState(
-        id = Uuid.parse(id),
+        id = id,
         name = name,
-        projectId = projectId
+        projectId = Uuid.parse(projectId)
     )
 }

@@ -32,7 +32,7 @@ class DeleteTaskStateUseCaseTest {
         // Given
         val fixedId = Uuid.parse("123e4567-e89b-12d3-a456-426614174000")
         val project = createProject(name = "PlanMate Core Features", createdBy = "adminUser01")
-        val state = createState(id = fixedId.toString(), name = "In Progress", projectId = project.id.toString())
+        val state = createState(id = fixedId, name = "In Progress", projectId = project.id.toString())
         every { getTaskStateByIdUseCase.getStateById(state.id.toString()) } returns state
         every { statesRepository.deleteState(state) } returns true
 
@@ -49,7 +49,7 @@ class DeleteTaskStateUseCaseTest {
         // Given
         val errorMessage = "the name of the new state is empty"
         val project = createProject(name = "PlanMate Core Features", createdBy = "adminUser01")
-        val state = createState(id = "999", name = "Archived", projectId = project.id.toString())
+        val state = createState(name = "Archived", projectId = project.id.toString())
 
         every { statesRepository.getAllStates() } returns listOf()
         every { statesRepository.getStateById(state.id.toString()) } throws StateNotFoundException(errorMessage)

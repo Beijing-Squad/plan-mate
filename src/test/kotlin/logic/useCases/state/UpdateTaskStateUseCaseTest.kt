@@ -37,9 +37,9 @@ class UpdateTaskStateUseCaseTest {
             projectId = project.id.toString()
         )
         val newState = createState(
-            id = state.id.toString(),
+            id = state.id,
             name = "done",
-            projectId = state.projectId
+            projectId = state.projectId.toString()
         )
 
         every { getTaskStateByIdUseCase.getStateById(newState.id.toString()) } returns state
