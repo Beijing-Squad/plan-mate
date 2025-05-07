@@ -67,7 +67,7 @@ class TaskStateScreen(
     private fun onChooseAddState() {
         try {
             val name = getInputWithLabel("📛 Enter State Name: ")
-            val projectId = getInputWithLabel("📁 Enter Project ID: ")
+            val projectId = Uuid.parse(getInputWithLabel("📁 Enter Project ID: "))
             val taskState = TaskState(name = name, projectId = projectId)
             val result = addTaskStateUseCase.addState(taskState)
             val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
@@ -83,7 +83,7 @@ class TaskStateScreen(
                         userName = sessionManagerUseCase.getCurrentUser()!!.userName,
                         action = ActionType.UPDATE,
                         entityType = EntityType.PROJECT,
-                        entityId = projectId,
+                        entityId = projectId.toString(),
                         actionDetails = actionDetails,
                         timeStamp = now
                     )
@@ -106,7 +106,7 @@ class TaskStateScreen(
     private fun onChooseDeleteState() {
         try {
             val id = Uuid.parse(getInputWithLabel("🆔 Enter State ID to delete: "))
-            val taskState = TaskState(id = id, name = "", projectId = "")
+            val taskState = TaskState(id = id, name = "", projectId = Uuid.parse(""))
             val result = deleteTaskStateUseCase.deleteState(taskState)
             showResult(result, "deleted")
         } catch (e: Exception) {
@@ -119,7 +119,7 @@ class TaskStateScreen(
         try {
             val id = Uuid.parse(getInputWithLabel("🆔 Enter State ID to update: "))
             val name = getInputWithLabel("📛 Enter New State Name: ")
-            val projectId = getInputWithLabel("📁 Enter New Project ID: ")
+            val projectId = Uuid.parse(getInputWithLabel("📁 Enter New Project ID: "))
             val taskState = TaskState(id = id, name = name, projectId = projectId)
             val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
             val updated = updateTaskStateUseCase.updateState(taskState)
@@ -132,7 +132,7 @@ class TaskStateScreen(
                         userName = sessionManagerUseCase.getCurrentUser()!!.userName,
                         action = ActionType.UPDATE,
                         entityType = EntityType.PROJECT,
-                        entityId = projectId,
+                        entityId = projectId.toString(),
                         actionDetails = actionDetails,
                         timeStamp = now
                     )
@@ -202,7 +202,7 @@ class TaskStateScreen(
             ╔═══════════════════════════════════════════════════════╗
             ║ 🆔 State ID  : ${taskState.id.toString().padEnd(31)}   ║
             ║ 📛 Name      : ${taskState.name.padEnd(39)}║
-            ║ 🗂️ Project ID: ${taskState.projectId.padEnd(39)}║
+            ║ 🗂️ Project ID: ${taskState.projectId.toString().padEnd(39)}║
             ╚═══════════════════════════════════════════════════════╝
         """.trimIndent()
     }

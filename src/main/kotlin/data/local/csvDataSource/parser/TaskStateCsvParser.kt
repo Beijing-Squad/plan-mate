@@ -23,7 +23,7 @@ class TaskStateCsvParser : CsvParser<TaskState> {
         return TaskState(
             id = Uuid.Companion.parse(parts[0]),
             name = parts[1],
-            projectId = parts[2]
+            projectId = Uuid.parse(parts[2])
         )
     }
 

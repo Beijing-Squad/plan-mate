@@ -43,9 +43,10 @@ class TaskStatesCsvDataSourceImpl(
             ?: throw StateNotFoundException()
     }
 
+    @OptIn(ExperimentalUuidApi::class)
     override fun getStatesByProjectId(projectId: String): List<TaskState> {
         return getAllStates()
-            .filter { it.projectId == projectId }
+            .filter { it.projectId.toString() == projectId }
     }
 
     @OptIn(ExperimentalUuidApi::class)

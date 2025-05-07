@@ -11,6 +11,7 @@ import logic.entities.TaskState
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
+import kotlin.uuid.ExperimentalUuidApi
 
 class TaskStatesCsvDataSourceImplTest {
 
@@ -24,10 +25,11 @@ class TaskStatesCsvDataSourceImplTest {
         statesCsvDataSource = TaskStatesCsvDataSourceImpl(csvDataSource)
     }
 
+    @OptIn(ExperimentalUuidApi::class)
     @Test
     fun `should add a new state to the data source`() {
         // Given
-        val newState = createState(id = "1", name = "InProgress", projectId = "project1")
+        val newState = createState(name = "InProgress", projectId = "project1")
 
         // When
         val result = statesCsvDataSource.addState(newState)
@@ -37,11 +39,12 @@ class TaskStatesCsvDataSourceImplTest {
         verify { csvDataSource.updateFile(match { it.contains(newState) }) }
     }
 
+    @OptIn(ExperimentalUuidApi::class)
     @Test
     fun `should return states filtered by project id`() {
         // Given
-        val state1 = createState(id = "1", name = "Todo", projectId = "p1")
-        val state2 = createState(id = "2", name = "Done", projectId = "p2")
+        val state1 = createState( name = "Todo", projectId = "p1")
+        val state2 = createState( name = "Done", projectId = "p2")
         every { csvDataSource.loadAllDataFromFile() } returns listOf(state1, state2)
 
         // When
@@ -51,10 +54,11 @@ class TaskStatesCsvDataSourceImplTest {
         assertThat(result).containsExactly(state1)
     }
 
+    @OptIn(ExperimentalUuidApi::class)
     @Test
     fun `should return state by id if it exists`() {
         // Given
-        val state = createState(id = "1", name = "InProgress", projectId = "project1")
+        val state = createState( name = "InProgress", projectId = "project1")
         every { csvDataSource.loadAllDataFromFile() } returns listOf(state)
 
         // When
@@ -64,10 +68,11 @@ class TaskStatesCsvDataSourceImplTest {
         assertThat(result).isEqualTo(state)
     }
 
+    @OptIn(ExperimentalUuidApi::class)
     @Test
     fun `should delete an existing state`() {
         // Given
-        val state = createState(id = "1", name = "Todo", projectId = "p1")
+        val state = createState(name = "Todo", projectId = "p1")
         val stateList = mutableListOf(state)
         every { csvDataSource.loadAllDataFromFile() } returns stateList
 
