@@ -1,13 +1,12 @@
 package di
 
-import data.csvDataSource.*
 import data.local.csvDataSource.*
 import data.local.csvDataSource.csv.CsvDataSourceImpl
 import data.local.csvDataSource.parser.AuditCsvParser
 import data.local.csvDataSource.parser.ProjectCsvParser
 import data.local.csvDataSource.parser.TaskCsvParser
 import data.local.csvDataSource.parser.UserCsvParser
-import data.parser.TaskStateCsvParser
+import data.local.csvDataSource.parser.TaskStateCsvParser
 import data.remote.mongoDataSource.AuditMongoDataSourceImpl
 import data.remote.mongoDataSource.ProjectMongoDataSourceImpl
 import data.remote.mongoDataSource.StateMongoDataSourceImpl
@@ -58,7 +57,7 @@ val dataSourceModule = module {
             get<AuditCsvParser>()
         )
     }
-    single (named("authenticationDataSource")){
+    single(named("authenticationDataSource")) {
         CsvDataSourceImpl(
             get(named("authenticationReader")),
             get(named("authenticationWriter")),
@@ -70,11 +69,13 @@ val dataSourceModule = module {
 
     // Implementations
     single { ProjectCsvDataSourceImpl(get(named("projectDataSource"))) } bind ProjectDataSource::class
-    single { UserCsvDataSourceImpl(get(named("userDataSource")),get(),get()) } bind UserDataSource::class
+    single { UserCsvDataSourceImpl(get(named("userDataSource")), get(), get()) } bind UserDataSource::class
     single { TasksCsvDataSourceImpl(get(named("taskDataSource"))) } bind TasksDataSource::class
     single { TaskStatesCsvDataSourceImpl(get(named("stateDataSource"))) } bind StatesDataSource::class
     single { AuditCsvDataSourceImpl(get(named("auditDataSource"))) } bind AuditDataSource::class
-    single { AuthenticationCsvDataSourceImpl(get(named("authenticationDataSource")),get(),get(),get())
+    single {
+        AuthenticationCsvDataSourceImpl(get(named("authenticationDataSource")), get(), get(), get())
+    }
 
     single { ProjectMongoDataSourceImpl(get(named("projectDataSource"))) } bind ProjectDataSource::class
     single { UserMongoDataSourceImpl(get(named("userDataSource"))) } bind UserDataSource::class
@@ -82,7 +83,4 @@ val dataSourceModule = module {
     single { StateMongoDataSourceImpl(get(named("stateDataSource"))) } bind StatesDataSource::class
     single { AuditMongoDataSourceImpl(get(named("auditDataSource"))) } bind AuditDataSource::class
 
-    single {
-        AuthenticationCsvDataSourceImpl(get(named("authenticationDataSource")), get())
-    }bind AuthenticationDataSource::class
 }
