@@ -5,6 +5,7 @@ import ui.screens.AuthenticationScreen
 
 fun main() {
 
+    System.setProperty("MONGO_CONNECTION_STRING", "mongodb+srv://radwamohamed5033:itGzVSNEk5JDnN95@cluster0.pcitphl.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
     startKoin {
         modules(appModule)
     }
