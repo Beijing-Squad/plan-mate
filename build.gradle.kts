@@ -2,6 +2,7 @@ plugins {
     kotlin("jvm") version "2.1.10"
     id("jacoco")
     id("com.github.kt3k.coveralls") version "2.12.0"
+    application
 }
 
 group = "org.example"
@@ -15,13 +16,8 @@ dependencies {
     testImplementation(kotlin("test"))
     implementation("io.insert-koin:koin-core:4.0.3")
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.2")
-
-    // Kotlin coroutine dependency
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
-
-    // MongoDB Kotlin driver dependency
     implementation("org.mongodb:mongodb-driver-kotlin-coroutine:4.10.1")
-
     testImplementation("com.google.truth:truth:1.4.4")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.12.0")
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.12.0")
@@ -53,4 +49,10 @@ coveralls {
 
 kotlin {
     jvmToolchain(22)
+}
+
+application {
+    applicationDefaultJvmArgs = listOf(
+        "-DMONGO_CONNECTION_STRING=${project.findProperty("MONGO_CONNECTION_STRING")}"
+    )
 }

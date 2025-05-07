@@ -1,12 +1,19 @@
 package di
 
-import data.csvDataSource.*
-import data.csvDataSource.csv.CsvDataSourceImpl
-import data.parser.AuditCsvParser
-import data.parser.ProjectCsvParser
-import data.parser.TaskStateCsvParser
-import data.parser.TaskCsvParser
-import data.parser.UserCsvParser
+import data.local.csvDataSource.AuthenticationCsvDataSourceImpl
+import data.local.csvDataSource.ProjectCsvDataSourceImpl
+import data.local.csvDataSource.UserCsvDataSourceImpl
+import data.local.csvDataSource.ValidationUserDataSourceImpl
+import data.local.csvDataSource.csv.CsvDataSourceImpl
+import data.local.csvDataSource.parser.AuditCsvParser
+import data.local.csvDataSource.parser.ProjectCsvParser
+import data.local.csvDataSource.parser.TaskCsvParser
+import data.local.csvDataSource.parser.TaskStateCsvParser
+import data.local.csvDataSource.TaskStatesCsvDataSourceImpl
+import data.local.csvDataSource.TasksCsvDataSourceImpl
+import data.local.csvDataSource.AuditCsvDataSourceImpl
+import data.local.csvDataSource.MD5HashPasswordImpl
+import data.local.csvDataSource.parser.UserCsvParser
 import data.repository.PasswordHashingDataSource
 import data.repository.ValidationUserDataSource
 import data.repository.dataSource.*

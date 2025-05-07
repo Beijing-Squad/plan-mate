@@ -1,6 +1,6 @@
-package data.parser
+package data.local.csvDataSource.parser
 
-import data.csvDataSource.csv.CsvParser
+import data.local.csvDataSource.csv.CsvParser
 import logic.entities.User
 import logic.entities.UserRole
 import kotlin.uuid.ExperimentalUuidApi

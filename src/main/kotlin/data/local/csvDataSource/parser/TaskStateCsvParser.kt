@@ -1,6 +1,6 @@
-package data.parser
+package data.local.csvDataSource.parser
 
-import data.csvDataSource.csv.CsvParser
+import data.local.csvDataSource.csv.CsvParser
 import logic.entities.TaskState
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
@@ -21,7 +21,7 @@ class TaskStateCsvParser : CsvParser<TaskState> {
     override fun deserializer(content: String): TaskState {
         val parts = content.split(",")
         return TaskState(
-            id = Uuid.parse(parts[0]),
+            id = Uuid.Companion.parse(parts[0]),
             name = parts[1],
             projectId = parts[2]
         )

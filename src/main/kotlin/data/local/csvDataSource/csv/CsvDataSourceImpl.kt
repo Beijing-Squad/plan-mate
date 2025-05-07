@@ -1,4 +1,4 @@
-package data.csvDataSource.csv
+package data.local.csvDataSource.csv
 
 import logic.entities.exceptions.CsvReadException
 import logic.entities.exceptions.CsvWriteException

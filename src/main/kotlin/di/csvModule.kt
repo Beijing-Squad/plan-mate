@@ -1,7 +1,7 @@
 package di
 
-import data.csvDataSource.csv.CsvReader
-import data.csvDataSource.csv.CsvWriter
+import data.local.csvDataSource.csv.CsvReader
+import data.local.csvDataSource.csv.CsvWriter
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 

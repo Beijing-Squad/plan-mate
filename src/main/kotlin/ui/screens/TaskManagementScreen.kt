@@ -73,7 +73,7 @@ class TaskManagementScreen(
     }
 
     @OptIn(ExperimentalUuidApi::class)
-    fun addTask() {
+     fun addTask() {
         val currentUser = sessionManagerUseCase.getCurrentUser()
 
         consoleIO.show("Enter Task Title: ")
@@ -148,7 +148,7 @@ class TaskManagementScreen(
         tasks.forEach { task ->
             consoleIO.showWithLine(
                 """
-            ╭────────────────────────────────────────╮            
+            ╭────────────────────────────────────────╮
             │ ID: ${task.id}
             │ Title: ${task.title}
             │ Description: ${task.description}
@@ -162,7 +162,7 @@ class TaskManagementScreen(
         }
     }
 
-    fun getTaskById() {
+     fun getTaskById() {
         consoleIO.showWithLine("\n\u001B[36m🔍 Find Task by ID\u001B[0m")
         consoleIO.show("\u001B[32mEnter Task ID: \u001B[0m")
         val id = consoleIO.read()
@@ -171,7 +171,7 @@ class TaskManagementScreen(
             val task = getTaskByIdUseCase.getTaskById(id ?: "")
             consoleIO.showWithLine(
                 """
-            ╭─────────────────────────────────────────╮           
+            ╭─────────────────────────────────────────╮
             │ ID: ${task.id}
             │ Title: ${task.title}
             │ Description: ${task.description}
