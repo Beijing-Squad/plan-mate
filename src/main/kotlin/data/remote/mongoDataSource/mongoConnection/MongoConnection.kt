@@ -7,16 +7,19 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 
 object MongoConnection {
-    private val CONNECTION_STRING: String = System.getProperty("MONGO_CONNECTION_STRING")
+    private val client by lazy { createClient() }
+    val database by lazy { client.getDatabase("planMate") }
+    val dbScope by lazy { CoroutineScope(Dispatchers.IO) }
 
-    val client = MongoClient.Factory.create(
-        MongoClientSettings.builder()
-            .applyConnectionString(ConnectionString(CONNECTION_STRING))
-            .build()
-    )
+    private fun createClient(): MongoClient {
+        val connectionString = System.getProperty("MONGO_CONNECTION_STRING")
+            ?: throw IllegalStateException("MongoDB connection string not set. Please set MONGO_CONNECTION_STRING system property.")
 
-    val database = client.getDatabase("planMate")
-
-    val dbScope = CoroutineScope(Dispatchers.IO)
+        return MongoClient.Factory.create(
+            MongoClientSettings.builder()
+                .applyConnectionString(ConnectionString(connectionString))
+                .build()
+        )
+    }
 
 }
