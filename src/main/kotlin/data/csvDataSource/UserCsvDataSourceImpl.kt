@@ -14,8 +14,6 @@ class UserCsvDataSourceImpl(
     private val mD5HashPasswordImpl: PasswordHashingDataSource
 ) : UserDataSource {
 
-    private val users = csvDataSource.loadAllDataFromFile().toMutableList()
-
     override fun getAllUsers(): List<User> {
         return csvDataSource
             .loadAllDataFromFile()
@@ -27,7 +25,7 @@ class UserCsvDataSourceImpl(
     override fun getUserByUserId(userId: String): User {
         return getAllUsers()
             .find { it.id.toString() == userId }
-            ?: throw UserNotFoundException("user not found")
+            ?: throw UserNotFoundException()
 
     }
 
