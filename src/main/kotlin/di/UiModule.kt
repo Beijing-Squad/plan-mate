@@ -45,7 +45,7 @@ val uiModule = module {
     }
 
     single {
-        StateScreen(
+        TaskStateScreen(
             get(), get(), get(),
             get(), get(), get(),
             get(), get(), get()

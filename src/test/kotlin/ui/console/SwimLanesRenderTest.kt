@@ -31,7 +31,7 @@ class SwimlanesRendererTest {
         val task = createTask()
         swimlanesRenderer.render(
             tasks = listOf(task),
-            states = emptyList()
+            taskStates = emptyList()
         )
 
         assertThat(output).containsExactly("⚠️ No states available.")
@@ -42,7 +42,7 @@ class SwimlanesRendererTest {
         val state = createState()
         swimlanesRenderer.render(
             tasks = emptyList(),
-            states = listOf(state)
+            taskStates = listOf(state)
         )
 
         assertThat(output).containsExactly("⚠️ No tasks available.")

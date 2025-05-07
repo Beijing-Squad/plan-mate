@@ -1,16 +1,14 @@
 package logic.useCases.state
 
-import logic.entities.State
-import logic.entities.exceptions.StateNotFoundException
+import logic.entities.TaskState
 import logic.repository.StatesRepository
 import kotlin.uuid.ExperimentalUuidApi
 
-class GetStateByIdUseCase(
+class GetTaskStateByIdUseCase(
     private val statesRepository: StatesRepository
 ) {
     @OptIn(ExperimentalUuidApi::class)
-    fun getStateById(stateId: String): State? {
+    fun getStateById(stateId: String): TaskState {
         return statesRepository.getStateById(stateId)
-            ?: throw StateNotFoundException("state not found")
     }
 }

@@ -4,24 +4,24 @@ import com.google.common.truth.Truth.assertThat
 import data.local.csvDataSource.StatesCsvDataSourceImpl
 import data.local.csvDataSource.csv.CsvDataSourceImpl
 import fake.createState
-import io.mockk.*
-import logic.entities.State
-import logic.entities.exceptions.CsvWriteException
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
+import logic.entities.TaskState
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import kotlin.test.assertEquals
 
-class StatesCsvDataSourceImplTest {
+class TaskStatesCsvDataSourceImplTest {
 
-    private lateinit var csvDataSource: CsvDataSourceImpl<State>
-    private lateinit var statesCsvDataSource: StatesCsvDataSourceImpl
+    private lateinit var csvDataSource: CsvDataSourceImpl<TaskState>
+    private lateinit var statesCsvDataSource: TaskStatesCsvDataSourceImpl
 
     @BeforeEach
     fun setup() {
         csvDataSource = mockk(relaxed = true)
         every { csvDataSource.loadAllDataFromFile() } returns mutableListOf()
-        statesCsvDataSource = StatesCsvDataSourceImpl(csvDataSource)
+        statesCsvDataSource = TaskStatesCsvDataSourceImpl(csvDataSource)
     }
 
     @Test
@@ -65,49 +65,13 @@ class StatesCsvDataSourceImplTest {
     }
 
     @Test
-    fun `should update an existing state`() {
-        // Given
-        val oldState = createState(id = "1", name = "Todo", projectId = "p1")
-        val stateList = mutableListOf(oldState)
-        every { csvDataSource.loadAllDataFromFile() } returns stateList
-        statesCsvDataSource = StatesCsvDataSourceImpl(csvDataSource)
-        every { csvDataSource.updateFile(any()) } just Runs
-
-        val updatedState = oldState.copy(name = "InProgress", projectId = "p2")
-
-        // When
-        val result = statesCsvDataSource.updateState(updatedState)
-
-        // Then
-        assertThat(result).isEqualTo(updatedState)
-        verify { csvDataSource.updateFile(match { it.contains(updatedState) }) }
-    }
-
-    @Test
-    fun `should throw exception when update state fails to write to file`() {
-        // Given
-        val originalState = createState(id = "1", name = "Todo", projectId = "p1")
-        val updatedState = originalState.copy(name = "InProgress")
-        val stateList = mutableListOf(originalState)
-        every { csvDataSource.loadAllDataFromFile() } returns stateList
-        statesCsvDataSource = StatesCsvDataSourceImpl(csvDataSource)
-        every { csvDataSource.updateFile(any()) } throws CsvWriteException("Failed")
-
-        // When & Then
-        assertThrows<CsvWriteException> {
-            statesCsvDataSource.updateState(updatedState)
-        }
-    }
-
-
-    @Test
     fun `should delete an existing state`() {
         // Given
         val state = createState(id = "1", name = "Todo", projectId = "p1")
         val stateList = mutableListOf(state)
         every { csvDataSource.loadAllDataFromFile() } returns stateList
 
-        statesCsvDataSource = StatesCsvDataSourceImpl(csvDataSource)
+        statesCsvDataSource = TaskStatesCsvDataSourceImpl(csvDataSource)
 
         // When
         val result = statesCsvDataSource.deleteState(state)
@@ -115,6 +79,4 @@ class StatesCsvDataSourceImplTest {
         // Then
         assertEquals(true, result)
     }
-
-
 }

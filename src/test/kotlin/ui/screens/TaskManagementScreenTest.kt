@@ -8,7 +8,7 @@ import io.mockk.*
 import kotlinx.datetime.LocalDateTime
 import logic.useCases.audit.AddAuditLogUseCase
 import logic.useCases.authentication.SessionManagerUseCase
-import logic.useCases.state.GetAllStatesUseCase
+import logic.useCases.state.GetAllTaskStatesUseCase
 import logic.useCases.task.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -21,7 +21,7 @@ class TaskManagementScreenTest {
 
     private lateinit var screen: TaskManagementScreen
     private val getAllTasksUseCase = mockk<GetAllTasksUseCase>()
-    private val getAllStatesUseCase = mockk<GetAllStatesUseCase>()
+    private val getAllTaskStatesUseCase = mockk<GetAllTaskStatesUseCase>()
     private val addTaskUseCase = mockk<AddTaskUseCase>(relaxed = true)
     private val updateTaskUseCase = mockk<UpdateTaskUseCase>(relaxed = true)
     private val deleteTaskUseCase = mockk<DeleteTaskUseCase>(relaxed = true)
@@ -35,7 +35,7 @@ class TaskManagementScreenTest {
     fun setUp() {
         screen = TaskManagementScreen(
             getAllTasksUseCase,
-            getAllStatesUseCase,
+            getAllTaskStatesUseCase,
             addTaskUseCase,
             deleteTaskUseCase,
             getTaskByIdUseCase,
@@ -218,7 +218,7 @@ class TaskManagementScreenTest {
         val tasks = listOf(createTask(title = "T1"))
         val states = listOf(createState(name = "To Do"))
         every { getAllTasksUseCase.getAllTasks() } returns tasks
-        every { getAllStatesUseCase.getAllStates() } returns states
+        every { getAllTaskStatesUseCase.getAllStates() } returns states
 
         // When
         screen.showTasksInSwimlanes()
@@ -235,7 +235,7 @@ class TaskManagementScreenTest {
         every { consoleIO.read() } returnsMany listOf("1", "2", "3", "4", "invalid", "0")
 
         every { getAllTasksUseCase.getAllTasks() } returns emptyList()
-        every { getAllStatesUseCase.getAllStates() } returns emptyList()
+        every { getAllTaskStatesUseCase.getAllStates() } returns emptyList()
         every { getTaskByIdUseCase.getTaskById(any()) } returns createTask()
         every { consoleIO.read() } returnsMany listOf("1", "2", "3", "4", "invalid", "0") // ensure input is reused
 

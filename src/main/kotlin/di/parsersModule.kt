@@ -11,6 +11,6 @@ val parsersModule = module {
     single { ProjectCsvParser() }
     single { UserCsvParser() }
     single { TaskCsvParser() }
-    single { StateCsvParser() }
+    single { TaskStateCsvParser() }
     single { AuditCsvParser() }
 }

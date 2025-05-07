@@ -2,6 +2,8 @@ package data.local.csvDataSource.parser
 
 import data.local.csvDataSource.csv.CsvParser
 import kotlinx.datetime.LocalDate
+import data.csvDataSource.csv.CsvParser
+import kotlinx.datetime.LocalDateTime
 import logic.entities.Project
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
@@ -16,8 +18,8 @@ class ProjectCsvParser : CsvParser<Project> {
             item.name,
             item.description,
             item.createdBy,
-            item.createdAt.toString(),
-            item.updatedAt.toString()
+            item.createdAt.date.toString(),
+            item.updatedAt.date.toString()
         ).joinToString(",")
     }
 
@@ -28,8 +30,8 @@ class ProjectCsvParser : CsvParser<Project> {
             name = parts[1],
             description = parts[2],
             createdBy = parts[3],
-            createdAt = LocalDate.parse(parts[4]),
-            updatedAt = LocalDate.parse(parts[5])
+            createdAt = LocalDateTime.parse(parts[4]),
+            updatedAt = LocalDateTime.parse(parts[5])
         )
     }
 

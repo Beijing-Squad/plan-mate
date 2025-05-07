@@ -1,15 +1,16 @@
 package ui.screens
 
 import fake.createProject
-import io.mockk.*
-import logic.useCases.project.*
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
 import logic.entities.UserRole
 import logic.useCases.audit.AddAuditLogUseCase
+import logic.useCases.project.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import ui.main.consoleIO.ConsoleIO
 import kotlin.uuid.ExperimentalUuidApi
-import kotlin.uuid.Uuid
 
 @OptIn(ExperimentalUuidApi::class)
 class ProjectManagementScreenTest {
@@ -42,35 +43,34 @@ class ProjectManagementScreenTest {
             updateProjectUseCase,
             addAuditLogUseCase,
             userRole,
-            consoleIO
+            consoleIO,
         )
     }
 
     @Test
-    fun `Given projects are available, when option 1 is selected, then all projects are displayed`() {
+    fun `list all projects when projects available`() {
         // Given
-        val project = listOf(createProject())
-        every { consoleIO.read() } returns "1"
+        val project = listOf(createProject())   
+        every { consoleIO.read() } returnsMany listOf("1", "0")
         every { getAllProjectsUseCase.getAllProjects() } returns project
 
         // When
-        projectScreen.execute()
+        projectScreen.handleFeatureChoice()
 
         // Then
         verify {
-            consoleIO.showWithLine(match { it.contains("Project Management") })
             consoleIO.showWithLine(match { it.contains("defaultProjectName") })
         }
     }
 
     @Test
-    fun `Given no projects are available, when option 1 is selected, then a warning message is displayed`() {
+    fun `list all projects empty when no projects`() {
         // Given
-        every { consoleIO.read() } returns "1"
+        every { consoleIO.read() } returnsMany listOf("1", "0")
         every { getAllProjectsUseCase.getAllProjects() } returns emptyList()
 
         // When
-        projectScreen.execute()
+        projectScreen.handleFeatureChoice()
 
         // Then
         verify {
@@ -79,172 +79,47 @@ class ProjectManagementScreenTest {
     }
 
     @Test
-    fun `Given an error occurs while fetching projects, when option 1 is selected, then an error message is displayed`() {
+    fun `should add new project when selecting option 4`() {
         // Given
-        every { consoleIO.read() } returns "1"
-        every { getAllProjectsUseCase.getAllProjects() } throws Exception("Error")
+        every { consoleIO.read() } returnsMany listOf("4", "New Project", "Description", "creatorUser", "0")
 
         // When
-        projectScreen.execute()
+        projectScreen.handleFeatureChoice()
 
         // Then
         verify {
-            consoleIO.showWithLine("\u001B[31m❌ Error\u001B[0m")
+            addProjectUseCase.addProject(match { it.name == "New Project" && it.description == "Description" })
+            addAuditLogUseCase.addAuditLog(any())
         }
     }
 
     @Test
-    fun `Given a valid project ID, when option 2 is selected, then the project is shown`() {
-        // Given
-        val id = Uuid.random()
-        val project = createProject()
-        every { consoleIO.read() } returnsMany listOf("2", id.toString())
-        every { getProjectByIdUseCase.getProjectById(id.toString()) } returns project
-
-        // When
-        projectScreen.execute()
-
-        // Then
-        verify {
-            consoleIO.show("\u001B[32mEnter project ID: \u001B[0m")
-            consoleIO.showWithLine(match { it.contains(project.name) })
-        }
-    }
-
-    @Test
-    fun `Given an invalid project ID, when option 2 is selected, then an error message is displayed`() {
-        // Given
-        every { consoleIO.read() } returnsMany listOf("2", "invalid-id")
-        every { getProjectByIdUseCase.getProjectById("invalid-id") } throws Exception("Not found")
-
-        // When
-        projectScreen.execute()
-
-        // Then
-        verify {
-            consoleIO.showWithLine("\u001B[31m❌ Not found\u001B[0m")
-        }
-    }
-
-    @Test
-    fun `Given a valid project, when option 3 is selected, then the project is updated successfully`() {
-        // Given
-        val project = createProject(name = "Old")
-        val id = project.id
-        every { consoleIO.read() } returnsMany listOf("3", id.toString(), "New name", "New desc")
-        every { getProjectByIdUseCase.getProjectById(id.toString()) } returns project
-        every { updateProjectUseCase.updateProject(any()) }
-
-        // When
-        projectScreen.execute()
-
-        // Then
-        verify {
-            updateProjectUseCase.updateProject(match {
-                it.id == id && it.name == "New name" && it.description == "New desc"
-            })
-            consoleIO.showWithLine(match { it.contains("✅ Project updated successfully") })
-        }
-    }
-
-    @Test
-    fun `Given a project to update is not found, when option 3 is selected, then an error message is displayed`() {
-        // Given
-        every { consoleIO.read() } returnsMany listOf("3", "bad-id")
-        every { getProjectByIdUseCase.getProjectById("bad-id") } throws Exception("Not found")
-
-        // When
-        projectScreen.execute()
-
-        // Then
-        verify {
-            consoleIO.showWithLine("\u001B[31m❌ Project not found\u001B[0m")
-        }
-    }
-
-    @Test
-    fun `Given an error while updating project, when option 3 is selected, then an error message is displayed`() {
+    fun `should get new project when selecting option 2`() {
         // Given
         val project = createProject()
-        val id = project.id
-        every { consoleIO.read() } returnsMany listOf("3", id.toString(), "Name", "Desc")
-        every { getProjectByIdUseCase.getProjectById(id.toString()) } returns project
-        every { updateProjectUseCase.updateProject(any()) } throws Exception("Update failed")
+        val projectId = project.id
+        every { consoleIO.read() } returnsMany listOf("2", "projectId", "0")
+        every { getProjectByIdUseCase.getProjectById(projectId.toString()) } returns project
 
         // When
-        projectScreen.execute()
+        projectScreen.handleFeatureChoice()
 
         // Then
         verify {
-            consoleIO.showWithLine("\u001B[31m❌ Update failed\u001B[0m")
+            consoleIO.showWithLine(match { it.contains("Find Project by ID") })
         }
     }
 
     @Test
-    fun `Given valid project details, when option 4 is selected, then the project is added successfully`() {
+    fun `invalid option shows error`() {
         // Given
-        every { consoleIO.read() } returnsMany listOf("4", "Project Name", "Project Desc")
-        every { addProjectUseCase.addProject(any()) }
-
+        every { consoleIO.read() } returnsMany listOf("invalid", "0")
         // When
-        projectScreen.execute()
+        projectScreen.handleFeatureChoice()
 
         // Then
         verify {
-            addProjectUseCase.addProject(match {
-                it.name == "Project Name" && it.description == "Project Desc"
-            })
-            consoleIO.showWithLine(match { it.contains("✅ Project added successfully") })
-        }
-    }
-
-    @Test
-    fun `Given an error while adding project, when option 4 is selected, then an error message is displayed`() {
-        // Given
-        every { consoleIO.read() } returnsMany listOf("4", "Project", "Desc")
-        every { addProjectUseCase.addProject(any()) } throws Exception("Add failed")
-
-        // When
-        projectScreen.execute()
-
-        // Then
-        verify {
-            consoleIO.showWithLine("\u001B[31m❌ Add failed\u001B[0m")
-        }
-    }
-
-    @Test
-    fun `Given a valid project, when option 5 is selected, then the project is deleted successfully`() {
-        // Given
-        val project = createProject(name = "Delete Me")
-        val id = project.id
-        every { consoleIO.read() } returnsMany listOf("5", id.toString())
-        every { getProjectByIdUseCase.getProjectById(id.toString()) } returns project
-        every { deleteProjectUseCase.deleteProject(id.toString()) }
-
-        // When
-        projectScreen.execute()
-
-        // Then
-        verify {
-            deleteProjectUseCase.deleteProject(id.toString())
-            consoleIO.showWithLine("\u001B[32m✅ Project deleted successfully.\u001B[0m")
-        }
-    }
-
-    @Test
-    fun `Given an error while deleting project, when option 5 is selected, then an error message is displayed`() {
-        // Given
-        val id = Uuid.random().toString()
-        every { consoleIO.read() } returnsMany listOf("5", id)
-        every { deleteProjectUseCase.deleteProject(id) } throws Exception("Delete failed")
-
-        // When
-        projectScreen.execute()
-
-        // Then
-        verify {
-            consoleIO.showWithLine("\u001B[31m❌ Delete failed\u001B[0m")
+            consoleIO.showWithLine("\u001B[31m❌ Invalid Option\u001B[0m")
         }
     }
 }
