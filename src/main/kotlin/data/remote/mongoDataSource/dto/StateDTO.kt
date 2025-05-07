@@ -1,4 +1,4 @@
-package data.dto
+package data.remote.mongoDataSource.dto
 
 data class StateDTO(
     val id: String? = null,

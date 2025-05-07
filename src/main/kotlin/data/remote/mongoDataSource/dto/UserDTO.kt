@@ -1,4 +1,4 @@
-package data.dto
+package data.remote.mongoDataSource.dto
 
 import logic.entities.UserRole
 

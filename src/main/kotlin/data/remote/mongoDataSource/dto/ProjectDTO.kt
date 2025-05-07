@@ -1,12 +1,10 @@
-package data.dto
+package data.remote.mongoDataSource.dto
 
-data class TaskDTO(
+data class ProjectDTO(
     val id: String? = null,
-    val projectId: String,
-    val title: String,
+    val name: String,
     val description: String,
     val createdBy: String,
-    val stateId: String,
     val createdAt: String,
     val updatedAt: String
 )
