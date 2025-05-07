@@ -1,6 +1,6 @@
 package logic.entities
 
-import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalDateTime
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -12,7 +12,6 @@ data class Audit(
     val entityId: String,
     val entityType: EntityType,
     val action: ActionType,
-    val oldState: String?,
-    val newState: String?,
-    val timeStamp: LocalDate
+    val actionDetails : String?,
+    val timeStamp: LocalDateTime
 )

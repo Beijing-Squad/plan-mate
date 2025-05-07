@@ -1,7 +1,6 @@
 package logic.useCases.audit
 
 import logic.entities.Audit
-import logic.entities.EntityType
 import logic.entities.exceptions.InvalidInputException
 import logic.entities.exceptions.ProjectNotFoundException
 import logic.repository.AuditRepository
@@ -10,14 +9,16 @@ class GetAuditLogsByProjectIdUseCase(
     private val auditRepository: AuditRepository
 ) {
     fun getAuditLogsByProjectId(projectId: String): List<Audit> {
-        validateProjectId(projectId)
+        if (projectId.isBlank()) throw InvalidInputException(INVALID_ID_ERROR)
+
         return auditRepository.getAuditLogsByProjectId(projectId)
-            .ifEmpty { throw ProjectNotFoundException(PROJECT_NOT_FOUND_ERROR) }
-            .sortedByDescending { auditLog -> auditLog.timeStamp }
+            .orThrowIfEmpty(PROJECT_NOT_FOUND_ERROR)
+            .sortedByDescending { it.timeStamp }
     }
 
-    private fun validateProjectId(projectId: String) {
-        if (projectId.isBlank()) throw InvalidInputException(INVALID_ID_ERROR)
+    private fun <T> Collection<T>.orThrowIfEmpty(errorMessage: String): Collection<T> {
+        if (isEmpty()) throw ProjectNotFoundException(errorMessage)
+        return this
     }
 
     companion object {
