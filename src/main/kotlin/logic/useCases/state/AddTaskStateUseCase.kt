@@ -18,7 +18,7 @@ class AddTaskStateUseCase(
             it.id == taskState.id
         }
         val isProjectExist = getAllProjectsUseCase.getAllProjects().any {
-            it.id.toString() == taskState.projectId
+            it.id == taskState.projectId
         }
 
         if (taskState.name.isBlank()) throw InvalidStateNameException()

@@ -12,6 +12,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
 class GetTaskStatesByProjectIdUseCaseTest {
 
@@ -30,14 +31,13 @@ class GetTaskStatesByProjectIdUseCaseTest {
     @Test
     fun `should return states of project when are exist`() {
         // Given
-        val project = createProject()
-        val projectId = project.id.toString()
+        val projectId = Uuid.random().toString()
         val states = listOf(
             createState(
                 projectId = projectId
             ),
             createState(
-                projectId = project.id.toString()
+                projectId = projectId
             )
         )
         every { stateRepository.getStatesByProjectId(projectId) } returns states
@@ -45,7 +45,7 @@ class GetTaskStatesByProjectIdUseCaseTest {
         val result = getStatesByProjectIdUseCase.getStatesByProjectId(projectId)
         // Then
         result.forEach { state ->
-            assertThat(state.projectId).isEqualTo(projectId)
+            assertThat(state.projectId).isEqualTo(Uuid.parse(projectId))
         }
     }
 

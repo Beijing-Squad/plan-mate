@@ -10,6 +10,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.assertThrows
 import kotlin.test.Test
 import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
 class GetTaskStateByIdUseCaseTest {
     private lateinit var statesRepository: StatesRepository
@@ -21,15 +22,16 @@ class GetTaskStateByIdUseCaseTest {
         getTaskStateByIdUseCase = GetTaskStateByIdUseCase(statesRepository)
     }
 
+    @OptIn(ExperimentalUuidApi::class)
     @Test
     fun `should return state when id exists`() {
         // Given
-        val expectedState = createState(id = "456", name = "Review", projectId = "project-2")
+        val expectedState = createState(name = "Review", projectId = "550e8400-e29b-41d4-a716-446655440000")
 
-        every { statesRepository.getStateById("456") } returns expectedState
+        every { statesRepository.getStateById(expectedState.id.toString()) } returns expectedState
 
         // When
-        val result = getTaskStateByIdUseCase.getStateById(stateId = "456")
+        val result = getTaskStateByIdUseCase.getStateById(expectedState.id.toString())
 
         // Then
         assertThat(result).isEqualTo(expectedState)
@@ -38,7 +40,7 @@ class GetTaskStateByIdUseCaseTest {
     @OptIn(ExperimentalUuidApi::class)
     @Test
     fun `should throw exception when state id does not exist`() {
-        val state = createState(id = "999")
+        val state = createState(id = Uuid.parse("550e8400-e29b-41d4-a716-446655440000"))
         val states = listOf(
             createState(),
             createState()
