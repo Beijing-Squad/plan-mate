@@ -1,27 +1,35 @@
 package data.remote.mongoDataSource
 
+import com.mongodb.client.model.Filters
+import com.mongodb.client.model.Filters.eq
 import com.mongodb.kotlin.client.coroutine.MongoDatabase
+import data.dto.UserDTO
 import data.remote.mongoDataSource.mongoConnection.MongoConnection
-import data.repository.dataSource.AuthenticationDataSource
-import kotlinx.coroutines.CoroutineScope
-import logic.entities.User
-import logic.entities.UserRole
+import data.repository.remoteDataSource.AuthenticationMongoDBDataSource
+import kotlinx.coroutines.flow.firstOrNull
+import logic.entities.exceptions.InvalidLoginException
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
 class AuthenticationMongoDataSourceImpl(
-    private val database: MongoDatabase = MongoConnection.database,
-    private val dbScope: CoroutineScope = MongoConnection.dbScope
-) : AuthenticationDataSource {
-    override fun saveUser(
-        username: String,
-        password: String,
-        role: UserRole
-    ): Boolean {
-        TODO("Not yet implemented")
+    private val database: MongoDatabase = MongoConnection.database
+) : AuthenticationMongoDBDataSource {
+    private val collection = database.getCollection<UserDTO>("users")
+
+    @OptIn(ExperimentalUuidApi::class)
+    override suspend fun saveUser(username: String, password: String, role: String): Boolean {
+        val newUser = UserDTO(
+            id = Uuid.random().toString(),
+            userName = username,
+            password = password,
+            role = role
+        )
+        val result = collection.insertOne(newUser)
+        return result.wasAcknowledged()
     }
 
-    override fun getAuthenticatedUser(username: String, password: String): User {
-        TODO("Not yet implemented")
+    override suspend fun getAuthenticatedUser(username: String, password: String): UserDTO {
+        val query = Filters.and(eq("userName", username), eq("password", password))
+        return collection.find(query).firstOrNull() ?: throw InvalidLoginException()
     }
-
-
 }
