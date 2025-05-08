@@ -4,8 +4,8 @@ import com.mongodb.kotlin.client.coroutine.MongoDatabase
 import data.remote.mongoDataSource.*
 import data.remote.mongoDataSource.mongoConnection.MongoConnection
 import data.repository.dataSource.*
-import data.repository.remoteDataSource.UserMongoDataSource
-import data.remote.mongoDataSource.UserMongoDataSourceImpl
+import data.repository.mongoDataSource.UserMongoDataSourceImpl
+import kotlinx.coroutines.CoroutineScope
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
@@ -15,13 +15,11 @@ val mongoModule = module {
         MongoConnection.database
     }
 
-    // Define coroutine scope for database operations
     single(named("dbScope")) {
         MongoConnection.dbScope
     }
 
-    // Data source implementations
-    single<UserMongoDataSource> {
+    single<UserDataSource> {
         UserMongoDataSourceImpl(get(), get(named("dbScope")))
     }
 
