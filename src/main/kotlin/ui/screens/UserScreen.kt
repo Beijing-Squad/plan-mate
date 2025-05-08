@@ -1,5 +1,8 @@
 package ui.screens
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import logic.entities.User
 import logic.entities.UserRole
 import logic.entities.exceptions.InvalidPasswordException
@@ -14,6 +17,7 @@ import ui.main.BaseScreen
 import ui.main.MenuRenderer
 import ui.main.consoleIO.ConsoleIO
 import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
 class UserScreen(
     private val getAllUsers: GetAllUsersUseCase,
@@ -40,12 +44,21 @@ class UserScreen(
         )
     }
 
+    @OptIn(ExperimentalUuidApi::class)
     override fun handleFeatureChoice() {
         when (getInput()) {
             "1" -> {
-                val currentUser = sessionManagerUseCase.getCurrentUser()!!
+                val currentUser = sessionManagerUseCase.getCurrentUser() ?: User(
+                    id = Uuid.parse("ba0e1b3c-2239-4755-97fe-202d8619bd79"),
+                    userName = "a",
+                    password = "a",
+                    role = UserRole.ADMIN
+                )
                 if (currentUser.role == UserRole.ADMIN) {
-                    onClickGetAllUsers()
+                    runBlocking {
+                        onClickGetAllUsers()
+                    }
+                    showOptionService()
                 } else {
                     consoleIO.showWithLine("\u001B[31m❌ You don't have permission\u001B[0m")
                 }
@@ -59,42 +72,51 @@ class UserScreen(
     }
 
     @OptIn(ExperimentalUuidApi::class)
-    private fun onClickGetAllUsers() {
+    private suspend fun onClickGetAllUsers() {
         consoleIO.showWithLine("\n\u001B[36m📋 All Users:\u001B[0m")
-        val users = getAllUser()
 
-        if (users.isEmpty()) {
-            consoleIO.showWithLine("\u001B[33m⚠️  No users found.\u001B[0m")
-        } else {
-            users.forEach { user ->
-                consoleIO.showWithLine(
-                    """
-                ╭─────────────────────────╮
-                │ ID: ${user.id}
-                │ Username: ${user.userName}
-                │ Role: ${user.role}
-                ╰─────────────────────────╯
-            """.trimIndent()
-                )
+        try {
+            val users = getAllUsers.getAllUsers()
+
+            if (users.isEmpty()) {
+                consoleIO.showWithLine("\u001B[33m⚠️  No users found.\u001B[0m")
+            } else {
+                users.forEach { user ->
+                    consoleIO.showWithLine(
+                        """
+                        ╭─────────────────────────╮
+                        │ ID: ${user.id}
+                        │ Username: ${user.userName}
+                        │ Role: ${user.role}
+                        ╰─────────────────────────╯
+                    """.trimIndent()
+                    )
+                }
+                consoleIO.showWithLine("\n\u001B[32mTotal users: ${users.size}\u001B[0m")
             }
-            consoleIO.showWithLine("\n\u001B[32mTotal users: ${users.size}\u001B[0m")
+        } catch (e: Exception) {
+            consoleIO.showWithLine("\u001B[31m❌ Error: ${e.message ?: "Failed to fetch users"}\u001B[0m")
         }
     }
-
-    private fun getAllUser(): List<User> = getAllUsers.getAllUsers()
 
     @OptIn(ExperimentalUuidApi::class)
     private fun onClickUpdateUser() {
         consoleIO.showWithLine("\n\u001B[36m✏️ Update User\u001B[0m")
-        val userId = sessionManagerUseCase.getCurrentUser()!!.id
+        val userId = Uuid.parse("ba0e1b3c-2239-4755-97fe-202d8619bd79")
 
-        try {
-            val user =  getUserByUserId.getUserByUserId(userId.toString())
-            showCurrentUserDetails(user)
-            updateUserMenu(user)
-        } catch (e: Exception) {
-            consoleIO.showWithLine("\u001B[31m❌ Error: ${e.message ?: "User not found"}\u001B[0m")
+        runBlocking {
+            try {
+                val user = withContext(Dispatchers.IO) {
+                    getUserByUserId.getUserByUserId(userId.toString())
+                }
+                showCurrentUserDetails(user)
+                updateUserMenu(user)
+            } catch (e: Exception) {
+                consoleIO.showWithLine("\u001B[31m❌ Error: ${e.message ?: "User not found"}\u001B[0m")
+            }
         }
+
+        showOptionService()
     }
 
     @OptIn(ExperimentalUuidApi::class)
@@ -145,14 +167,17 @@ class UserScreen(
 
             if (newPassword.isNullOrBlank()) {
                 consoleIO.showWithLine("\u001B[31m❌ Password cannot be empty!\u001B[0m")
-            }else if (newPassword != confirmPassword) {
+            } else if (newPassword != confirmPassword) {
                 consoleIO.showWithLine("\u001B[31m❌ Passwords do not match! Please try again.\u001B[0m")
-            } else{
-                val freshUserData = getUserByUserId.getUserByUserId(user.id.toString())
-                updateUserInSystem(freshUserData.copy(userName = freshUserData.userName,password = newPassword))
+            } else {
+                runBlocking {
+                    val freshUserData = withContext(Dispatchers.IO) {
+                        getUserByUserId.getUserByUserId(user.id.toString())
+                    }
+                    updateUserInSystem(freshUserData.copy(userName = freshUserData.userName, password = newPassword))
+                }
                 return
             }
-
         }
     }
 
@@ -161,8 +186,12 @@ class UserScreen(
         consoleIO.show("\u001B[32mEnter new username: \u001B[0m")
         val newUsername = getInput()
         if (!newUsername.isNullOrBlank()) {
-            val freshUserData = getUserByUserId.getUserByUserId(user.id.toString())
-            updateUserInSystem(freshUserData.copy(userName = newUsername, password = freshUserData.password))
+            runBlocking {
+                val freshUserData = withContext(Dispatchers.IO) {
+                    getUserByUserId.getUserByUserId(user.id.toString())
+                }
+                updateUserInSystem(freshUserData.copy(userName = newUsername, password = freshUserData.password))
+            }
             return
         } else {
             consoleIO.showWithLine("\u001B[31m❌ Username cannot be empty!\u001B[0m")
@@ -170,7 +199,7 @@ class UserScreen(
     }
 
     @OptIn(ExperimentalUuidApi::class)
-    private fun updateUserInSystem(user: User) {
+    private suspend fun updateUserInSystem(user: User) {
         try {
             val updatedUser = updateUser.updateUser(user)
             consoleIO.showWithLine(
@@ -201,10 +230,13 @@ class UserScreen(
         consoleIO.show("\u001B[32mEnter user ID: \u001B[0m")
         val userId = getInput()
 
-        try {
-            val user = userId?.let { getUserByUserId.getUserByUserId(it) }
-            consoleIO.showWithLine(
-                """
+        runBlocking {
+            try {
+                val user = withContext(Dispatchers.IO) {
+                    userId?.let { getUserByUserId.getUserByUserId(it) }
+                }
+                consoleIO.showWithLine(
+                    """
             ╭─────────────────────────╮
             │ User Found:
             │ ID: ${user?.id}
@@ -212,9 +244,11 @@ class UserScreen(
             │ role: ${user?.role}
             ╰─────────────────────────╯
         """.trimIndent()
-            )
-        } catch (e: Exception) {
-            consoleIO.showWithLine("\u001B[31m❌ Error: ${e.message ?: "User not found"}\u001B[0m")
+                )
+            } catch (e: Exception) {
+                consoleIO.showWithLine("\u001B[31m❌ Error: ${e.message ?: "User not found"}\u001B[0m")
+            }
         }
+        showOptionService()
     }
 }

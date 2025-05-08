@@ -1,10 +1,10 @@
 package data.dto
 
-import logic.entities.UserRole
+import org.bson.codecs.pojo.annotations.BsonProperty
 
 data class UserDTO(
-    val id: String? = null,
+    val id: String?,
     val userName: String,
     val password: String,
-    val role: UserRole
+    val role: String
 )
