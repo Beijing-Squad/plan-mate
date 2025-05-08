@@ -15,12 +15,10 @@ val mongoModule = module {
         MongoConnection.database
     }
 
-    // Define coroutine scope for database operations
     single(named("dbScope")) {
         MongoConnection.dbScope
     }
 
-    // Data source implementations
     single<UserDataSource> {
         UserMongoDataSourceImpl(get(), get(named("dbScope")))
     }
