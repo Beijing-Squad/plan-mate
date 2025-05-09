@@ -13,5 +13,5 @@ interface TaskMongoDBDataSource {
 
     suspend fun deleteTask(taskId: String)
 
-    suspend fun updateTask(updatedTask: Task): TaskDTO
+    suspend fun updateTask(updatedTask: TaskDTO): TaskDTO
 }
