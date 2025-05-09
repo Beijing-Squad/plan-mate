@@ -1,19 +1,15 @@
 package data.repository
 
-import data.repository.dataSource.ProjectDataSource
+import data.repository.remoteDataSource.ProjectMongoDataSource
 import logic.entities.Project
 import logic.repository.ProjectsRepository
 
 class ProjectsRepositoryImpl(
-    private val projectDataSource: ProjectDataSource
+    private val projectMongoDataSource: ProjectMongoDataSource
 ) : ProjectsRepository {
-    override fun getAllProjects(): List<Project> = projectDataSource.getAllProjects()
-
-    override fun addProject(project: Project) = projectDataSource.addProject(project)
-
-    override fun deleteProject(projectId: String) = projectDataSource.deleteProject(projectId)
-
-    override fun updateProject(newProjects: Project) = projectDataSource.updateProject(newProjects)
-
-    override fun getProjectById(projectId: String): Project = projectDataSource.getProjectById(projectId)
+    override suspend fun getAllProjects(): List<Project> = projectMongoDataSource.getAllProjects()
+    override suspend fun addProject(project: Project) = projectMongoDataSource.addProject(project)
+    override suspend fun deleteProject(projectId: String) = projectMongoDataSource.deleteProject(projectId)
+    override suspend fun updateProject(newProjects: Project) = projectMongoDataSource.updateProject(newProjects)
+    override suspend fun getProjectById(projectId: String): Project = projectMongoDataSource.getProjectById(projectId)
 }

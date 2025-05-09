@@ -1,0 +1,18 @@
+package data.repository.mapper
+
+import data.dto.ProjectDTO
+import logic.entities.Project
+import kotlin.uuid.ExperimentalUuidApi
+
+@OptIn(ExperimentalUuidApi::class)
+fun toProjectEntity(projectDto : ProjectDTO) : Project{
+    return Project(
+        id = projectDto.id,
+        name = projectDto.name,
+        description = projectDto.description,
+        createdBy = projectDto.createdBy,
+        createdAt = projectDto.createdAt,
+        updatedAt = projectDto.updatedAt
+    )
+
+}

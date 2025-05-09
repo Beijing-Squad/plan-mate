@@ -1,11 +1,11 @@
-package logic.repository
+package data.repository.remoteDataSource
 
 import logic.entities.Project
 
-interface ProjectsRepository {
+interface ProjectMongoDataSource {
     suspend fun getAllProjects(): List<Project>
     suspend fun addProject(project: Project)
     suspend fun deleteProject(projectId: String)
-    suspend fun updateProject(newProjects: Project)
+    suspend fun updateProject(newProject: Project)
     suspend fun getProjectById(projectId: String): Project
 }
