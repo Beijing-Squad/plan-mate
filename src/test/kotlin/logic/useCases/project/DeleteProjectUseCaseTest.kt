@@ -1,7 +1,10 @@
 package logic.useCases.project
 
 import fake.createProject
-import io.mockk.*
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.mockk
+import kotlinx.coroutines.test.runTest
 import logic.entities.exceptions.CsvWriteException
 import logic.entities.exceptions.ProjectNotFoundException
 import logic.repository.ProjectsRepository
@@ -25,37 +28,43 @@ class DeleteProjectUseCaseTest {
     @OptIn(ExperimentalUuidApi::class)
     @Test
     fun `should delete project when project is exist`() {
-        // Given
-        val desiredProject=createProject()
-        every { projectRepository.getAllProjects()}
+        runTest {
+            // Given
+            val desiredProject = createProject()
+            coEvery { projectRepository.getAllProjects() }
 
-        // When
-        deleteProject.deleteProject(desiredProject.id.toString())
-        // Then
-        verify { projectRepository.deleteProject(desiredProject.id.toString()) }
+            // When
+            deleteProject.deleteProject(desiredProject.id.toString())
+            // Then
+            coVerify { projectRepository.deleteProject(desiredProject.id.toString()) }
+        }
     }
 
     @OptIn(ExperimentalUuidApi::class)
     @Test
     fun `should throw exception when project is notExist`() {
-        // Given
-        val projectId = createProject().id.toString()
-        every { projectRepository.deleteProject(projectId) } throws ProjectNotFoundException("")
-        // When && Then
-        assertThrows<ProjectNotFoundException> { deleteProject.deleteProject(projectId) }
+        runTest {
+            // Given
+            val projectId = createProject().id.toString()
+            coEvery { projectRepository.deleteProject(projectId) } throws ProjectNotFoundException("")
+            // When && Then
+            assertThrows<ProjectNotFoundException> { deleteProject.deleteProject(projectId) }
+        }
     }
 
     @OptIn(ExperimentalUuidApi::class)
     @Test
     fun `should throw exception when there is error in csv file`() {
-        // Given
-        val desiredProject=createProject()
-        val allProjects=listOf(desiredProject,createProject())
+        runTest {
+            // Given
+            val desiredProject = createProject()
+            val allProjects = listOf(desiredProject, createProject())
 
-        every { projectRepository.deleteProject(desiredProject.id.toString()) } throws CsvWriteException("")
-        every { projectRepository.getAllProjects() } returns allProjects
+            coEvery { projectRepository.deleteProject(desiredProject.id.toString()) } throws CsvWriteException("")
+            coEvery { projectRepository.getAllProjects() } returns allProjects
 
-        // When && Then
-        assertThrows<CsvWriteException> { deleteProject.deleteProject(desiredProject.id.toString()) }
+            // When && Then
+            assertThrows<CsvWriteException> { deleteProject.deleteProject(desiredProject.id.toString()) }
+        }
     }
 }

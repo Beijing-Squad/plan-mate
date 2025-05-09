@@ -13,7 +13,7 @@ class AddTaskStateUseCase(
     private val getAllProjectsUseCase: GetAllProjectsUseCase,
 ) {
     @OptIn(ExperimentalUuidApi::class)
-    fun addState(taskState: TaskState): Boolean {
+    suspend fun addState(taskState: TaskState): Boolean {
         val isStateExist = statesRepository.getAllStates().any {
             it.id == taskState.id
         }
