@@ -1,15 +1,25 @@
 package di
 
 import com.mongodb.kotlin.client.coroutine.MongoDatabase
+import data.local.csvDataSource.MD5HashPasswordImpl
+import data.local.csvDataSource.ValidationUserDataSourceImpl
 import data.remote.mongoDataSource.*
 import data.remote.mongoDataSource.mongoConnection.MongoConnection
-import data.repository.dataSource.*
-import data.repository.mongoDataSource.UserMongoDataSourceImpl
+import data.repository.PasswordHashingDataSource
+import data.repository.ValidationUserDataSource
+import data.repository.dataSource.AuditDataSource
+import data.repository.dataSource.ProjectDataSource
+import data.repository.dataSource.StatesDataSource
+import data.repository.dataSource.TasksDataSource
 import data.repository.remoteDataSource.AuthenticationMongoDBDataSource
+import data.repository.remoteDataSource.UserMongoDataSource
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
 val mongoModule = module {
+
+    single<PasswordHashingDataSource> { MD5HashPasswordImpl() }
+    single<ValidationUserDataSource> { ValidationUserDataSourceImpl() }
 
     single<MongoDatabase> {
         MongoConnection.database
@@ -19,8 +29,8 @@ val mongoModule = module {
         MongoConnection.dbScope
     }
 
-    single<UserDataSource> {
-        UserMongoDataSourceImpl(get(), get(named("dbScope")))
+    single<UserMongoDataSource> {
+        UserMongoDataSourceImpl(get(), get(),get())
     }
 
     single<TasksDataSource> {
