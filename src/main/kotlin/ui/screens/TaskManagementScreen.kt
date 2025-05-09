@@ -78,7 +78,7 @@ class TaskManagementScreen(
         }
     }
 
-    private suspend fun showTasksInSwimlanes() {
+    suspend fun showTasksInSwimlanes() {
         consoleIO.showWithLine("\n\u001B[36m📋 All Tasks (Swimlanes View):\u001B[0m")
         try {
             val tasks = getAllTasksUseCase.getAllTasks()
@@ -102,7 +102,7 @@ class TaskManagementScreen(
         }
     }
 
-    private suspend fun showAllTasksList() {
+    suspend fun showAllTasksList() {
         consoleIO.showWithLine("\n\u001B[36m📋 All Tasks (List View):\u001B[0m")
         try {
             val tasks = getAllTasksUseCase.getAllTasks()
@@ -160,7 +160,7 @@ class TaskManagementScreen(
         }
     }
 
-    private suspend fun getTaskById() {
+    suspend fun getTaskById() {
         consoleIO.showWithLine("\n\u001B[36m🔍 Find Task by ID\u001B[0m")
         consoleIO.show("\u001B[32mEnter Task ID: \u001B[0m")
         val id = consoleIO.read()?.trim()
@@ -223,7 +223,7 @@ class TaskManagementScreen(
         }
     }
 
-    private suspend fun addTask() {
+    suspend fun addTask() {
         consoleIO.showWithLine("\n\u001B[36m➕ Add New Task\u001B[0m")
         val currentUser = sessionManagerUseCase.getCurrentUser()
 
@@ -284,7 +284,7 @@ class TaskManagementScreen(
         }
     }
 
-    private suspend fun updateTaskById() {
+    suspend fun updateTaskById() {
         consoleIO.showWithLine("\n\u001B[36m🔄 Update Task\u001B[0m")
         consoleIO.show("Enter Task ID to update: ")
         val id = consoleIO.read()?.trim()
@@ -347,7 +347,7 @@ class TaskManagementScreen(
         }
     }
 
-    private suspend fun deleteTaskById() {
+    suspend fun deleteTaskById() {
         consoleIO.showWithLine("\n\u001B[36m🗑️ Delete Task\u001B[0m")
         consoleIO.show("\u001B[32mEnter Task ID to delete: \u001B[0m")
         val id = consoleIO.read()?.trim()

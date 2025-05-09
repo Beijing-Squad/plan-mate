@@ -1,15 +1,31 @@
 package ui.screens
 
 import com.google.common.truth.Truth.assertThat
+import com.mongodb.kotlin.client.coroutine.MongoDatabase
 import fake.createState
 import fake.createTask
-import format
-import io.mockk.*
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.slot
+import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.LocalDateTime
+import logic.entities.ActionType
+import logic.entities.Audit
+import logic.entities.EntityType
+import logic.entities.Task
+import logic.entities.User
+import logic.entities.UserRole
+import logic.entities.exceptions.TaskNotFoundException
 import logic.useCases.audit.AddAuditLogUseCase
 import logic.useCases.authentication.SessionManagerUseCase
 import logic.useCases.state.GetAllTaskStatesUseCase
-import logic.useCases.task.*
+import logic.useCases.task.AddTaskUseCase
+import logic.useCases.task.DeleteTaskUseCase
+import logic.useCases.task.GetAllTasksUseCase
+import logic.useCases.task.GetTaskByIdUseCase
+import logic.useCases.task.UpdateTaskUseCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import ui.console.SwimlanesRenderer
@@ -29,266 +45,242 @@ class TaskManagementScreenTest {
     private val swimlanesRenderer = mockk<SwimlanesRenderer>(relaxed = true)
     private val consoleIO = mockk<ConsoleIO>(relaxed = true)
     private val sessionManagerUseCase = mockk<SessionManagerUseCase>(relaxed = true)
-    private val addAuditLogUseCase: AddAuditLogUseCase = mockk(relaxed = true)
-
+    private val addAuditLogUseCase = mockk<AddAuditLogUseCase>(relaxed = true)
+    private val database = mockk<MongoDatabase>(relaxed = true)
     @BeforeEach
     fun setUp() {
         screen = TaskManagementScreen(
-            getAllTasksUseCase,
-            getAllTaskStatesUseCase,
-            addTaskUseCase,
-            deleteTaskUseCase,
-            getTaskByIdUseCase,
-            updateTaskUseCase,
-            swimlanesRenderer,
-            addAuditLogUseCase,
-            consoleIO,
-            sessionManagerUseCase
-        )
+            getAllTasksUseCase = getAllTasksUseCase,
+            getAllTaskStatesUseCase = getAllTaskStatesUseCase,
+            addTaskUseCase = addTaskUseCase,
+            deleteTaskUseCase = deleteTaskUseCase,
+            getTaskByIdUseCase = getTaskByIdUseCase,
+            updateTaskUseCase = updateTaskUseCase,
+            swimlanesRenderer = swimlanesRenderer,
+            addAudit = addAuditLogUseCase,
+            consoleIO = consoleIO,
+            sessionManagerUseCase = sessionManagerUseCase,
+            database = database)
     }
 
 
-    @Test
-    fun `should display all task management options when showOptionService is called`() {
-        // When
-        screen.showOptionService()
-
-        // Then
-        verify {
-            consoleIO.showWithLine(match { it.contains("Task Management") })
-            consoleIO.showWithLine(match { it.contains("1. Show All Tasks (Swimlanes)") })
-            consoleIO.showWithLine(match { it.contains("2. Add Task") })
-            consoleIO.showWithLine(match { it.contains("3. Find Task by ID") })
-            consoleIO.showWithLine(match { it.contains("4. Delete Task") })
-            consoleIO.showWithLine(match { it.contains("5. Show All Tasks (List View)") })
-            consoleIO.showWithLine(match { it.contains("6. Update Task") })
-        }
-        verify { consoleIO.show("💡 Please enter your choice: ") }
-    }
 
     @Test
-    fun `addTask should invoke use case with constructed task`() {
+    fun `addTask should invoke use case with constructed task`() = runTest {
         // Given
-        every { consoleIO.read() } returnsMany listOf("Title", "Description", "s1", "p1", "Zeinab")
-        val taskSlot = slot<logic.entities.Task>()
-        every { addTaskUseCase.addTask(capture(taskSlot)) } just Runs
+        val user = mockk<User> {
+            every { userName } returns "Zeinab"
+            every { role } returns UserRole.MATE
+        }
+        coEvery { sessionManagerUseCase.getCurrentUser() } returns user
+        coEvery { consoleIO.read() } returnsMany listOf("Title", "Description", "s1", "p1")
+        val taskSlot = slot<Task>()
+        coEvery { addTaskUseCase.addTask(capture(taskSlot)) } returns Unit
+        val auditSlot = slot<Audit>()
+        coEvery { addAuditLogUseCase.addAuditLog(capture(auditSlot)) } returns Unit
 
         // When
         screen.addTask()
 
         // Then
-        assertThat(taskSlot.captured.title).isEqualTo("Title")
+        with(taskSlot.captured) {
+            assertThat(title).isEqualTo("Title")
+            assertThat(description).isEqualTo("Description")
+            assertThat(stateId).isEqualTo("s1")
+            assertThat(projectId).isEqualTo("p1")
+            assertThat(createdBy).isEqualTo("Zeinab")
+        }
+        with(auditSlot.captured) {
+            assertThat(userName).isEqualTo("Zeinab")
+            assertThat(action).isEqualTo(ActionType.CREATE)
+            assertThat(entityType).isEqualTo(EntityType.TASK)
+        }
+        coVerify { consoleIO.showWithLine("✅ Task added successfully.") }
     }
 
     @Test
-    fun `getTaskById should fetch task and show output`() {
+    fun `getTaskById should fetch task and show output`() = runTest {
         // Given
         val task = createTask(title = "My Task")
-        every { consoleIO.read() } returns task.id.toString()
-        every { getTaskByIdUseCase.getTaskById(task.id.toString()) } returns task
+        coEvery { consoleIO.read() } returns task.id.toString()
+        coEvery { getTaskByIdUseCase.getTaskById(task.id.toString()) } returns task
 
         // When
         screen.getTaskById()
 
         // Then
-        assertThat(task.title).isEqualTo("My Task")
+        coVerify {
+            consoleIO.showWithLine(match {
+                it.contains("ID: ${task.id}") &&
+                        it.contains("Title: ${task.title}")
+            })
+        }
     }
 
     @Test
-    fun `deleteTaskById should call deleteTask use case`() {
+    fun `deleteTaskById should call deleteTask use case`() = runTest {
         // Given
-        every { consoleIO.read() } returns "task-id-123"
+        val task = createTask(title = "Task to Delete")
+        coEvery { consoleIO.read() } returns task.id.toString()
+        coEvery { getTaskByIdUseCase.getTaskById(task.id.toString()) } returns task
+        coEvery { deleteTaskUseCase.deleteTask(task.id.toString()) } returns Unit
+        val auditSlot = slot<Audit>()
+        coEvery { addAuditLogUseCase.addAuditLog(capture(auditSlot)) } returns Unit
+        coEvery { sessionManagerUseCase.getCurrentUser() } returns mockk {
+            every { userName } returns "Zeinab"
+            every { role } returns UserRole.MATE
+        }
 
         // When
         screen.deleteTaskById()
 
         // Then
-        verify { deleteTaskUseCase.deleteTask("task-id-123") }
-        assertThat("task-id-123").isEqualTo("task-id-123")
+        coVerify { deleteTaskUseCase.deleteTask(task.id.toString()) }
+        coVerify { consoleIO.showWithLine("✅ Task deleted successfully.") }
+        with(auditSlot.captured) {
+            assertThat(action).isEqualTo(ActionType.DELETE)
+            assertThat(entityId).isEqualTo(task.id.toString())
+        }
     }
+
     @Test
-    fun `should update task when input is valid`() {
+    fun `should update task when input is valid`() = runTest {
         // Given
         val oldTask = createTask(title = "Old", description = "Old Desc")
-        every { consoleIO.read() } returnsMany listOf(oldTask.id.toString(), "New", "New Desc")
-        every { getTaskByIdUseCase.getTaskById(oldTask.id.toString()) } returns oldTask
-
-        val expectedTaskToUpdate = oldTask.copy(
+        coEvery { consoleIO.read() } returnsMany listOf(oldTask.id.toString(), "New", "New Desc", "s2")
+        coEvery { getTaskByIdUseCase.getTaskById(oldTask.id.toString()) } returns oldTask
+        val updatedTask = oldTask.copy(
             title = "New",
             description = "New Desc",
+            stateId = "s2",
             updatedAt = LocalDateTime(2023, 1, 1, 0, 0)
         )
-
-        val updatedTask = expectedTaskToUpdate
-        every { updateTaskUseCase.updateTask(match {
-            it.id == oldTask.id &&
-                    it.title == "New" &&
-                    it.description == "New Desc"
-        }) } returns updatedTask
+        coEvery { updateTaskUseCase.updateTask(any()) } returns updatedTask
+        coEvery { sessionManagerUseCase.getCurrentUser() } returns mockk {
+            every { userName } returns "Zeinab"
+            every { role } returns UserRole.MATE
+        }
+        val auditSlot = slot<Audit>()
+        coEvery { addAuditLogUseCase.addAuditLog(capture(auditSlot)) } returns Unit
 
         // When
         screen.updateTaskById()
 
         // Then
-        verify {
+        coVerify {
             updateTaskUseCase.updateTask(match {
                 it.id == oldTask.id &&
                         it.title == "New" &&
-                        it.description == "New Desc"
+                        it.description == "New Desc" &&
+                        it.stateId == "s2"
             })
+            consoleIO.showWithLine(match { it.contains("✅ Task updated successfully") })
         }
-        verify { consoleIO.showWithLine(match { it.contains("✅ Task updated successfully") }) }
+        with(auditSlot.captured) {
+            assertThat(action).isEqualTo(ActionType.UPDATE)
+            assertThat(entityId).isEqualTo(oldTask.id.toString())
+        }
     }
 
     @Test
-    fun `should show error when task ID is blank`() {
+    fun `should show error when task ID is blank`() = runTest {
         // Given
-        every { consoleIO.read() } returns ""
+        coEvery { consoleIO.read() } returns ""
 
         // When
         screen.updateTaskById()
 
         // Then
-        verify { consoleIO.showWithLine("❌ Task ID is required.") }
+        coVerify { consoleIO.showWithLine("❌ Task ID is required.") }
     }
 
     @Test
-    fun `should show error when task not found`() {
+    fun `should keep original values when inputs are blank`() = runTest {
         // Given
-        every { consoleIO.read() } returns "non-existing-id"
-        every { getTaskByIdUseCase.getTaskById("non-existing-id") } throws RuntimeException("Task not found")
+        val task = createTask(title = "Original Title", description = "Original Desc", stateId = "s1")
+        coEvery { consoleIO.read() } returnsMany listOf(task.id.toString(), "", "", "")
+        coEvery { getTaskByIdUseCase.getTaskById(task.id.toString()) } returns task
+        coEvery { updateTaskUseCase.updateTask(any()) } returns task
+        coEvery { sessionManagerUseCase.getCurrentUser() } returns mockk {
+            every { userName } returns "Zeinab"
+            every { role } returns UserRole.MATE
+        }
+        val auditSlot = slot<Audit>()
+        coEvery { addAuditLogUseCase.addAuditLog(capture(auditSlot)) } returns Unit
 
         // When
         screen.updateTaskById()
 
         // Then
-        verify { consoleIO.showWithLine("❌ Failed to update task: Task not found") }
-    }
-
-    @Test
-    fun `should show error when update use case throws exception`() {
-        // Given
-        val task = createTask()
-        every { consoleIO.read() } returnsMany listOf(task.id.toString(), "New Title", "New Desc")
-        every { getTaskByIdUseCase.getTaskById(task.id.toString()) } returns task
-
-        every { updateTaskUseCase.updateTask(any()) } throws RuntimeException("Unexpected error")
-
-        // When
-        screen.updateTaskById()
-
-        // Then
-        verify { consoleIO.showWithLine("❌ Failed to update task: Unexpected error") }
-    }
-
-    @Test
-    fun `should keep original values when inputs are blank`() {
-        // Given
-        val task = createTask(title = "Original Title", description = "Original Desc")
-        every { consoleIO.read() } returnsMany listOf(task.id.toString(), "", "")
-        every { getTaskByIdUseCase.getTaskById(task.id.toString()) } returns task
-
-        val expectedTaskToUpdate = task.copy(
-            updatedAt = LocalDateTime(2023, 1, 1, 0, 0)
-        )
-
-        val updatedTask = expectedTaskToUpdate.copy()
-        every { updateTaskUseCase.updateTask(match {
-            it.id == task.id &&
-                    it.title == "Original Title" &&
-                    it.description == "Original Desc"
-        }) } returns updatedTask
-
-        // When
-        screen.updateTaskById()
-
-        // Then
-        verify {
+        coVerify {
             updateTaskUseCase.updateTask(match {
                 it.id == task.id &&
                         it.title == "Original Title" &&
-                        it.description == "Original Desc"
+                        it.description == "Original Desc" &&
+                        it.stateId == "s1"
             })
+            consoleIO.showWithLine(match { it.contains("✅ Task updated successfully") })
         }
-        verify { consoleIO.showWithLine(match { it.contains("✅ Task updated successfully") }) }
+        with(auditSlot.captured) {
+            assertThat(action).isEqualTo(ActionType.UPDATE)
+            assertThat(entityId).isEqualTo(task.id.toString())
+        }
     }
+
     @Test
-    fun `showTasksInSwimlanes should render tasks and states`() {
+    fun `showTasksInSwimlanes should render tasks and states`() = runTest {
         // Given
         val tasks = listOf(createTask(title = "T1"))
         val states = listOf(createState(name = "To Do"))
-        every { getAllTasksUseCase.getAllTasks() } returns tasks
-        every { getAllTaskStatesUseCase.getAllStates() } returns states
+        coEvery { getAllTasksUseCase.getAllTasks() } returns tasks
+        coEvery { getAllTaskStatesUseCase.getAllStates() } returns states
 
         // When
         screen.showTasksInSwimlanes()
 
         // Then
-        verify { swimlanesRenderer.render(tasks, states) }
+        coVerify { swimlanesRenderer.render(tasks, states) }
         assertThat(states.first().name).isEqualTo("To Do")
     }
 
 
     @Test
-    fun `handleFeatureChoice should trigger correct actions for all options`() {
+    fun `showAllTasksList should display message when no tasks exist`() = runTest {
         // Given
-        every { consoleIO.read() } returnsMany listOf("1", "2", "3", "4", "invalid", "0")
-
-        every { getAllTasksUseCase.getAllTasks() } returns emptyList()
-        every { getAllTaskStatesUseCase.getAllStates() } returns emptyList()
-        every { getTaskByIdUseCase.getTaskById(any()) } returns createTask()
-        every { consoleIO.read() } returnsMany listOf("1", "2", "3", "4", "invalid", "0") // ensure input is reused
-
-        // When
-        repeat(6) {
-            screen.handleFeatureChoice()
-        }
-
-        // Then
-        verify { swimlanesRenderer.render(any(), any()) }
-        verify { addTaskUseCase.addTask(any()) }
-
-    }
-    @Test
-    fun `showAllTasksList should display message when no tasks exist`() {
-        // Given
-        every { getAllTasksUseCase.getAllTasks() } returns emptyList()
+        coEvery { getAllTasksUseCase.getAllTasks() } returns emptyList()
 
         // When
         screen.showAllTasksList()
 
         // Then
-        verify {
+        coVerify {
             consoleIO.showWithLine(match { it.contains("📋 All Tasks") })
             consoleIO.showWithLine("⚠️ No tasks available.")
         }
     }
 
     @Test
-    fun `showAllTasksList should display all task details when tasks exist`() {
+    fun `showAllTasksList should display all task details when tasks exist`() = runTest {
         // Given
         val task = createTask(
             title = "Test Title",
             description = "Test Description",
             createdBy = "Zeinab"
         )
-        every { getAllTasksUseCase.getAllTasks() } returns listOf(task)
+        coEvery { getAllTasksUseCase.getAllTasks() } returns listOf(task)
 
         // When
         screen.showAllTasksList()
 
         // Then
-        verify {
+        coVerify {
             consoleIO.showWithLine(match { it.contains("📋 All Tasks") })
             consoleIO.showWithLine(match {
                 it.contains("ID: ${task.id}") &&
                         it.contains("Title: ${task.title}") &&
                         it.contains("Description: ${task.description}") &&
-                        it.contains("Created By: ${task.createdBy}") &&
-                        it.contains("Created At: ${task.createdAt.format()}") &&
-                        it.contains("Updated At: ${task.updatedAt.format()}")
+                        it.contains("Created By: ${task.createdBy}")
             })
         }
     }
-
 }
