@@ -2,24 +2,27 @@ package data.remote.mongoDataSource
 
 import com.mongodb.client.model.Filters
 import com.mongodb.client.model.Filters.eq
-import com.mongodb.kotlin.client.coroutine.MongoDatabase
 import data.dto.*
 import data.remote.mongoDataSource.mongoConnection.MongoConnection
 import data.repository.remoteDataSource.MongoDBDataSource
-import kotlinx.coroutines.flow.firstOrNull
 import logic.entities.exceptions.InvalidLoginException
+import logic.entities.exceptions.ProjectNotFoundException
+import org.litote.kmongo.coroutine.CoroutineDatabase
+import java.util.*
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
 class MongoDBDataSourceImpl(
-    database: MongoDatabase = MongoConnection.database
+    database: CoroutineDatabase? = MongoConnection.database
 ) : MongoDBDataSource {
 
-    private val userCollection = database.getCollection<UserDTO>("users")
-    private val auditsCollection = database.getCollection<AuditDTO>("audits")
-    private val projectCollection = database.getCollection<ProjectDTO>("projects")
-    private val statesCollection = database.getCollection<TaskStateDTO>("states")
-    private val taskCollection = database.getCollection<TaskStateDTO>("users")
+    private val userCollection = database?.getCollection<UserDTO>("users")?: error("❌ MongoDB database is not connected.")
+
+    private val auditsCollection = database?.getCollection<AuditDTO>("audits")?: error("❌ MongoDB database is not connected.")
+
+    private val projectCollection = database?.getCollection<ProjectDTO>("projects")?: error("❌ MongoDB database is not connected.")
+    private val statesCollection = database?.getCollection<TaskStateDTO>("states")?: error("❌ MongoDB database is not connected.")
+    private val taskCollection = database?.getCollection<TaskStateDTO>("users")?: error("❌ MongoDB database is not connected.")
 
     @OptIn(ExperimentalUuidApi::class)
     override suspend fun saveUser(
@@ -39,7 +42,8 @@ class MongoDBDataSourceImpl(
 
     override suspend fun getAuthenticatedUser(username: String, password: String): UserDTO {
         val query = Filters.and(eq("userName", username), eq("password", password))
-        return userCollection.find(query).firstOrNull() ?: throw InvalidLoginException()
+        return userCollection.find(query).toList().firstOrNull() ?: throw InvalidLoginException()
+
     }
 
     override suspend fun getAllAuditLogs(): List<AuditDTO> {
@@ -57,25 +61,30 @@ class MongoDBDataSourceImpl(
     override suspend fun getAuditLogsByTaskId(taskId: String): List<AuditDTO> {
         TODO("Not yet implemented")
     }
-
-    override suspend fun getAllProjects(): List<ProjectDTO> {
-        TODO("Not yet implemented")
-    }
+    override suspend fun getAllProjects(): List<ProjectDTO> = projectCollection.find().toList()
 
     override suspend fun addProject(project: ProjectDTO) {
-        TODO("Not yet implemented")
+        projectCollection.insertOne(project)
     }
 
     override suspend fun deleteProject(projectId: String) {
-        TODO("Not yet implemented")
+        val result = projectCollection.deleteOneById(UUID.fromString(projectId))
+        if (result.deletedCount == 0L) {
+            throw ProjectNotFoundException("Project with ID $projectId not found.")
+        }
     }
 
+    @OptIn(ExperimentalUuidApi::class)
     override suspend fun updateProject(newProjects: ProjectDTO) {
-        TODO("Not yet implemented")
+        val result = projectCollection.replaceOneById(newProjects.id, newProjects)
+        if (result.matchedCount == 0L) {
+            throw ProjectNotFoundException("Project with ID ${newProjects.id} not found.")
+        }
     }
 
     override suspend fun getProjectById(projectId: String): ProjectDTO {
-        TODO("Not yet implemented")
+        return projectCollection.findOneById(UUID.fromString(projectId))
+            ?: throw ProjectNotFoundException("Project with ID $projectId not found.")
     }
 
     override suspend fun getAllTasks(): List<TaskDTO> {
