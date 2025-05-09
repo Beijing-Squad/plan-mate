@@ -1,6 +1,7 @@
 package ui.screens
 
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import logic.entities.User
@@ -72,27 +73,31 @@ class UserScreen(
     }
 
     @OptIn(ExperimentalUuidApi::class)
-    private suspend fun onClickGetAllUsers() {
+    private fun onClickGetAllUsers() {
         consoleIO.showWithLine("\n\u001B[36m📋 All Users:\u001B[0m")
 
         try {
-            val users = getAllUsers.getAllUsers()
+            uiScope.launch {
 
-            if (users.isEmpty()) {
-                consoleIO.showWithLine("\u001B[33m⚠️  No users found.\u001B[0m")
-            } else {
-                users.forEach { user ->
-                    consoleIO.showWithLine(
-                        """
+
+                val users = getAllUsers.getAllUsers()
+
+                if (users.isEmpty()) {
+                    consoleIO.showWithLine("\u001B[33m⚠️  No users found.\u001B[0m")
+                } else {
+                    users.forEach { user ->
+                        consoleIO.showWithLine(
+                            """
                         ╭─────────────────────────╮
                         │ ID: ${user.id}
                         │ Username: ${user.userName}
                         │ Role: ${user.role}
                         ╰─────────────────────────╯
                     """.trimIndent()
-                    )
+                        )
+                    }
+                    consoleIO.showWithLine("\n\u001B[32mTotal users: ${users.size}\u001B[0m")
                 }
-                consoleIO.showWithLine("\n\u001B[32mTotal users: ${users.size}\u001B[0m")
             }
         } catch (e: Exception) {
             consoleIO.showWithLine("\u001B[31m❌ Error: ${e.message ?: "Failed to fetch users"}\u001B[0m")
@@ -104,11 +109,10 @@ class UserScreen(
         consoleIO.showWithLine("\n\u001B[36m✏️ Update User\u001B[0m")
         val userId = Uuid.parse("ba0e1b3c-2239-4755-97fe-202d8619bd79")
 
-        runBlocking {
+        uiScope.launch {
             try {
-                val user = withContext(Dispatchers.IO) {
-                    getUserByUserId.getUserByUserId(userId.toString())
-                }
+                val user = getUserByUserId.getUserByUserId(userId.toString())
+
                 showCurrentUserDetails(user)
                 updateUserMenu(user)
             } catch (e: Exception) {
@@ -171,9 +175,8 @@ class UserScreen(
                 consoleIO.showWithLine("\u001B[31m❌ Passwords do not match! Please try again.\u001B[0m")
             } else {
                 runBlocking {
-                    val freshUserData = withContext(Dispatchers.IO) {
-                        getUserByUserId.getUserByUserId(user.id.toString())
-                    }
+                    val freshUserData = getUserByUserId.getUserByUserId(user.id.toString())
+
                     updateUserInSystem(freshUserData.copy(userName = freshUserData.userName, password = newPassword))
                 }
                 return
@@ -187,9 +190,8 @@ class UserScreen(
         val newUsername = getInput()
         if (!newUsername.isNullOrBlank()) {
             runBlocking {
-                val freshUserData = withContext(Dispatchers.IO) {
-                    getUserByUserId.getUserByUserId(user.id.toString())
-                }
+                val freshUserData = getUserByUserId.getUserByUserId(user.id.toString())
+
                 updateUserInSystem(freshUserData.copy(userName = newUsername, password = freshUserData.password))
             }
             return
@@ -232,9 +234,9 @@ class UserScreen(
 
         runBlocking {
             try {
-                val user = withContext(Dispatchers.IO) {
-                    userId?.let { getUserByUserId.getUserByUserId(it) }
-                }
+
+                val user = userId?.let { getUserByUserId.getUserByUserId(it) }
+
                 consoleIO.showWithLine(
                     """
             ╭─────────────────────────╮

@@ -9,7 +9,7 @@ import kotlin.uuid.Uuid
 @OptIn(ExperimentalUuidApi::class)
 fun toUserEntity(userDTO: UserDTO): User{
     return User(
-        id = Uuid.parse(userDTO.id ?: "ba0e1b3c-2239-4755-97fe-202d8619bd79"),
+        id = Uuid.parse(userDTO.id),
         userName = userDTO.userName,
         password = userDTO.password,
         role = UserRole.valueOf(userDTO.role)
