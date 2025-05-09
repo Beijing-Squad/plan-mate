@@ -1,18 +1,28 @@
 package data.remote.mongoDataSource
 
+import com.mongodb.MongoTimeoutException
 import com.mongodb.client.model.Filters
 import com.mongodb.client.model.Filters.eq
+import com.mongodb.client.model.Updates
 import com.mongodb.kotlin.client.coroutine.MongoDatabase
 import data.dto.*
 import data.remote.mongoDataSource.mongoConnection.MongoConnection
+import data.repository.PasswordHashingDataSource
+import data.repository.ValidationUserDataSource
 import data.repository.remoteDataSource.MongoDBDataSource
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.withContext
 import logic.entities.exceptions.InvalidLoginException
+import logic.entities.exceptions.UserNotFoundException
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
 class MongoDBDataSourceImpl(
-    database: MongoDatabase = MongoConnection.database
+    database: MongoDatabase = MongoConnection.database,
+    private val validationUserDataSource: ValidationUserDataSource,
+    private val passwordHashingDataSource: PasswordHashingDataSource
 ) : MongoDBDataSource {
 
     private val userCollection = database.getCollection<UserDTO>("users")
@@ -123,14 +133,49 @@ class MongoDBDataSourceImpl(
     }
 
     override suspend fun getAllUsers(): List<UserDTO> {
-        TODO("Not yet implemented")
+        return withContext(Dispatchers.IO) {
+            try {
+                userCollection.find().toList()
+            } catch (e: MongoTimeoutException) {
+                println("Database connection failed: ${e.message}")
+                emptyList()
+            }
+        }
+
     }
 
     override suspend fun getUserByUserId(userId: String): UserDTO {
-        TODO("Not yet implemented")
+        return getAllUsers()
+            .find { it.id == userId }
+            ?: throw UserNotFoundException()
     }
 
     override suspend fun updateUser(user: UserDTO): UserDTO {
-        TODO("Not yet implemented")
+        val filters = Filters.eq(UserDTO::id.name, user.id)
+        val existingUser = userCollection.find(filters).firstOrNull() ?: throw UserNotFoundException()
+
+        validationUserDataSource.validateUsername(user.userName)
+        validationUserDataSource.validatePassword(user.password)
+        val updates = buildList {
+            if (user.userName != existingUser.userName) {
+                add(Updates.set(UserDTO::userName.name, user.userName))
+            }
+            if (passwordHashingDataSource.hashPassword(user.password)
+                != passwordHashingDataSource.hashPassword(existingUser.password)
+            ) {
+                add(Updates.set(UserDTO::password.name, passwordHashingDataSource.hashPassword(user.password)))
+            }
+        }
+
+        if (updates.isNotEmpty()) {
+            val result = userCollection.updateOne(filters, Updates.combine(updates))
+            require(result.matchedCount.toInt() != 0) { throw UserNotFoundException() }
+        }
+
+        return userCollection.find(filters).firstOrNull() ?: throw UserNotFoundException()
+    }
+
+    private companion object {
+        const val USER_COLLECTION = "users"
     }
 }
