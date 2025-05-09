@@ -31,6 +31,8 @@ class TasksRepositoryImpl(
     }
 
     override suspend fun updateTask(updatedTask: Task): Task {
-        return toTaskEntity(taskMongoDBDataSource.updateTask(updatedTask))
+        val updatedDTO = taskMongoDBDataSource.updateTask(toTaskDTO(updatedTask))
+        return toTaskEntity(updatedDTO)
     }
+
 }
