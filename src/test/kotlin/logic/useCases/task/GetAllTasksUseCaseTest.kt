@@ -2,9 +2,10 @@ package logic.useCases.task
 
 import com.google.common.truth.Truth.assertThat
 import fake.createTask
-import io.mockk.every
+import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.mockk
-import io.mockk.verify
+import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.LocalDateTime
 import logic.repository.TasksRepository
 import org.junit.jupiter.api.BeforeEach
@@ -22,7 +23,7 @@ class GetAllTasksUseCaseTest {
     }
 
     @Test
-    fun `should return all tasks when multiple tasks exist`() {
+    fun `should return all tasks when multiple tasks exist`() = runTest {
         // Given
         val task1 = createTask(
             projectId = "project-1",
@@ -43,31 +44,31 @@ class GetAllTasksUseCaseTest {
             updatedAt = LocalDateTime(2023, 1, 1, 0, 0)
         )
         val tasks = listOf(task1, task2)
-        every { tasksRepository.getAllTasks() } returns tasks
+        coEvery { tasksRepository.getAllTasks() } returns tasks
 
         // When
         val result = getAllTasksUseCase.getAllTasks()
 
         // Then
         assertThat(result).containsExactly(task1, task2)
-        verify { tasksRepository.getAllTasks() }
+        coVerify { tasksRepository.getAllTasks() }
     }
 
     @Test
-    fun `should return empty list when no tasks exist`() {
+    fun `should return empty list when no tasks exist`() = runTest {
         // Given
-        every { tasksRepository.getAllTasks() } returns emptyList()
+        coEvery { tasksRepository.getAllTasks() } returns emptyList()
 
         // When
         val result = getAllTasksUseCase.getAllTasks()
 
         // Then
         assertThat(result).isEmpty()
-        verify { tasksRepository.getAllTasks() }
+        coVerify { tasksRepository.getAllTasks() }
     }
 
     @Test
-    fun `should return single task when only one task exists`() {
+    fun `should return single task when only one task exists`() = runTest {
         // Given
         val task = createTask(
             projectId = "project-1",
@@ -78,13 +79,13 @@ class GetAllTasksUseCaseTest {
             createdAt = LocalDateTime(2023, 1, 1, 0, 0),
             updatedAt = LocalDateTime(2023, 1, 1, 0, 0)
         )
-        every { tasksRepository.getAllTasks() } returns listOf(task)
+        coEvery { tasksRepository.getAllTasks() } returns listOf(task)
 
         // When
         val result = getAllTasksUseCase.getAllTasks()
 
         // Then
         assertThat(result).containsExactly(task)
-        verify { tasksRepository.getAllTasks() }
+        coVerify { tasksRepository.getAllTasks() }
     }
 }

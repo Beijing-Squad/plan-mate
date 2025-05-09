@@ -1,9 +1,8 @@
 package ui.screens
 
 import fake.createProject
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.verify
+import io.mockk.*
+import kotlinx.coroutines.test.runTest
 import logic.entities.UserRole
 import logic.useCases.audit.AddAuditLogUseCase
 import logic.useCases.project.*
@@ -49,64 +48,72 @@ class ProjectManagementScreenTest {
 
     @Test
     fun `list all projects when projects available`() {
-        // Given
-        val project = listOf(createProject())   
-        every { consoleIO.read() } returnsMany listOf("1", "0")
-        every { getAllProjectsUseCase.getAllProjects() } returns project
+        runTest {
+            // Given
+            val project = listOf(createProject())
+            every { consoleIO.read() } returnsMany listOf("1", "0")
+            coEvery { getAllProjectsUseCase.getAllProjects() } returns project
 
-        // When
-        projectScreen.handleFeatureChoice()
+            // When
+            projectScreen.handleFeatureChoice()
 
-        // Then
-        verify {
-            consoleIO.showWithLine(match { it.contains("defaultProjectName") })
+            // Then
+            verify {
+                consoleIO.showWithLine(match { it.contains("defaultProjectName") })
+            }
         }
     }
 
     @Test
     fun `list all projects empty when no projects`() {
-        // Given
-        every { consoleIO.read() } returnsMany listOf("1", "0")
-        every { getAllProjectsUseCase.getAllProjects() } returns emptyList()
+        runTest {
+            // Given
+            every { consoleIO.read() } returnsMany listOf("1", "0")
+            coEvery { getAllProjectsUseCase.getAllProjects() } returns emptyList()
 
-        // When
-        projectScreen.handleFeatureChoice()
+            // When
+            projectScreen.handleFeatureChoice()
 
-        // Then
-        verify {
-            consoleIO.showWithLine("\u001B[33m⚠️ No projects found.\u001B[0m")
+            // Then
+            verify {
+                consoleIO.showWithLine("\u001B[33m⚠️ No projects found.\u001B[0m")
+            }
         }
     }
 
     @Test
     fun `should add new project when selecting option 4`() {
-        // Given
-        every { consoleIO.read() } returnsMany listOf("4", "New Project", "Description", "creatorUser", "0")
+        runTest {
+            // Given
+            every { consoleIO.read() } returnsMany listOf("4", "New Project", "Description", "creatorUser", "0")
 
-        // When
-        projectScreen.handleFeatureChoice()
+            // When
+            projectScreen.handleFeatureChoice()
 
-        // Then
-        verify {
-            addProjectUseCase.addProject(match { it.name == "New Project" && it.description == "Description" })
-            addAuditLogUseCase.addAuditLog(any())
+            // Then
+            coVerify {
+                addProjectUseCase.addProject(match { it.name == "New Project" && it.description == "Description" })
+                addAuditLogUseCase.addAuditLog(any())
+            }
         }
     }
 
     @Test
     fun `should get new project when selecting option 2`() {
-        // Given
-        val project = createProject()
-        val projectId = project.id
-        every { consoleIO.read() } returnsMany listOf("2", "projectId", "0")
-        every { getProjectByIdUseCase.getProjectById(projectId.toString()) } returns project
+        runTest {
+            // Given
+            val project = createProject()
+            val projectId = project.id
+            every { consoleIO.read() } returnsMany listOf("2", "projectId", "0")
+            coEvery { getProjectByIdUseCase.getProjectById(projectId.toString()) } returns project
 
-        // When
-        projectScreen.handleFeatureChoice()
+            // When
+            projectScreen.handleFeatureChoice()
 
-        // Then
-        verify {
-            consoleIO.showWithLine(match { it.contains("Find Project by ID") })
+            // Then
+            verify {
+                consoleIO.showWithLine(match { it.contains("Find Project by ID") })
+            }
         }
     }
 

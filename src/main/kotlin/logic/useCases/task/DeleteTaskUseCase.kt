@@ -5,5 +5,5 @@ import logic.repository.TasksRepository
 class DeleteTaskUseCase(
     private val tasksRepository: TasksRepository
 ) {
-      fun  deleteTask(taskId : String) = tasksRepository.deleteTask(taskId)
+      suspend fun  deleteTask(taskId : String) = tasksRepository.deleteTask(taskId)
 }

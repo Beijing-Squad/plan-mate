@@ -3,13 +3,9 @@ package logic.repository
 import logic.entities.Project
 
 interface ProjectsRepository {
-    fun getAllProjects(): List<Project>
-
-    fun addProject(project: Project)
-
-    fun deleteProject(projectId: String)
-
-    fun updateProject(newProjects: Project)
-
-    fun getProjectById(projectId: String): Project
+    suspend fun getAllProjects(): List<Project>
+    suspend fun addProject(project: Project)
+    suspend fun deleteProject(projectId: String)
+    suspend fun updateProject(newProjects: Project)
+    suspend fun getProjectById(projectId: String): Project
 }
