@@ -7,7 +7,7 @@ import logic.repository.StatesRepository
 class GetAllTaskStatesUseCase(
     private val statesRepository: StatesRepository
 ) {
-    fun getAllStates(): List<TaskState>{
+    suspend fun getAllStates(): List<TaskState> {
         require(statesRepository.getAllStates().isNotEmpty()) {
             throw StateNotFoundException("No States Found")
         }

@@ -9,7 +9,7 @@ class UpdateTaskStateUseCase(
     private val getTaskStateByIdUseCase: GetTaskStateByIdUseCase
 ) {
     @OptIn(ExperimentalUuidApi::class)
-    fun updateState(taskState: TaskState): TaskState {
+    suspend fun updateState(taskState: TaskState): TaskState {
         getTaskStateByIdUseCase.getStateById(taskState.id.toString())
 
         return statesRepository.updateState(taskState)

@@ -9,7 +9,7 @@ class DeleteTaskStateUseCase(
     private val getTaskStateByIdUseCase: GetTaskStateByIdUseCase
 ) {
     @OptIn(ExperimentalUuidApi::class)
-    fun deleteState(taskState: TaskState): Boolean {
+    suspend fun deleteState(taskState: TaskState): Boolean {
         val existedState = getTaskStateByIdUseCase.getStateById(taskState.id.toString())
         return statesRepository.deleteState(existedState)
     }

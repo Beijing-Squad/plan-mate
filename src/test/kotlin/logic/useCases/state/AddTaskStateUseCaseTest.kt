@@ -3,8 +3,9 @@ package logic.useCases.state
 import com.google.common.truth.Truth.assertThat
 import fake.createProject
 import fake.createState
-import io.mockk.every
+import io.mockk.coEvery
 import io.mockk.mockk
+import kotlinx.coroutines.test.runTest
 import logic.entities.exceptions.InvalidStateNameException
 import logic.entities.exceptions.ProjectNotFoundException
 import logic.entities.exceptions.StateAlreadyExistException
@@ -37,71 +38,81 @@ class AddTaskStateUseCaseTest {
     @OptIn(ExperimentalUuidApi::class)
     @Test
     fun `should return true when add valid new state`() {
-        // Given
-        val project = listOf(
-            createProject(name = "PlanMate Core Features", createdBy = "adminUser01")
-        )
-        val newState = createState(name = "Done", projectId = project[0].id.toString())
+        runTest {
+            // Given
+            val project = listOf(
+                createProject(name = "PlanMate Core Features", createdBy = "adminUser01")
+            )
+            val newState = createState(name = "Done", projectId = project[0].id.toString())
 
-        every { statesRepository.getAllStates() } returns listOf()
-        every { projectsRepository.getAllProjects() } returns project
-        every { statesRepository.addState(newState) } returns true
+            coEvery { statesRepository.getAllStates() } returns listOf()
+            coEvery { projectsRepository.getAllProjects() } returns project
+            coEvery { statesRepository.addState(newState) } returns true
 
-        // When
-        val result = addTaskStateUseCase.addState(newState)
+            // When
+            val result = addTaskStateUseCase.addState(newState)
 
-        // Then
-        assertThat(result).isTrue()
+            // Then
+            assertThat(result).isTrue()
+        }
+
     }
 
     @OptIn(ExperimentalUuidApi::class)
     @Test
     fun `should throw exception when add invalid new state with empty name`() {
-        // Given
-        val project = listOf(
-            createProject(name = "PlanMate Core Features", createdBy = "adminUser01")
-        )
-        val newState = createState(name = "", projectId = project[0].id.toString())
+        runTest {
+            // Given
+            val project = listOf(
+                createProject(name = "PlanMate Core Features", createdBy = "adminUser01")
+            )
+            val newState = createState(name = "", projectId = project[0].id.toString())
 
-        every { statesRepository.getAllStates() } returns listOf()
-        every { projectsRepository.getAllProjects() } returns project
+            coEvery { statesRepository.getAllStates() } returns listOf()
+            coEvery { projectsRepository.getAllProjects() } returns project
 
-        // When & Then
-        assertThrows<InvalidStateNameException> {
-            addTaskStateUseCase.addState(newState)
+            // When & Then
+            assertThrows<InvalidStateNameException> {
+                addTaskStateUseCase.addState(newState)
+            }
         }
     }
 
     @OptIn(ExperimentalUuidApi::class)
     @Test
     fun `should throw exception when project does not exist`() {
-        // Given
-        val newState = createState(name = "Done", projectId = Uuid.random().toString())
+        runTest {
+            // Given
+            val newState = createState(name = "Done", projectId = Uuid.random().toString())
 
-        every { statesRepository.getAllStates() } returns listOf()
-        every { projectsRepository.getAllProjects() } returns listOf() // No matching project
+            coEvery { statesRepository.getAllStates() } returns listOf()
+            coEvery { projectsRepository.getAllProjects() } returns listOf() // No matching project
 
-        // When & Then
-        assertThrows<ProjectNotFoundException> {
-            addTaskStateUseCase.addState(newState)
+            // When & Then
+            assertThrows<ProjectNotFoundException> {
+                addTaskStateUseCase.addState(newState)
+            }
         }
     }
 
     @OptIn(ExperimentalUuidApi::class)
     @Test
     fun `should throw exception when adding state that already exists`() {
-        // Given
-        val project = listOf(
-            createProject(name = "PlanMate Core Features", createdBy = "adminUser01")
-        )
-        val existingState = createState(projectId = project[0].id.toString())
+        runTest {
+            // Given
+            val project = listOf(
+                createProject(name = "PlanMate Core Features", createdBy = "adminUser01")
+            )
+            val existingState = createState(projectId = project[0].id.toString())
 
-        every { statesRepository.getAllStates() } returns listOf(existingState)
-        every { getAllProjectsUseCase.getAllProjects() } returns project
+            coEvery { statesRepository.getAllStates() } returns listOf(existingState)
+            coEvery { getAllProjectsUseCase.getAllProjects() } returns project
 
-        // When & Then
-        assertThrows<StateAlreadyExistException> {
-            addTaskStateUseCase.addState(existingState)
+            // When & Then
+            assertThrows<StateAlreadyExistException> {
+                addTaskStateUseCase.addState(existingState)
+            }
         }
+
     }
 }
