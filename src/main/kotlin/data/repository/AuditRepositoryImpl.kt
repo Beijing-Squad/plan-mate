@@ -11,15 +11,12 @@ class AuditRepositoryImpl(
     override fun getAllAuditLogs(): List<Audit> {
         return auditDataSource.getAllAuditLogs()
     }
-
     override fun addAuditLog(audit: Audit) {
         auditDataSource.addAuditLog(audit)
     }
-
     override fun getAuditLogsByProjectId(projectId: String): List<Audit> {
         return auditDataSource.getAuditLogsByProjectId(projectId)
     }
-
     override fun getAuditLogsByTaskId(taskId: String): List<Audit> {
         return auditDataSource.getAuditLogsByTaskId(taskId)
     }
