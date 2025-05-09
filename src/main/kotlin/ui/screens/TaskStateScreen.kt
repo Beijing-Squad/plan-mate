@@ -1,6 +1,7 @@
 package ui.screens
 
 import format
+import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -65,121 +66,134 @@ class TaskStateScreen(
 
     @OptIn(ExperimentalUuidApi::class)
     private fun onChooseAddState() {
-        try {
-            val name = getInputWithLabel("📛 Enter State Name: ")
-            val projectId = Uuid.parse(getInputWithLabel("📁 Enter Project ID: "))
-            val taskState = TaskState(name = name, projectId = projectId)
-            val result = addTaskStateUseCase.addState(taskState)
-            val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+        runBlocking {
+            try {
+                val name = getInputWithLabel("📛 Enter State Name: ")
+                val projectId = Uuid.parse(getInputWithLabel("📁 Enter Project ID: "))
+                val taskState = TaskState(name = name, projectId = projectId)
+                val result = addTaskStateUseCase.addState(taskState)
+                val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
 
-            sessionManagerUseCase.getCurrentUser()?.userName?.let { userName ->
-                val actionDetails =
-                    "Admin $userName added new state ${taskState.id} with name '$name' at ${now.format()}"
+                sessionManagerUseCase.getCurrentUser()?.userName?.let { userName ->
+                    val actionDetails =
+                        "Admin $userName added new state ${taskState.id} with name '$name' at ${now.format()}"
 
-                addAudit.addAuditLog(
-                    Audit(
-                        id = Uuid.random(),
-                        userRole = UserRole.ADMIN,
-                        userName = sessionManagerUseCase.getCurrentUser()!!.userName,
-                        action = ActionType.UPDATE,
-                        entityType = EntityType.PROJECT,
-                        entityId = projectId.toString(),
-                        actionDetails = actionDetails,
-                        timeStamp = now
+                    addAudit.addAuditLog(
+                        Audit(
+                            id = Uuid.random(),
+                            userRole = UserRole.ADMIN,
+                            userName = sessionManagerUseCase.getCurrentUser()!!.userName,
+                            action = ActionType.UPDATE,
+                            entityType = EntityType.PROJECT,
+                            entityId = projectId.toString(),
+                            actionDetails = actionDetails,
+                            timeStamp = now
+                        )
                     )
-                )
-            }
+                }
 
-            showResult(result, "added")
-        } catch (e: StateAlreadyExistException) {
-            consoleIO.showWithLine("⚠️ ${e.message}")
-        } catch (e: InvalidStateNameException) {
-            consoleIO.showWithLine("⚠️ ${e.message}")
-        } catch (e: ProjectNotFoundException) {
-            consoleIO.showWithLine("⚠️ ${e.message}")
-        } catch (e: Exception) {
-            consoleIO.showWithLine("❌ Unexpected error: ${e.message}")
+                showResult(result, "added")
+            } catch (e: StateAlreadyExistException) {
+                consoleIO.showWithLine("⚠️ ${e.message}")
+            } catch (e: InvalidStateNameException) {
+                consoleIO.showWithLine("⚠️ ${e.message}")
+            } catch (e: ProjectNotFoundException) {
+                consoleIO.showWithLine("⚠️ ${e.message}")
+            } catch (e: Exception) {
+                consoleIO.showWithLine("❌ Unexpected error: ${e.message}")
+            }
         }
     }
 
     @OptIn(ExperimentalUuidApi::class)
     private fun onChooseDeleteState() {
-        try {
-            val id = Uuid.parse(getInputWithLabel("🆔 Enter State ID to delete: "))
-            val taskState = TaskState(id = id, name = "", projectId = Uuid.parse(""))
-            val result = deleteTaskStateUseCase.deleteState(taskState)
-            showResult(result, "deleted")
-        } catch (e: Exception) {
-            consoleIO.showWithLine("❌ ${e.message}")
+        runBlocking {
+            try {
+                val id = Uuid.parse(getInputWithLabel("🆔 Enter State ID to delete: "))
+                val taskState = TaskState(id = id, name = "", projectId = Uuid.parse(""))
+                val result = deleteTaskStateUseCase.deleteState(taskState)
+                showResult(result, "deleted")
+            } catch (e: Exception) {
+                consoleIO.showWithLine("❌ ${e.message}")
+            }
         }
     }
 
     @OptIn(ExperimentalUuidApi::class)
     private fun onChooseUpdateState() {
-        try {
-            val id = Uuid.parse(getInputWithLabel("🆔 Enter State ID to update: "))
-            val name = getInputWithLabel("📛 Enter New State Name: ")
-            val projectId = Uuid.parse(getInputWithLabel("📁 Enter New Project ID: "))
-            val taskState = TaskState(id = id, name = name, projectId = projectId)
-            val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
-            val updated = updateTaskStateUseCase.updateState(taskState)
-            sessionManagerUseCase.getCurrentUser()?.userName?.let { userName ->
-                val actionDetails = "Admin $userName updated state ${taskState.id} with name '$name' at ${now.format()}"
-                addAudit.addAuditLog(
-                    Audit(
-                        id = Uuid.random(),
-                        userRole = UserRole.ADMIN,
-                        userName = sessionManagerUseCase.getCurrentUser()!!.userName,
-                        action = ActionType.UPDATE,
-                        entityType = EntityType.PROJECT,
-                        entityId = projectId.toString(),
-                        actionDetails = actionDetails,
-                        timeStamp = now
+        runBlocking {
+            try {
+                val id = Uuid.parse(getInputWithLabel("🆔 Enter State ID to update: "))
+                val name = getInputWithLabel("📛 Enter New State Name: ")
+                val projectId = Uuid.parse(getInputWithLabel("📁 Enter New Project ID: "))
+                val taskState = TaskState(id = id, name = name, projectId = projectId)
+                val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+                val updated = updateTaskStateUseCase.updateState(taskState)
+                sessionManagerUseCase.getCurrentUser()?.userName?.let { userName ->
+                    val actionDetails =
+                        "Admin $userName updated state ${taskState.id} with name '$name' at ${now.format()}"
+                    addAudit.addAuditLog(
+                        Audit(
+                            id = Uuid.random(),
+                            userRole = UserRole.ADMIN,
+                            userName = sessionManagerUseCase.getCurrentUser()!!.userName,
+                            action = ActionType.UPDATE,
+                            entityType = EntityType.PROJECT,
+                            entityId = projectId.toString(),
+                            actionDetails = actionDetails,
+                            timeStamp = now
+                        )
                     )
-                )
+                }
+                consoleIO.showWithLine("✅ State updated:\n${formatState(updated)}")
+            } catch (e: Exception) {
+                consoleIO.showWithLine("❌ ${e.message}")
             }
-            consoleIO.showWithLine("✅ State updated:\n${formatState(updated)}")
-        } catch (e: Exception) {
-            consoleIO.showWithLine("❌ ${e.message}")
         }
     }
 
     private fun onChooseGetAllStates() {
-        try {
-            val states = getAllStates.getAllStates()
-            if (states.isEmpty()) {
-                consoleIO.showWithLine("❌ No states found")
-            } else {
-                consoleIO.showWithLine("\n📋 All States:\n")
-                states.forEach { consoleIO.showWithLine(formatState(it)) }
+        runBlocking {
+            try {
+                val states = getAllStates.getAllStates()
+                if (states.isEmpty()) {
+                    consoleIO.showWithLine("❌ No states found")
+                } else {
+                    consoleIO.showWithLine("\n📋 All States:\n")
+                    states.forEach { consoleIO.showWithLine(formatState(it)) }
+                }
+            } catch (e: Exception) {
+                consoleIO.showWithLine("❌ ${e.message}")
             }
-        } catch (e: Exception) {
-            consoleIO.showWithLine("❌ ${e.message}")
         }
     }
 
     private fun onChooseGetStateById() {
-        try {
-            val id = getInputWithLabel("🆔 Enter State ID: ")
-            val state = getStateById.getStateById(id)
-            consoleIO.showWithLine("✅ State found:\n${formatState(state)}")
-        } catch (e: Exception) {
-            consoleIO.showWithLine("❌ ${e.message}")
+        runBlocking {
+            try {
+                val id = getInputWithLabel("🆔 Enter State ID: ")
+                val state = getStateById.getStateById(id)
+                consoleIO.showWithLine("✅ State found:\n${formatState(state)}")
+            } catch (e: Exception) {
+                consoleIO.showWithLine("❌ ${e.message}")
+            }
         }
     }
 
     private fun onChooseGetStatesByProjectId() {
-        try {
-            val projectId = getInputWithLabel("📁 Enter Project ID: ")
-            val states = getStatesByProjectId.getStatesByProjectId(projectId)
-            if (states.isEmpty()) {
-                consoleIO.showWithLine("❌ No states found for this project.")
-            } else {
-                consoleIO.showWithLine("\n📁 States in project:\n")
-                states.forEach { consoleIO.showWithLine(formatState(it)) }
+        runBlocking {
+            try {
+                val projectId = getInputWithLabel("📁 Enter Project ID: ")
+                val states = getStatesByProjectId.getStatesByProjectId(projectId)
+                if (states.isEmpty()) {
+                    consoleIO.showWithLine("❌ No states found for this project.")
+                } else {
+                    consoleIO.showWithLine("\n📁 States in project:\n")
+                    states.forEach { consoleIO.showWithLine(formatState(it)) }
+                }
+            } catch (e: Exception) {
+                consoleIO.showWithLine("❌ ${e.message}")
             }
-        } catch (e: Exception) {
-            consoleIO.showWithLine("❌ ${e.message}")
         }
     }
 
