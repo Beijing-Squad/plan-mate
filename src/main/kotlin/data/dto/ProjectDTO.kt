@@ -1,11 +1,9 @@
 package data.dto
 
 import kotlinx.datetime.LocalDateTime
-import kotlin.uuid.ExperimentalUuidApi
-import kotlin.uuid.Uuid
 
-data class ProjectDTO @OptIn(ExperimentalUuidApi::class) constructor(
-    val id: Uuid = Uuid.random(),
+data class ProjectDTO (
+    val id: String,
     val name: String,
     val description: String,
     val createdBy: String,
