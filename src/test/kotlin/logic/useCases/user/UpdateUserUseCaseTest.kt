@@ -2,14 +2,12 @@ package logic.useCases.user
 
 import com.google.common.truth.Truth.assertThat
 import fake.createUser
-import io.mockk.every
+import io.mockk.coEvery
 import io.mockk.mockk
-import logic.entities.exceptions.InvalidPasswordException
-import logic.entities.exceptions.InvalidUserNameException
+import kotlinx.coroutines.test.runTest
 import logic.repository.UserRepository
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import kotlin.uuid.ExperimentalUuidApi
 
 class UpdateUserUseCaseTest {
@@ -32,14 +30,11 @@ class UpdateUserUseCaseTest {
         val password = "12345678"
         val mohammed = createUser(userName = userName, password = password)
         val userUpdated = mohammed.copy(userName = "mohammed2001")
-        // When
-        every { userRepository.updateUser(mohammed) } returns userUpdated
-        val actual = updateUser.updateUser(mohammed)
-        // Then
-        assertThat(actual).isEqualTo(userUpdated)
-    }
-
-    private companion object {
-        const val EMPTY_STRING = ""
+        // When && Then
+        coEvery { userRepository.updateUser(mohammed) } returns userUpdated
+        runTest {
+            val actual = updateUser.updateUser(mohammed)
+            assertThat(actual).isEqualTo(userUpdated)
+        }
     }
 }

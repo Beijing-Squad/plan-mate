@@ -1,12 +1,13 @@
 package di
 
 import com.mongodb.kotlin.client.coroutine.MongoDatabase
-import data.remote.mongoDataSource.*
+import data.local.csvDataSource.MD5HashPasswordImpl
+import data.local.csvDataSource.ValidationUserDataSourceImpl
+import data.remote.mongoDataSource.MongoDBDataSourceImpl
 import data.remote.mongoDataSource.mongoConnection.MongoConnection
-import data.repository.dataSource.*
-import data.repository.mongoDataSource.UserMongoDataSourceImpl
-import data.repository.remoteDataSource.TaskStateMongoDBDataSource
-import org.koin.core.qualifier.named
+import data.repository.PasswordHashingDataSource
+import data.repository.ValidationUserDataSource
+import data.repository.remoteDataSource.MongoDBDataSource
 import org.koin.dsl.module
 
 val mongoModule = module {
@@ -15,31 +16,11 @@ val mongoModule = module {
         MongoConnection.database
     }
 
-    single(named("dbScope")) {
-        MongoConnection.dbScope
+    single<PasswordHashingDataSource> { MD5HashPasswordImpl() }
+    single<ValidationUserDataSource> { ValidationUserDataSourceImpl() }
+
+    single<MongoDBDataSource> {
+        MongoDBDataSourceImpl(get(), get(), get())
     }
 
-    single<UserDataSource> {
-        UserMongoDataSourceImpl(get(), get(named("dbScope")))
-    }
-
-    single<TasksDataSource> {
-        TaskMongoDataSourceImpl(get(), get(named("dbScope")))
-    }
-
-    single<ProjectDataSource> {
-        ProjectMongoDataSourceImpl(get(), get(named("dbScope")))
-    }
-
-    single<TaskStateMongoDBDataSource> {
-        TaskStateMongoDataSourceImpl(get(), get(named("dbScope")))
-    }
-
-    single<AuditDataSource> {
-        AuditMongoDataSourceImpl(get(), get(named("dbScope")))
-    }
-
-    single<AuthenticationDataSource> {
-        AuthenticationMongoDataSourceImpl(get(), get(named("dbScope")))
-    }
 }
