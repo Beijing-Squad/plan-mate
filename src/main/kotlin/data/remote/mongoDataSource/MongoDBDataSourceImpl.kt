@@ -174,8 +174,4 @@ class MongoDBDataSourceImpl(
 
         return userCollection.find(filters).firstOrNull() ?: throw UserNotFoundException()
     }
-
-    private companion object {
-        const val USER_COLLECTION = "users"
-    }
 }
