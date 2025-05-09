@@ -1,13 +1,13 @@
 package data.repository
 
-import data.repository.remoteDataSource.TaskMongoDBDataSource
 import data.repository.mapper.toTaskDTO
 import data.repository.mapper.toTaskEntity
+import data.repository.remoteDataSource.MongoDBDataSource
 import logic.entities.Task
 import logic.repository.TasksRepository
 
 class TasksRepositoryImpl(
-    private val taskMongoDBDataSource: TaskMongoDBDataSource
+    private val taskMongoDBDataSource: MongoDBDataSource
 ) : TasksRepository {
 
     override suspend fun getAllTasks(): List<Task> {
