@@ -2,8 +2,9 @@ package logic.useCases.audit
 
 import com.google.common.truth.Truth.assertThat
 import fake.createAudit
-import io.mockk.every
+import io.mockk.coEvery
 import io.mockk.mockk
+import kotlinx.coroutines.test.runTest
 import logic.entities.ActionType
 import logic.entities.EntityType
 import logic.entities.UserRole
@@ -47,25 +48,25 @@ class GetAuditLogsByProjectIdUseCaseTest {
     }
 
     @Test
-    fun `should return list of audit logs when project id is found`() {
+    fun `should return list of audit logs when project id is found`() = runTest {
         // Given
         val givenId = "PROJECT-001"
-        every { auditRepository.getAllAuditLogs() } returns allAudit
-        every { auditRepository.getAuditLogsByProjectId(givenId) } returns listOf(
+        coEvery { auditRepository.getAllAuditLogs() } returns allAudit
+        coEvery { auditRepository.getAuditLogsByProjectId(givenId) } returns listOf(
             createAudit(
                 userRole = UserRole.ADMIN,
                 userName = "Adel",
                 action = ActionType.CREATE,
                 entityType = EntityType.PROJECT,
                 entityId = givenId,
-                ),
+            ),
             createAudit(
                 userRole = UserRole.ADMIN,
                 userName = "Adel",
                 action = ActionType.UPDATE,
                 entityType = EntityType.PROJECT,
                 entityId = givenId,
-                )
+            )
         )
 
         // When
@@ -76,10 +77,11 @@ class GetAuditLogsByProjectIdUseCaseTest {
     }
 
     @Test
-    fun `should throw ProjectNotFoundException of audit logs when project id not found`() {
+    fun `should throw ProjectNotFoundException when project id not found`() = runTest {
         // Given
         val givenId = "PROJECT-001"
-        every { auditRepository.getAllAuditLogs() } returns allAudit
+        coEvery { auditRepository.getAllAuditLogs() } returns allAudit
+        coEvery { auditRepository.getAuditLogsByProjectId(givenId) } returns emptyList()
 
         // When && Then
         assertThrows<ProjectNotFoundException> {
@@ -88,15 +90,14 @@ class GetAuditLogsByProjectIdUseCaseTest {
     }
 
     @Test
-    fun `should throw InvalidInputException when project id is blank`() {
+    fun `should throw InvalidInputException when project id is blank`() = runTest {
         // Given
         val givenId = " "
-        every { auditRepository.getAllAuditLogs() } returns allAudit
+        coEvery { auditRepository.getAllAuditLogs() } returns allAudit
 
         // When && Then
         assertThrows<InvalidInputException> {
             getAuditLogsByProjectIdUseCase.getAuditLogsByProjectId(givenId)
         }
     }
-
 }
