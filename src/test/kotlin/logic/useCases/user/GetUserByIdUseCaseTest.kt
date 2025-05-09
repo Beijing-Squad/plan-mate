@@ -1,7 +1,6 @@
 package logic.useCases.user
 
 import com.google.common.truth.Truth.assertThat
-import data.repository.UserRepositoryImpl
 import fake.createUser
 import io.mockk.coEvery
 import io.mockk.mockk
@@ -11,14 +10,14 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import kotlin.uuid.ExperimentalUuidApi
 
-class GetUserByUserIdUseCaseTest {
+class GetUserByIdUseCaseTest {
 
     private lateinit var getUserByUserId: GetUserByIdUseCase
     private lateinit var userRepository: UserRepository
 
     @BeforeEach
     fun setUp() {
-        userRepository = UserRepositoryImpl(mockk())
+        userRepository = mockk(relaxed = true)
         getUserByUserId = GetUserByIdUseCase(userRepository)
     }
 
