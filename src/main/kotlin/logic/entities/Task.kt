@@ -1,6 +1,6 @@
 package logic.entities
 
-import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.LocalDate
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -12,6 +12,6 @@ data class Task(
     val description: String,
     val createdBy: String,
     val stateId: String,
-    val createdAt: LocalDateTime,
-    val updatedAt: LocalDateTime
+    val createdAt: LocalDate,
+    val updatedAt: LocalDate
 )

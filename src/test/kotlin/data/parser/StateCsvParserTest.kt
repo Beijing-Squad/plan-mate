@@ -1,92 +1,56 @@
 package data.parser
 
 import com.google.common.truth.Truth.assertThat
-import data.local.csvDataSource.parser.TaskStateCsvParser
 import fake.createState
-import logic.entities.TaskState
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import kotlin.uuid.ExperimentalUuidApi
-import kotlin.uuid.Uuid
 
-@OptIn(ExperimentalUuidApi::class)
+
 class StateCsvParserTest {
 
-    private lateinit var parser: TaskStateCsvParser
+    private lateinit var parser: StateCsvParser
 
     @BeforeEach
     fun setup() {
-        parser = TaskStateCsvParser()
+        parser = StateCsvParser()
     }
 
     @Test
     fun `should return correct CSV header`() {
+        // When
         val header = parser.header()
+
+        // Then
         assertThat(header).isEqualTo("id,name,projectId")
     }
 
     @Test
     fun `should deserialize line to correct State object`() {
         // Given
-        val id = "123e4567-e89b-12d3-a456-426614174000"
-        val name = "TODO"
-        val projectId = "project-001"
-        val line = "$id,$name,$projectId"
+        val line = "252,TODO,123e4567-e89b-12d3-a456-426614174000"
 
         // When
-        val result: TaskState = parser.deserializer(line)
+        val result = parser.deserializer(line)
 
         // Then
         with(result) {
-            assertThat(this.id).isEqualTo(Uuid.parse(id))
-            assertThat(this.name).isEqualTo(name)
-            assertThat(this.projectId).isEqualTo(projectId)
+            assertThat(id).isEqualTo("252")
+            assertThat(name).isEqualTo("TODO")
+            assertThat(projectId).isEqualTo("123e4567-e89b-12d3-a456-426614174000")
         }
     }
 
     @Test
-    fun `should return correct id from State object`() {
+    fun `should return correct id from Audit object`() {
         // Given
-        val fixedId = Uuid.parse("123e4567-e89b-12d3-a456-426614174000")
-        val state = createState(id = fixedId)
+        val fakeId = "123e4567-e89b-12d3-a456-426614174000"
+        val state = createState().copy(id = fakeId)
 
         // When
         val result = parser.getId(state)
 
         // Then
-        assertThat(result).isEqualTo(fixedId.toString())
+        assertThat(result).isEqualTo("123e4567-e89b-12d3-a456-426614174000")
     }
 
-    @Test
-    fun `should serialize TaskState correctly`() {
-        // Given
-        val state = createState(
-            id = Uuid.parse("11111111-1111-1111-1111-111111111111"),
-            name = "InProgress",
-            projectId = "project-123"
-        )
-
-        // When
-        val csv = parser.serializer(state)
-
-        // Then
-        assertThat(csv).isEqualTo("11111111-1111-1111-1111-111111111111,InProgress,project-123")
-    }
-
-    @Test
-    fun `serialize and deserialize should result in the same TaskState`() {
-        // Given
-        val original = createState(
-            id = Uuid.parse("22222222-2222-2222-2222-222222222222"),
-            name = "Review",
-            projectId = "project-456"
-        )
-
-        // When
-        val serialized = parser.serializer(original)
-        val deserialized = parser.deserializer(serialized)
-
-        // Then
-        assertThat(deserialized).isEqualTo(original)
-    }
 }

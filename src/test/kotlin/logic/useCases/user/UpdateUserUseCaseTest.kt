@@ -1,27 +1,29 @@
 package logic.useCases.user
 
 import com.google.common.truth.Truth.assertThat
+import data.repository.UserRepositoryImpl
 import fake.createUser
 import io.mockk.every
 import io.mockk.mockk
-import logic.entities.exceptions.InvalidPasswordException
-import logic.entities.exceptions.InvalidUserNameException
 import logic.repository.UserRepository
+import logic.useCases.authentication.MD5PasswordUseCase
+import logic.useCases.authentication.SessionManager
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import kotlin.uuid.ExperimentalUuidApi
 
 class UpdateUserUseCaseTest {
     private lateinit var updateUser: UpdateUserUseCase
     private lateinit var userRepository: UserRepository
+    private lateinit var mD5Password: MD5PasswordUseCase
+    private lateinit var sessionManager: SessionManager
 
     @BeforeEach
     fun setUp() {
-        userRepository = mockk(relaxed = true)
-        updateUser = UpdateUserUseCase(
-            userRepository
-        )
+        userRepository = UserRepositoryImpl(mockk(relaxed = true))
+        mD5Password = mockk(relaxed = true)
+        sessionManager = mockk(relaxed = true)
+        updateUser = UpdateUserUseCase(userRepository, mD5Password, sessionManager)
     }
 
     @OptIn(ExperimentalUuidApi::class)
@@ -33,13 +35,38 @@ class UpdateUserUseCaseTest {
         val mohammed = createUser(userName = userName, password = password)
         val userUpdated = mohammed.copy(userName = "mohammed2001")
         // When
-        every { userRepository.updateUser(mohammed) } returns userUpdated
-        val actual = updateUser.updateUser(mohammed)
+
+        every { sessionManager.getCurrentUser() } returns mohammed
+        val actual = updateUser.updateUser(userUpdated)
+
         // Then
-        assertThat(actual).isEqualTo(userUpdated)
+        assertThat(actual.isSuccess).isTrue()
     }
 
-    private companion object {
-        const val EMPTY_STRING = ""
+    @Test
+    fun `should throw InvalidUserNameException when username is invalid`() {
+        // Given
+        val user = createUser(userName = "")
+
+        // When
+        val actual = updateUser.updateUser(user)
+
+        // Given
+        assertThat(actual.isFailure).isTrue()
+
     }
+
+    @Test
+    fun `should throw InvalidPasswordException when password is invalid`() {
+        // Given
+        val user = createUser(password = "")
+
+        // When
+        val actual = updateUser.updateUser(user)
+
+        // Given
+        assertThat(actual.isFailure).isTrue()
+
+    }
+
 }

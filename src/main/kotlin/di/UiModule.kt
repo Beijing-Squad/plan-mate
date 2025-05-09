@@ -3,6 +3,7 @@ package di
 import logic.entities.UserRole
 import org.koin.dsl.module
 import ui.console.SwimlanesRenderer
+import ui.main.PlanMateConsoleUi
 import ui.main.consoleIO.ConsoleIO
 import ui.main.consoleIO.SystemConsoleIOImpl
 import ui.screens.*
@@ -30,22 +31,7 @@ val uiModule = module {
     }
 
     single {
-        AdminScreen(
-            get(), get(), get(),
-            get(), get(), get(),
-            get(), get()
-        )
-    }
-
-    single {
-        MateScreen(
-            get(), get(), get(),
-            get(), get(), get()
-        )
-    }
-
-    single {
-        TaskStateScreen(
+        StateScreen(
             get(), get(), get(),
             get(), get(), get(),
             get(), get(), get()
@@ -70,6 +56,19 @@ val uiModule = module {
     single {
         UserScreen(
             get(), get(), get(), get(), get()
+        )
+    }
+
+    single {
+        PlanMateConsoleUi(
+            listOf(
+                get<ProjectManagementScreen>(),
+                get<StateScreen>(),
+                get<TaskManagementScreen>(),
+                get<AuditScreen>(),
+                get<UserScreen>()
+            ),
+            get()
         )
     }
 }

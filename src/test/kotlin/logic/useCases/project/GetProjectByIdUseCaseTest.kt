@@ -4,44 +4,81 @@ import com.google.common.truth.Truth.assertThat
 import fake.createProject
 import io.mockk.every
 import io.mockk.mockk
+import logic.entities.UserRole
+import logic.entities.exceptions.CsvReadException
 import logic.entities.exceptions.ProjectNotFoundException
+import logic.entities.exceptions.ProjectUnauthorizedUserException
 import logic.repository.ProjectsRepository
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import kotlin.uuid.ExperimentalUuidApi
-import kotlin.uuid.Uuid
 
 class GetProjectByIdUseCaseTest {
 
-    private val projectRepository = mockk<ProjectsRepository>()
-    private val getProjectByIdUseCase = GetProjectByIdUseCase(projectRepository)
+    private lateinit var getProjectByIdUseCase: GetProjectByIdUseCase
+    private lateinit var projectRepository: ProjectsRepository
+
+
+    @BeforeEach
+    fun setUp() {
+        projectRepository = mockk(relaxed = true)
+        getProjectByIdUseCase = GetProjectByIdUseCase(projectRepository)
+    }
 
     @OptIn(ExperimentalUuidApi::class)
     @Test
-    fun `should return project by id successfully`() {
+    fun `should return project when is exist`() {
         // Given
-        val projectId = Uuid.random()
-        val expectedProject = createProject().copy(id = projectId)
-
-        every { projectRepository.getProjectById(projectId.toString()) } returns expectedProject
+        val foundProject = createProject()
+        val allProjects = listOf(foundProject, createProject())
+        val foundProjectID = foundProject.id.toString()
+        every { projectRepository.getAllProjects() } returns allProjects
 
         // When
-        val result = getProjectByIdUseCase.getProjectById(projectId.toString())
+        val result = getProjectByIdUseCase.getProjectById(foundProjectID, UserRole.ADMIN).getOrThrow()
 
         // Then
-        assertThat(result).isEqualTo(expectedProject)
+        assertThat(result).isEqualTo(foundProject)
     }
 
+    @OptIn(ExperimentalUuidApi::class)
     @Test
-    fun `should throw exception when project is not found`() {
+    fun `should throw exception when project is notExist`() {
         // Given
-        val invalidProjectId = "invalid-id"
-        every { projectRepository.getProjectById(invalidProjectId) } throws ProjectNotFoundException("Not found")
+        val projectId = createProject().id.toString()
+        val allProjects = listOf(createProject(), createProject())
+        every { projectRepository.getAllProjects() } returns allProjects
 
-        // When & Then
-        try {
-            getProjectByIdUseCase.getProjectById(invalidProjectId)
-        } catch (e: ProjectNotFoundException) {
-            assertThat(e.message).isEqualTo("Not found")
+        // When && Then
+        assertThrows<ProjectNotFoundException> {
+            getProjectByIdUseCase.getProjectById(projectId, UserRole.ADMIN).getOrThrow()
         }
     }
+
+    @OptIn(ExperimentalUuidApi::class)
+    @Test
+    fun `should throw exception when user is not admin`() {
+        // Given
+        val projectId = createProject().id.toString()
+
+        // When && Then
+        assertThrows<ProjectUnauthorizedUserException> {
+            getProjectByIdUseCase.getProjectById(projectId, UserRole.MATE).getOrThrow()
+        }
+    }
+
+    @OptIn(ExperimentalUuidApi::class)
+    @Test
+    fun `should throw exception when there is error in csv file`() {
+        // Given
+        val projectId = createProject().id.toString()
+        every { projectRepository.getAllProjects() } throws CsvReadException("")
+
+        // When && Then
+        assertThrows<CsvReadException> {
+            getProjectByIdUseCase.getProjectById(projectId, UserRole.ADMIN).getOrThrow()
+        }
+    }
+
 }

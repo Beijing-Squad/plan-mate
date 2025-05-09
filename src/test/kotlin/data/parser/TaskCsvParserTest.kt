@@ -1,8 +1,8 @@
 package data.parser
 
 import com.google.common.truth.Truth.assertThat
-import data.local.csvDataSource.parser.TaskCsvParser
 import fake.createTask
+import kotlinx.datetime.LocalDate
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -48,8 +48,8 @@ class TaskCsvParserTest {
                         "defaultDescription," +
                         "defaultCreator," +
                         "defaultStateId," +
-                        "2023-01-01T00:00," +
-                        "2023-01-01T00:00"
+                        "2023-01-01," +
+                        "2023-01-01"
             )
         }
     }
@@ -63,8 +63,8 @@ class TaskCsvParserTest {
                 "View screen," +
                 "Mohamed," +
                 "98," +
-                "2024-04-01T00:00," +
-                "2024-04-01T00:00"
+                "2024-04-01," +
+                "2024-04-01"
 
         // When
         val result = parser.deserializer(line)
@@ -77,8 +77,8 @@ class TaskCsvParserTest {
             assertThat(description).isEqualTo("View screen")
             assertThat(createdBy).isEqualTo("Mohamed")
             assertThat(stateId).isEqualTo("98")
-            assertThat(createdAt.toString()).isEqualTo("2024-04-01T00:00")
-            assertThat(updatedAt.toString()).isEqualTo("2024-04-01T00:00")
+            assertThat(createdAt).isEqualTo(LocalDate(2024, 4, 1))
+            assertThat(updatedAt).isEqualTo(LocalDate(2024, 4, 1))
         }
     }
 

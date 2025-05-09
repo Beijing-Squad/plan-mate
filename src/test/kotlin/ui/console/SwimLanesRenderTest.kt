@@ -6,7 +6,6 @@ import org.junit.jupiter.api.*
 import ui.main.consoleIO.ConsoleIO
 import fake.createTask
 import fake.createState
-import kotlin.uuid.ExperimentalUuidApi
 
 class SwimlanesRendererTest {
 
@@ -32,31 +31,29 @@ class SwimlanesRendererTest {
         val task = createTask()
         swimlanesRenderer.render(
             tasks = listOf(task),
-            taskStates = emptyList()
+            states = emptyList()
         )
 
         assertThat(output).containsExactly("⚠️ No states available.")
     }
 
-    @OptIn(ExperimentalUuidApi::class)
     @Test
     fun `render shows warning when tasks are empty`() {
         val state = createState()
         swimlanesRenderer.render(
             tasks = emptyList(),
-            taskStates = listOf(state)
+            states = listOf(state)
         )
 
         assertThat(output).containsExactly("⚠️ No tasks available.")
     }
 
-    @OptIn(ExperimentalUuidApi::class)
     @Test
     fun `render prints tasks under each state`() {
-        val state1 = createState(name = "To Do")
-        val state2 = createState(name = "Done")
-        val task1 = createTask(title = "Task A", stateId = state1.id.toString())
-        val task2 = createTask(title = "Task B", stateId = state2.id.toString())
+        val state1 = createState(id = "1", name = "To Do")
+        val state2 = createState(id = "2", name = "Done")
+        val task1 = createTask(title = "Task A", stateId = "1")
+        val task2 = createTask(title = "Task B", stateId = "2")
 
         swimlanesRenderer.render(listOf(task1, task2), listOf(state1, state2))
 
@@ -68,14 +65,13 @@ class SwimlanesRendererTest {
         assertThat(output).hasSize(3)
     }
 
-    @OptIn(ExperimentalUuidApi::class)
     @Test
     fun `render handles multiple tasks in a single state`() {
-        val state1 = createState(name = "Backlog")
-        val state2 = createState(name = "Review")
-        val task1 = createTask(title = "Task A", stateId = state1.id.toString())
-        val task2 = createTask(title = "Task B", stateId = state1.id.toString())
-        val task3 = createTask(title = "Task C", stateId = state2.id.toString())
+        val state1 = createState(id = "1", name = "Backlog")
+        val state2 = createState(id = "2", name = "Review")
+        val task1 = createTask(title = "Task A", stateId = "1")
+        val task2 = createTask(title = "Task B", stateId = "1")
+        val task3 = createTask(title = "Task C", stateId = "2")
 
         swimlanesRenderer.render(listOf(task1, task2, task3), listOf(state1, state2))
 
@@ -86,17 +82,16 @@ class SwimlanesRendererTest {
         assertThat(output).hasSize(4)
     }
 
-    @OptIn(ExperimentalUuidApi::class)
     @Test
     fun `render truncates long task titles to fit column`() {
         val longTitle = "Very long task title that should be trimmed"
-        val state = createState(name = "TrimTest")
-        val task = createTask(title = longTitle, stateId = state.id.toString())
+        val state = createState(id = "1", name = "TrimTest")
+        val task = createTask(title = longTitle, stateId = "1")
 
         swimlanesRenderer.render(listOf(task), listOf(state))
 
         val maxLength = 14
-        val expectedTruncated = "#1: $longTitle".take(maxLength).padEnd(20)
+        val expectedTruncated = "#1: ${longTitle}".take(maxLength).padEnd(20)
         assertThat(output[2]).isEqualTo(expectedTruncated)
     }
 }

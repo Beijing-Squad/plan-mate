@@ -1,6 +1,6 @@
 package fake
 
-import kotlinx.datetime.*
+import kotlinx.datetime.LocalDate
 import logic.entities.ActionType
 import logic.entities.Audit
 import logic.entities.EntityType
@@ -15,8 +15,9 @@ fun createAudit(
     entityId: String = "defaultEntityId",
     entityType: EntityType = EntityType.PROJECT,
     action: ActionType = ActionType.CREATE,
-    actionDetails : String = "",
-    timeStamp: LocalDateTime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+    oldState: String? = null,
+    newState: String? = null,
+    timeStamp: LocalDate = LocalDate(2023, 1, 1)
 ): Audit {
     return Audit(
         id = Uuid.random(),
@@ -25,7 +26,8 @@ fun createAudit(
         entityId = entityId,
         entityType = entityType,
         action = action,
-        actionDetails = actionDetails,
+        oldState = oldState,
+        newState = newState,
         timeStamp = timeStamp
     )
 }

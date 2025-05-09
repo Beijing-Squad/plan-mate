@@ -1,10 +1,6 @@
 package data.csvDataSource.csv
 
 import com.google.common.truth.Truth.assertThat
-import data.local.csvDataSource.csv.CsvDataSourceImpl
-import data.local.csvDataSource.csv.CsvParser
-import data.local.csvDataSource.csv.CsvReader
-import data.local.csvDataSource.csv.CsvWriter
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verifyOrder
@@ -189,41 +185,48 @@ class CsvDataSourceImplTest {
             writer.updateLines(listOf("Name,Age,Gender"))
         }
     }
-    @Test
-    fun `should return item by id when item exists`() {
-        // Given
-        val csvLines = listOf("Name,Age,Gender", "John,25,Male")
-        val item = MyData("John", 25, "Male")
 
-        every { reader.readCsv() } returns csvLines
-        every { parser.deserializer("John,25,Male") } returns item
-        every { parser.getId(item) } returns "123"
+    @Test
+    fun `should don't make thing when id not found`() {
+        // Given
+        val lines = listOf("Name,Age,Gender", "Mohamed,25,Male")
+        val item1 = MyData("Mohamed", 25, "Male")
+
+        every { reader.readCsv() } returns lines
+        every { parser.deserializer("Mohamed,25,Male") } returns item1
+        every { parser.getId(item1) } returns "1"
+        every { parser.header() } returns "Name,Age,Gender"
+        every { parser.serializer(item1) } returns "Mohamed,25,Male"
 
         // When
-        val result = csvDataSource.getById("123")
+        csvDataSource.deleteById("100")
 
         // Then
-        assertThat(result).isEqualTo(item)
+        verify {
+            writer.updateLines(listOf("Name,Age,Gender", "Mohamed,25,Male"))
+        }
     }
 
     @Test
-    fun `should throw ProjectNotFoundException when deleting item with non-existing id`() {
+    fun `should throw CsvWriteException when error occurs during delete`() {
         // Given
-        val csvLines = listOf("Name,Age,Gender", "Alice,30,Female")
-        val item = MyData("Alice", 30, "Female")
+        val item1 = MyData("Mohamed", 25, "Male")
 
-        every { reader.readCsv() } returns csvLines
-        every { parser.deserializer("Alice,30,Female") } returns item
-        every { parser.getId(item) } returns "111"
+        every { reader.readCsv() } returns listOf("Name,Age,Gender", "Mohamed,25,Male")
+        every { parser.deserializer("John,25,Male") } returns item1
+        every { parser.getId(item1) } returns "1"
+        every { parser.header() } returns "Name,Age,Gender"
+        every { writer.updateLines(any()) } throws Exception("Delete failed")
 
         // When & Then
         val exception = assertThrows<CsvWriteException> {
-            csvDataSource.deleteById("999")
+            csvDataSource.deleteById("1")
         }
+        assertThat(exception.message).isEqualTo(
+            "Error deleting item from CSV: Error saving to CSV file: Delete failed"
+        )
 
-        assertThat(exception.message).contains("Item with ID: 999 does not exist.")
     }
-
 }
 
 // Sample data class for testing purposes

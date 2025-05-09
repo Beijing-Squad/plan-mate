@@ -1,7 +1,6 @@
 package data.parser
 
 import com.google.common.truth.Truth.assertThat
-import data.local.csvDataSource.parser.UserCsvParser
 import fake.createUser
 import logic.entities.UserRole
 import org.junit.jupiter.api.BeforeEach

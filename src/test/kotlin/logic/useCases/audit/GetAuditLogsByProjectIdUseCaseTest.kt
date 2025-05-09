@@ -4,6 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import fake.createAudit
 import io.mockk.every
 import io.mockk.mockk
+import kotlinx.datetime.LocalDate
 import logic.entities.ActionType
 import logic.entities.EntityType
 import logic.entities.UserRole
@@ -25,18 +26,21 @@ class GetAuditLogsByProjectIdUseCaseTest {
             userName = "Adel",
             action = ActionType.CREATE,
             entityType = EntityType.PROJECT,
+            timeStamp = LocalDate(2025, 4, 29)
         ),
         createAudit(
             userRole = UserRole.ADMIN,
             userName = "Adel",
             action = ActionType.UPDATE,
             entityType = EntityType.PROJECT,
+            timeStamp = LocalDate(2025, 4, 29)
         ),
         createAudit(
             userRole = UserRole.ADMIN,
             userName = "Adel",
             action = ActionType.UPDATE,
             entityType = EntityType.PROJECT,
+            timeStamp = LocalDate(2025, 4, 29)
         )
     )
 
@@ -58,14 +62,16 @@ class GetAuditLogsByProjectIdUseCaseTest {
                 action = ActionType.CREATE,
                 entityType = EntityType.PROJECT,
                 entityId = givenId,
-                ),
+                timeStamp = LocalDate(2025, 4, 29)
+            ),
             createAudit(
                 userRole = UserRole.ADMIN,
                 userName = "Adel",
                 action = ActionType.UPDATE,
                 entityType = EntityType.PROJECT,
                 entityId = givenId,
-                )
+                timeStamp = LocalDate(2025, 4, 29)
+            )
         )
 
         // When
@@ -97,6 +103,42 @@ class GetAuditLogsByProjectIdUseCaseTest {
         assertThrows<InvalidInputException> {
             getAuditLogsByProjectIdUseCase.getAuditLogsByProjectId(givenId)
         }
+    }
+
+    @Test
+    fun `should return audit logs in timestamp order for a project`() {
+        // Given
+        val givenId = "PROJECT-001"
+        every { auditRepository.getAllAuditLogs() } returns allAudit
+        every { auditRepository.getAuditLogsByProjectId(givenId) } returns listOf(
+            createAudit(
+                entityType = EntityType.PROJECT,
+                entityId = givenId,
+                timeStamp = LocalDate(2025, 4, 29)
+            ),
+            createAudit(
+                entityType = EntityType.PROJECT,
+                entityId = givenId,
+                timeStamp = LocalDate(2025, 4, 29)
+            ),
+            createAudit(
+                entityType = EntityType.PROJECT,
+                entityId = givenId,
+                timeStamp = LocalDate(2025, 4, 30)
+            ),
+
+            )
+
+        // When
+        val result = getAuditLogsByProjectIdUseCase.getAuditLogsByProjectId(givenId)
+            .map { it.timeStamp }
+
+        // Then
+        assertThat(result).containsExactly(
+            LocalDate(2025, 4, 30),
+            LocalDate(2025, 4, 29),
+            LocalDate(2025, 4, 29)
+        ).inOrder()
     }
 
 }

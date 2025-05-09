@@ -6,7 +6,6 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.LocalDateTime
 import logic.entities.exceptions.TaskNotFoundException
 import logic.repository.TasksRepository
 import org.junit.jupiter.api.BeforeEach
@@ -35,8 +34,8 @@ class GetTaskByIdUseCaseTest {
             description = "Test Description",
             createdBy = "user-1",
             stateId = "state-1",
-            createdAt = LocalDateTime(2023, 1, 1, 0, 0),
-            updatedAt = LocalDateTime(2023, 1, 1, 0, 0)
+            createdAt = LocalDate(2023, 1, 1),
+            updatedAt = LocalDate(2023, 1, 1)
         )
         every { tasksRepository.getTaskById(task.id.toString()) } returns task
 

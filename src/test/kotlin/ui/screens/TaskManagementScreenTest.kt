@@ -3,12 +3,10 @@ package ui.screens
 import com.google.common.truth.Truth.assertThat
 import fake.createState
 import fake.createTask
-import format
 import io.mockk.*
-import kotlinx.datetime.LocalDateTime
 import logic.useCases.audit.AddAuditLogUseCase
-import logic.useCases.authentication.SessionManagerUseCase
-import logic.useCases.state.GetAllTaskStatesUseCase
+import logic.useCases.authentication.SessionManager
+import logic.useCases.state.GetAllStatesUseCase
 import logic.useCases.task.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -21,21 +19,21 @@ class TaskManagementScreenTest {
 
     private lateinit var screen: TaskManagementScreen
     private val getAllTasksUseCase = mockk<GetAllTasksUseCase>()
-    private val getAllTaskStatesUseCase = mockk<GetAllTaskStatesUseCase>()
+    private val getAllStatesUseCase = mockk<GetAllStatesUseCase>()
     private val addTaskUseCase = mockk<AddTaskUseCase>(relaxed = true)
     private val updateTaskUseCase = mockk<UpdateTaskUseCase>(relaxed = true)
     private val deleteTaskUseCase = mockk<DeleteTaskUseCase>(relaxed = true)
     private val getTaskByIdUseCase = mockk<GetTaskByIdUseCase>()
     private val swimlanesRenderer = mockk<SwimlanesRenderer>(relaxed = true)
     private val consoleIO = mockk<ConsoleIO>(relaxed = true)
-    private val sessionManagerUseCase = mockk<SessionManagerUseCase>(relaxed = true)
+    private val sessionManager = mockk<SessionManager>(relaxed = true)
     private val addAuditLogUseCase: AddAuditLogUseCase = mockk(relaxed = true)
 
     @BeforeEach
     fun setUp() {
         screen = TaskManagementScreen(
             getAllTasksUseCase,
-            getAllTaskStatesUseCase,
+            getAllStatesUseCase,
             addTaskUseCase,
             deleteTaskUseCase,
             getTaskByIdUseCase,
@@ -43,7 +41,7 @@ class TaskManagementScreenTest {
             swimlanesRenderer,
             addAuditLogUseCase,
             consoleIO,
-            sessionManagerUseCase
+            sessionManager
         )
     }
 
@@ -112,34 +110,18 @@ class TaskManagementScreenTest {
         val oldTask = createTask(title = "Old", description = "Old Desc")
         every { consoleIO.read() } returnsMany listOf(oldTask.id.toString(), "New", "New Desc")
         every { getTaskByIdUseCase.getTaskById(oldTask.id.toString()) } returns oldTask
-
-        val expectedTaskToUpdate = oldTask.copy(
-            title = "New",
-            description = "New Desc",
-            updatedAt = LocalDateTime(2023, 1, 1, 0, 0)
-        )
-
-        val updatedTask = expectedTaskToUpdate
-        every { updateTaskUseCase.updateTask(match {
-            it.id == oldTask.id &&
-                    it.title == "New" &&
-                    it.description == "New Desc"
-        }) } returns updatedTask
+        val updatedTask = oldTask.copy(title = "New", description = "New Desc")
+        every {
+            updateTaskUseCase.updateTask(oldTask.id.toString(), "New", "New Desc", any())
+        } returns updatedTask
 
         // When
         screen.updateTaskById()
 
         // Then
-        verify {
-            updateTaskUseCase.updateTask(match {
-                it.id == oldTask.id &&
-                        it.title == "New" &&
-                        it.description == "New Desc"
-            })
-        }
+        verify { updateTaskUseCase.updateTask(oldTask.id.toString(), "New", "New Desc", any()) }
         verify { consoleIO.showWithLine(match { it.contains("✅ Task updated successfully") }) }
     }
-
     @Test
     fun `should show error when task ID is blank`() {
         // Given
@@ -151,7 +133,6 @@ class TaskManagementScreenTest {
         // Then
         verify { consoleIO.showWithLine("❌ Task ID is required.") }
     }
-
     @Test
     fun `should show error when task not found`() {
         // Given
@@ -164,15 +145,15 @@ class TaskManagementScreenTest {
         // Then
         verify { consoleIO.showWithLine("❌ Failed to update task: Task not found") }
     }
-
     @Test
     fun `should show error when update use case throws exception`() {
         // Given
         val task = createTask()
         every { consoleIO.read() } returnsMany listOf(task.id.toString(), "New Title", "New Desc")
         every { getTaskByIdUseCase.getTaskById(task.id.toString()) } returns task
-
-        every { updateTaskUseCase.updateTask(any()) } throws RuntimeException("Unexpected error")
+        every {
+            updateTaskUseCase.updateTask(any(), any(), any(), any())
+        } throws RuntimeException("Unexpected error")
 
         // When
         screen.updateTaskById()
@@ -180,45 +161,32 @@ class TaskManagementScreenTest {
         // Then
         verify { consoleIO.showWithLine("❌ Failed to update task: Unexpected error") }
     }
-
     @Test
     fun `should keep original values when inputs are blank`() {
         // Given
         val task = createTask(title = "Original Title", description = "Original Desc")
         every { consoleIO.read() } returnsMany listOf(task.id.toString(), "", "")
         every { getTaskByIdUseCase.getTaskById(task.id.toString()) } returns task
-
-        val expectedTaskToUpdate = task.copy(
-            updatedAt = LocalDateTime(2023, 1, 1, 0, 0)
-        )
-
-        val updatedTask = expectedTaskToUpdate.copy()
-        every { updateTaskUseCase.updateTask(match {
-            it.id == task.id &&
-                    it.title == "Original Title" &&
-                    it.description == "Original Desc"
-        }) } returns updatedTask
+        val updatedTask = task.copy()
+        every {
+            updateTaskUseCase.updateTask(task.id.toString(), null, null, any())
+        } returns updatedTask
 
         // When
         screen.updateTaskById()
 
         // Then
-        verify {
-            updateTaskUseCase.updateTask(match {
-                it.id == task.id &&
-                        it.title == "Original Title" &&
-                        it.description == "Original Desc"
-            })
-        }
+        verify { updateTaskUseCase.updateTask(task.id.toString(), null, null, any()) }
         verify { consoleIO.showWithLine(match { it.contains("✅ Task updated successfully") }) }
     }
+
     @Test
     fun `showTasksInSwimlanes should render tasks and states`() {
         // Given
         val tasks = listOf(createTask(title = "T1"))
         val states = listOf(createState(name = "To Do"))
         every { getAllTasksUseCase.getAllTasks() } returns tasks
-        every { getAllTaskStatesUseCase.getAllStates() } returns states
+        every { getAllStatesUseCase.getAllStates() } returns states
 
         // When
         screen.showTasksInSwimlanes()
@@ -235,7 +203,7 @@ class TaskManagementScreenTest {
         every { consoleIO.read() } returnsMany listOf("1", "2", "3", "4", "invalid", "0")
 
         every { getAllTasksUseCase.getAllTasks() } returns emptyList()
-        every { getAllTaskStatesUseCase.getAllStates() } returns emptyList()
+        every { getAllStatesUseCase.getAllStates() } returns emptyList()
         every { getTaskByIdUseCase.getTaskById(any()) } returns createTask()
         every { consoleIO.read() } returnsMany listOf("1", "2", "3", "4", "invalid", "0") // ensure input is reused
 
@@ -280,14 +248,12 @@ class TaskManagementScreenTest {
         // Then
         verify {
             consoleIO.showWithLine(match { it.contains("📋 All Tasks") })
-            consoleIO.showWithLine(match {
-                it.contains("ID: ${task.id}") &&
-                        it.contains("Title: ${task.title}") &&
-                        it.contains("Description: ${task.description}") &&
-                        it.contains("Created By: ${task.createdBy}") &&
-                        it.contains("Created At: ${task.createdAt.format()}") &&
-                        it.contains("Updated At: ${task.updatedAt.format()}")
-            })
+            consoleIO.showWithLine(match { it.contains("🆔 ID: ${task.id}") })
+            consoleIO.showWithLine(match { it.contains("📌 Title: ${task.title}") })
+            consoleIO.showWithLine(match { it.contains("📝 Description: ${task.description}") })
+            consoleIO.showWithLine(match { it.contains("👤 Created By: ${task.createdBy}") })
+            consoleIO.showWithLine(match { it.contains("📅 Created At: ${task.createdAt}") })
+            consoleIO.showWithLine(match { it.contains("🔄 Updated At: ${task.updatedAt}") })
         }
     }
 

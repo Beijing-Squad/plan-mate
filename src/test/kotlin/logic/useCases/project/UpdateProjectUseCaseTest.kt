@@ -1,71 +1,92 @@
 package logic.useCases.project
 
-import com.google.common.truth.Truth.assertThat
+
 import fake.createProject
-import io.mockk.Runs
 import io.mockk.every
-import io.mockk.just
 import io.mockk.mockk
-import logic.entities.exceptions.ProjectNotFoundException
+import logic.entities.UserRole
+import logic.entities.exceptions.ProjectUnauthorizedUserException
 import logic.repository.ProjectsRepository
+import com.google.common.truth.Truth.assertThat
+import logic.entities.exceptions.CsvWriteException
+import logic.entities.exceptions.ProjectNotFoundException
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import kotlin.uuid.ExperimentalUuidApi
+
 
 class UpdateProjectUseCaseTest {
 
     private lateinit var updateProjectUseCase: UpdateProjectUseCase
     private lateinit var projectRepository: ProjectsRepository
 
+
     @BeforeEach
     fun setUp() {
         projectRepository = mockk(relaxed = true)
         updateProjectUseCase = UpdateProjectUseCase(projectRepository)
     }
-
+    @OptIn(ExperimentalUuidApi::class)
     @Test
-    fun `should update project successfully`() {
+    fun `should update project when project is exist`() {
         // Given
-        val updatedProject = createProject(name = "Updated Project", description = "Updated Description")
-
-        every { projectRepository.updateProject(updatedProject) } just Runs
+        val project=createProject()
+        val projects = listOf(project,project)
+        val newProject=project.copy(name = "New Project")
+        every { projectRepository.getAllProjects() } returns projects
 
         // When
-        val result = updateProjectUseCase.updateProject(updatedProject)
+        val result=updateProjectUseCase.updateProject(newProject, UserRole.ADMIN).getOrThrow()
 
-        // Then
-        assertThat(result).isNotNull()
+        //Then
+        assertThat(result).isEqualTo(true)
+
     }
-
-
-
+    @OptIn(ExperimentalUuidApi::class)
     @Test
-    fun `should throw ProjectNotFoundException when project does not exist`() {
+    fun `should throw exception when project is not exist`() {
         // Given
-        val nonExistentProject = createProject( name = "Non Existent Project")
+        val projects = listOf(createProject(),createProject())
+        val newProject=createProject().copy(name = "New Project")
+        every { projectRepository.getAllProjects() } returns projects
 
-        every { projectRepository.updateProject(nonExistentProject) } throws ProjectNotFoundException("Project not found")
-
-        // When & Then
-        val exception = assertThrows<ProjectNotFoundException> {
-            updateProjectUseCase.updateProject(nonExistentProject)
+        // When && Then
+        assertThrows<ProjectNotFoundException> {
+            updateProjectUseCase.updateProject(newProject, UserRole.ADMIN).getOrThrow()
         }
 
-        assertThat(exception).hasMessageThat().contains("Project not found")
     }
-
+    @OptIn(ExperimentalUuidApi::class)
     @Test
-    fun `should handle exceptions thrown by repository`() {
+    fun `should throw exception when user is not admin`() {
         // Given
-        val invalidProject = createProject(name = "Invalid Project", description = "Invalid Description")
+        val project = createProject()
+        val projects = listOf(project, project)
+        val newProject = createProject().copy(name = "New Project")
+        every { projectRepository.getAllProjects() } returns projects
 
-        every { projectRepository.updateProject(invalidProject) } throws RuntimeException("Repository failure")
-
-        // When & Then
-        val exception = assertThrows<RuntimeException> {
-            updateProjectUseCase.updateProject(invalidProject)
+        // When && Then
+        assertThrows<ProjectUnauthorizedUserException> {
+            updateProjectUseCase.updateProject(newProject, UserRole.MATE).getOrThrow()
         }
 
-        assertThat(exception).hasMessageThat().contains("Repository failure")
     }
+    @OptIn(ExperimentalUuidApi::class)
+    @Test
+    fun `should throw exception when there is error in csv file`() {
+        // Given
+        val updatedProject=createProject().copy(name = "Project2")
+        val allProjects=listOf(updatedProject,createProject())
+        every { projectRepository.updateProject(any()) } throws CsvWriteException("")
+        every { projectRepository.getAllProjects() } returns allProjects
+
+        // When && Then
+        assertThrows<CsvWriteException> { updateProjectUseCase.updateProject(updatedProject,UserRole.ADMIN).getOrThrow() }
+
+    }
+
+
+
+
 }

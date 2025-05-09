@@ -5,7 +5,7 @@ import fake.createTask
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.LocalDate
 import logic.repository.TasksRepository
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -30,8 +30,8 @@ class GetAllTasksUseCaseTest {
             description = "Description 1",
             createdBy = "user-1",
             stateId = "state-1",
-            createdAt = LocalDateTime(2023, 1, 1, 0, 0),
-            updatedAt = LocalDateTime(2023, 1, 1, 0, 0)
+            createdAt = LocalDate(2023, 1, 1),
+            updatedAt = LocalDate(2023, 1, 1)
         )
         val task2 = createTask(
             projectId = "project-2",
@@ -39,8 +39,8 @@ class GetAllTasksUseCaseTest {
             description = "Description 2",
             createdBy = "user-2",
             stateId = "state-2",
-            createdAt = LocalDateTime(2023, 1, 1, 0, 0),
-            updatedAt = LocalDateTime(2023, 1, 1, 0, 0)
+            createdAt = LocalDate(2023, 1, 2),
+            updatedAt = LocalDate(2023, 1, 2)
         )
         val tasks = listOf(task1, task2)
         every { tasksRepository.getAllTasks() } returns tasks
@@ -75,8 +75,8 @@ class GetAllTasksUseCaseTest {
             description = "Single Description",
             createdBy = "user-1",
             stateId = "state-1",
-            createdAt = LocalDateTime(2023, 1, 1, 0, 0),
-            updatedAt = LocalDateTime(2023, 1, 1, 0, 0)
+            createdAt = LocalDate(2023, 1, 1),
+            updatedAt = LocalDate(2023, 1, 1)
         )
         every { tasksRepository.getAllTasks() } returns listOf(task)
 

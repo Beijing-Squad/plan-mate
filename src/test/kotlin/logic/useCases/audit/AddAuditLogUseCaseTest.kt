@@ -3,6 +3,7 @@ package logic.useCases.audit
 import fake.createAudit
 import io.mockk.mockk
 import io.mockk.verify
+import kotlinx.datetime.LocalDate
 import logic.entities.ActionType
 import logic.entities.EntityType
 import logic.entities.UserRole
@@ -29,6 +30,7 @@ class AddAuditLogUseCaseTest {
             action = ActionType.CREATE,
             entityType = EntityType.PROJECT,
             entityId = "PROJECT-001",
+            timeStamp = LocalDate(2025, 4, 30)
         )
 
         // When
@@ -47,6 +49,9 @@ class AddAuditLogUseCaseTest {
             action = ActionType.UPDATE,
             entityType = EntityType.TASK,
             entityId = "TASK-123",
+            oldState = "In Progress",
+            newState = "Completed",
+            timeStamp = LocalDate(2025, 4, 29)
         )
 
         // When
@@ -65,6 +70,7 @@ class AddAuditLogUseCaseTest {
             action = ActionType.DELETE,
             entityType = EntityType.PROJECT,
             entityId = "PROJECT-002",
+            timeStamp = LocalDate(2025, 4, 28)
         )
 
         // When
@@ -83,6 +89,7 @@ class AddAuditLogUseCaseTest {
             action = ActionType.CREATE,
             entityType = EntityType.TASK,
             entityId = "TASK-456",
+            timeStamp = LocalDate(2025, 4, 27)
         )
         val auditLog2 = createAudit(
             userRole = UserRole.ADMIN,
@@ -90,6 +97,9 @@ class AddAuditLogUseCaseTest {
             action = ActionType.UPDATE,
             entityType = EntityType.TASK,
             entityId = "TASK-456",
+            oldState = "To Do",
+            newState = "In Progress",
+            timeStamp = LocalDate(2025, 4, 28)
         )
 
         // When
@@ -112,6 +122,9 @@ class AddAuditLogUseCaseTest {
             action = ActionType.CREATE,
             entityType = EntityType.TASK,
             entityId = "TASK-789",
+            oldState = null,
+            newState = null,
+            timeStamp = LocalDate(2025, 4, 25)
         )
 
         // When

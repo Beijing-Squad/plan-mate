@@ -1,19 +1,19 @@
 package data.repository.dataSource
 
-import logic.entities.TaskState
+import logic.entities.State
 
 interface StatesDataSource {
 
-    fun getAllStates(): List<TaskState>
+    fun getAllStates(): List<State>
 
-    fun getStatesByProjectId(projectId: String): List<TaskState>
+    fun getStatesByProjectId(projectId: String): List<State>
 
-    fun getStateById(stateId: String): TaskState
+    fun getStateById(stateId: String): State?
 
-    fun addState(taskState: TaskState): Boolean
+    fun addState(state: State): Boolean
 
-    fun updateState(taskState: TaskState): TaskState
+    fun updateState(state: State): State
 
-    fun deleteState(taskState: TaskState): Boolean
+    fun deleteState(state: State): Boolean
 
 }

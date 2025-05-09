@@ -1,9 +1,13 @@
 package logic.useCases.project
 
+import com.google.common.truth.Truth.assertThat
 import fake.createProject
-import io.mockk.*
+import io.mockk.every
+import io.mockk.mockk
+import logic.entities.UserRole
 import logic.entities.exceptions.CsvWriteException
 import logic.entities.exceptions.ProjectNotFoundException
+import logic.entities.exceptions.ProjectUnauthorizedUserException
 import logic.repository.ProjectsRepository
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -27,12 +31,13 @@ class DeleteProjectUseCaseTest {
     fun `should delete project when project is exist`() {
         // Given
         val desiredProject=createProject()
-        every { projectRepository.getAllProjects()}
+        val allProjects=listOf(desiredProject,createProject())
 
+        every { projectRepository.getAllProjects()} returns allProjects
         // When
-        deleteProject.deleteProject(desiredProject.id.toString())
+        val result = deleteProject.deleteProject(desiredProject.id.toString(), UserRole.ADMIN).getOrThrow()
         // Then
-        verify { projectRepository.deleteProject(desiredProject.id.toString()) }
+        assertThat(result).isEqualTo(true)
     }
 
     @OptIn(ExperimentalUuidApi::class)
@@ -42,9 +47,19 @@ class DeleteProjectUseCaseTest {
         val projectId = createProject().id.toString()
         every { projectRepository.deleteProject(projectId) } throws ProjectNotFoundException("")
         // When && Then
-        assertThrows<ProjectNotFoundException> { deleteProject.deleteProject(projectId) }
+        assertThrows<ProjectNotFoundException> { deleteProject.deleteProject(projectId, UserRole.ADMIN).getOrThrow() }
     }
 
+    @OptIn(ExperimentalUuidApi::class)
+    @Test
+    fun `should throw exception when user is not admin`() {
+        // Given
+        val projectId = createProject().id.toString()
+
+        // When && Then
+        assertThrows<ProjectUnauthorizedUserException> { deleteProject.deleteProject(projectId, UserRole.MATE).getOrThrow() }
+
+    }
     @OptIn(ExperimentalUuidApi::class)
     @Test
     fun `should throw exception when there is error in csv file`() {
@@ -56,6 +71,9 @@ class DeleteProjectUseCaseTest {
         every { projectRepository.getAllProjects() } returns allProjects
 
         // When && Then
-        assertThrows<CsvWriteException> { deleteProject.deleteProject(desiredProject.id.toString()) }
+        assertThrows<CsvWriteException> { deleteProject.deleteProject(desiredProject.id.toString(),UserRole.ADMIN).getOrThrow() }
+
     }
+
+
 }

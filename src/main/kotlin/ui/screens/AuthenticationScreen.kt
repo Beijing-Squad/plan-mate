@@ -1,19 +1,19 @@
 package ui.screens
 
-import kotlinx.coroutines.runBlocking
 import logic.entities.User
 import logic.entities.UserRole
 import logic.useCases.authentication.LoginUserAuthenticationUseCase
 import logic.useCases.authentication.RegisterUserAuthenticationUseCase
-import logic.useCases.authentication.SessionManagerUseCase
+import logic.useCases.authentication.SessionManager
 import org.koin.mp.KoinPlatform.getKoin
+import ui.main.PlanMateConsoleUi
 import ui.main.consoleIO.ConsoleIO
 import kotlin.system.exitProcess
 
 class AuthenticationScreen(
     private val registerUseCase: RegisterUserAuthenticationUseCase,
     private val loginUseCase: LoginUserAuthenticationUseCase,
-    private val sessionManagerUseCase: SessionManagerUseCase,
+    private val sessionManager: SessionManager,
     private val consoleIO: ConsoleIO
 ) {
 
@@ -27,18 +27,17 @@ class AuthenticationScreen(
 
             when (consoleIO.read()!!.trim()) {
                 "1" -> {
-                    val user = runBlocking { login() }
+                    val user = login()
                     if (user != null) return user
                 }
-
-                "2" -> runBlocking { register() }
+                "2" -> register()
                 "0" -> exitProcess(0)
                 else -> consoleIO.showWithLine("❌ Invalid option. Please try again.")
             }
         }
     }
 
-    private suspend fun login(): User? {
+    private fun login(): User? {
         consoleIO.showWithLine("\n--- Login ---")
         consoleIO.show("Username: ")
         val username = consoleIO.read()!!.trim()
@@ -47,20 +46,9 @@ class AuthenticationScreen(
 
         return try {
             val user = loginUseCase.execute(username, password)
-            consoleIO.showWithLine("✅ Login successful. Welcome, ${sessionManagerUseCase.getCurrentUser()?.userName}!")
-
-            when (user.role) {
-                UserRole.ADMIN -> {
-                    val adminScreen: AdminScreen = getKoin().get()
-                    adminScreen.start()
-                }
-
-                UserRole.MATE -> {
-                    val mateScreen: MateScreen = getKoin().get()
-                    mateScreen.start()
-                }
-            }
-
+            consoleIO.showWithLine("✅ Login successful. Welcome, ${sessionManager.getCurrentUser()?.userName}!")
+            val planMateConsoleUi: PlanMateConsoleUi = getKoin().get()
+            planMateConsoleUi.start()
             user
         } catch (e: Exception) {
             consoleIO.showWithLine("❌ ${e.message}")
@@ -68,7 +56,7 @@ class AuthenticationScreen(
         }
     }
 
-    private suspend fun register() {
+    private fun register() {
         consoleIO.showWithLine("\n--- Register ---")
         consoleIO.show("Username: ")
         val username = consoleIO.read()!!.trim()

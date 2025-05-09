@@ -5,6 +5,7 @@ import data.repository.AuditRepositoryImpl
 import fake.createAudit
 import io.mockk.every
 import io.mockk.mockk
+import kotlinx.datetime.LocalDate
 import logic.entities.ActionType
 import logic.entities.EntityType
 import logic.entities.UserRole
@@ -31,11 +32,13 @@ class GetAllAuditLogsUseCaseTest {
                 userRole = UserRole.ADMIN,
                 userName = "Admin",
                 entityType = EntityType.PROJECT,
+                timeStamp = LocalDate(2023, 1, 1)
             ),
             createAudit(
                 userRole = UserRole.MATE,
                 userName = "MATE",
                 entityType = EntityType.TASK,
+                timeStamp = LocalDate(2023, 1, 12)
             )
         )
 
@@ -67,19 +70,22 @@ class GetAllAuditLogsUseCaseTest {
                 userName = "Admin",
                 entityType = EntityType.PROJECT,
                 action = ActionType.CREATE,
+                timeStamp = LocalDate(2023, 1, 1)
             ),
             createAudit(
                 userRole = UserRole.MATE,
                 userName = "User1",
                 entityType = EntityType.TASK,
                 action = ActionType.UPDATE,
-                           ),
+                timeStamp = LocalDate(2023, 1, 2)
+            ),
             createAudit(
                 userRole = UserRole.MATE,
                 userName = "User2",
                 entityType = EntityType.PROJECT,
                 action = ActionType.DELETE,
-                           )
+                timeStamp = LocalDate(2023, 1, 3)
+            )
         )
         // When
         val result = getAllAuditLogsUseCase.getAllAuditLogs()
@@ -92,6 +98,42 @@ class GetAllAuditLogsUseCaseTest {
             ActionType.DELETE
         )
     }
+
+    @Test
+    fun `should return audit logs with old and new state values when provided`() {
+        // Given
+        every { auditRepository.getAllAuditLogs() } returns listOf(
+            createAudit(
+                userRole = UserRole.MATE,
+                userName = "User1",
+                entityType = EntityType.TASK,
+                action = ActionType.UPDATE,
+                oldState = "In Progress",
+                newState = "Completed",
+                timeStamp = LocalDate(2023, 1, 1)
+            ),
+            createAudit(
+                userRole = UserRole.ADMIN,
+                userName = "Admin",
+                entityType = EntityType.PROJECT,
+                action = ActionType.UPDATE,
+                oldState = "Draft",
+                newState = "Active",
+                timeStamp = LocalDate(2023, 1, 2)
+            )
+        )
+
+        // When
+        val result = getAllAuditLogsUseCase.getAllAuditLogs()
+
+        // Then
+        assertThat(result.size).isEqualTo(2)
+        assertThat(result[0].oldState).isEqualTo("Draft")
+        assertThat(result[0].newState).isEqualTo("Active")
+        assertThat(result[1].oldState).isEqualTo("In Progress")
+        assertThat(result[1].newState).isEqualTo("Completed")
+    }
+
     @Test
     fun `should return audit logs for both project and task entities when they exist`() {
         // Given
@@ -102,6 +144,7 @@ class GetAllAuditLogsUseCaseTest {
                 entityType = EntityType.PROJECT,
                 entityId = "project-123",
                 action = ActionType.CREATE,
+                timeStamp = LocalDate(2023, 1, 1)
             ),
             createAudit(
                 userRole = UserRole.MATE,
@@ -109,7 +152,8 @@ class GetAllAuditLogsUseCaseTest {
                 entityType = EntityType.TASK,
                 entityId = "task-456",
                 action = ActionType.CREATE,
-                           )
+                timeStamp = LocalDate(2023, 1, 2)
+            )
         )
 
         // When
@@ -125,5 +169,41 @@ class GetAllAuditLogsUseCaseTest {
             "project-123",
             "task-456"
         )
+    }
+
+    @Test
+    fun `should return audit logs sorted by timestamp when provided`() {
+        // Given
+        every { auditRepository.getAllAuditLogs() } returns listOf(
+            createAudit(
+                userRole = UserRole.MATE,
+                userName = "User1",
+                entityType = EntityType.TASK,
+                timeStamp = LocalDate(2023, 1, 3)
+            ),
+            createAudit(
+                userRole = UserRole.ADMIN,
+                userName = "Admin",
+                entityType = EntityType.PROJECT,
+                timeStamp = LocalDate(2023, 1, 1)
+            ),
+            createAudit(
+                userRole = UserRole.MATE,
+                userName = "User2",
+                entityType = EntityType.TASK,
+                timeStamp = LocalDate(2023, 1, 2)
+            )
+        )
+
+        // When
+        val result = getAllAuditLogsUseCase.getAllAuditLogs()
+
+        // Then
+        assertThat(result.size).isEqualTo(3)
+        assertThat(result.map { it.timeStamp }).containsExactly(
+            LocalDate(2023, 1, 3),
+            LocalDate(2023, 1, 2),
+            LocalDate(2023, 1, 1)
+        ).inOrder()
     }
 }

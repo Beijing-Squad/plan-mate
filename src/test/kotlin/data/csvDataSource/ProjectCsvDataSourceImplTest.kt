@@ -2,8 +2,7 @@ package data.csvDataSource
 
 
 import com.google.common.truth.Truth.assertThat
-import data.local.csvDataSource.ProjectCsvDataSourceImpl
-import data.local.csvDataSource.csv.CsvDataSourceImpl
+import data.csvDataSource.csv.CsvDataSourceImpl
 import fake.createProject
 import io.mockk.*
 import logic.entities.Project
@@ -71,23 +70,23 @@ class ProjectCsvDataSourceImplTest {
     @Test
     fun `should update a project by ID when it exists`() {
         // Given
-        val newProjects=createProject()
+        val newProjects=listOf(createProject(),createProject())
 
         // When
         projectCsvDataSource.updateProject(newProjects)
 
         // Then
         verify {
-            csvDataSource.updateItem(newProjects)
+            csvDataSource.updateFile(newProjects)
         }
     }
 
     @Test
     fun `should throw exception when updating project that does not exist`() {
         // Given
-        val newProjects = createProject()
+        val newProjects = listOf(createProject(), createProject())
         every {
-            csvDataSource.updateItem (newProjects)
+            csvDataSource.updateFile (newProjects)
         } throws CsvWriteException("Error saving to CSV file")
 
         // When & Then

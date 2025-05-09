@@ -12,13 +12,13 @@ import kotlin.uuid.ExperimentalUuidApi
 
 class GetUserByUserIdUseCaseTest {
 
-    private lateinit var getUserByUserId: GetUserByIdUseCase
+    private lateinit var getUserByUserId: GetUserByUserIdUseCase
     private lateinit var userRepository: UserRepository
 
     @BeforeEach
     fun setUp() {
         userRepository = UserRepositoryImpl(mockk())
-        getUserByUserId = GetUserByIdUseCase(userRepository)
+        getUserByUserId = GetUserByUserIdUseCase(userRepository)
     }
 
     @OptIn(ExperimentalUuidApi::class)
@@ -35,4 +35,5 @@ class GetUserByUserIdUseCaseTest {
         assertThat(actual).isEqualTo(firstUser)
 
     }
+
 }

@@ -1,26 +1,20 @@
 package ui.screens
 
 import logic.entities.User
-import logic.entities.UserRole
-import logic.entities.exceptions.InvalidPasswordException
-import logic.entities.exceptions.InvalidUserNameException
-import logic.entities.exceptions.UnauthorizedUserException
-import logic.useCases.authentication.SessionManagerUseCase
+import logic.useCases.authentication.SessionManager
 import logic.useCases.user.GetAllUsersUseCase
-import logic.useCases.user.GetUserByIdUseCase
+import logic.useCases.user.GetUserByUserIdUseCase
 import logic.useCases.user.UpdateUserUseCase
-import ui.enums.UserBoardOption
 import ui.main.BaseScreen
-import ui.main.MenuRenderer
 import ui.main.consoleIO.ConsoleIO
 import kotlin.uuid.ExperimentalUuidApi
 
 class UserScreen(
     private val getAllUsers: GetAllUsersUseCase,
-    private val getUserByUserId: GetUserByIdUseCase,
+    private val getUserByUserId: GetUserByUserIdUseCase,
     private val updateUser: UpdateUserUseCase,
     private val consoleIO: ConsoleIO,
-    private val sessionManagerUseCase: SessionManagerUseCase
+    private val sessionManager: SessionManager
 ) : BaseScreen(consoleIO) {
     override val id: String
         get() = "5"
@@ -29,28 +23,31 @@ class UserScreen(
 
 
     override fun showOptionService() {
-        MenuRenderer.renderMenu(
+        consoleIO.showWithLine(
             """
         ╔════════════════════════════════════════╗
-        ║         User Management System         ║
+        ║          User Management System        ║
         ╚════════════════════════════════════════╝
-        """,
-            UserBoardOption.entries,
-            consoleIO
+
+        ┌─── Available Options ────────────────────┐
+        │                                          │
+        │  1. List All Users                       │
+        │  2. Find User by ID                      │
+        │  3. Update User                          │
+        │  0. Exit to Main Menu                    │
+        │                                          │
+        └──────────────────────────────────────────┘
+
+        """
+                .trimIndent()
         )
+
+        consoleIO.show("\uD83D\uDCA1 Please enter your choice:")
     }
 
     override fun handleFeatureChoice() {
         when (getInput()) {
-            "1" -> {
-                val currentUser = sessionManagerUseCase.getCurrentUser()!!
-                if (currentUser.role == UserRole.ADMIN) {
-                    onClickGetAllUsers()
-                } else {
-                    consoleIO.showWithLine("\u001B[31m❌ You don't have permission\u001B[0m")
-                }
-            }
-
+            "1" -> onClickGetAllUsers()
             "2" -> onClickGetUserByID()
             "3" -> onClickUpdateUser()
             "0" -> return
@@ -61,7 +58,7 @@ class UserScreen(
     @OptIn(ExperimentalUuidApi::class)
     private fun onClickGetAllUsers() {
         consoleIO.showWithLine("\n\u001B[36m📋 All Users:\u001B[0m")
-        val users = getAllUser()
+        val users = getAllUsers.getAllUsers()
 
         if (users.isEmpty()) {
             consoleIO.showWithLine("\u001B[33m⚠️  No users found.\u001B[0m")
@@ -81,15 +78,13 @@ class UserScreen(
         }
     }
 
-    private fun getAllUser(): List<User> = getAllUsers.getAllUsers()
-
     @OptIn(ExperimentalUuidApi::class)
     private fun onClickUpdateUser() {
         consoleIO.showWithLine("\n\u001B[36m✏️ Update User\u001B[0m")
-        val userId = sessionManagerUseCase.getCurrentUser()!!.id
+        val userId = sessionManager.getCurrentUser()?.id.toString()
 
         try {
-            val user =  getUserByUserId.getUserByUserId(userId.toString())
+            val user = userId.let { getUserByUserId.getUserByUserId(it) }
             showCurrentUserDetails(user)
             updateUserMenu(user)
         } catch (e: Exception) {
@@ -145,14 +140,16 @@ class UserScreen(
 
             if (newPassword.isNullOrBlank()) {
                 consoleIO.showWithLine("\u001B[31m❌ Password cannot be empty!\u001B[0m")
-            }else if (newPassword != confirmPassword) {
-                consoleIO.showWithLine("\u001B[31m❌ Passwords do not match! Please try again.\u001B[0m")
-            } else{
-                val freshUserData = getUserByUserId.getUserByUserId(user.id.toString())
-                updateUserInSystem(freshUserData.copy(userName = freshUserData.userName,password = newPassword))
-                return
+                continue
             }
 
+            if (newPassword != confirmPassword) {
+                consoleIO.showWithLine("\u001B[31m❌ Passwords do not match! Please try again.\u001B[0m")
+                continue
+            }
+
+            updateUserInSystem(user.copy(password = newPassword))
+            return
         }
     }
 
@@ -161,37 +158,34 @@ class UserScreen(
         consoleIO.show("\u001B[32mEnter new username: \u001B[0m")
         val newUsername = getInput()
         if (!newUsername.isNullOrBlank()) {
-            val freshUserData = getUserByUserId.getUserByUserId(user.id.toString())
-            updateUserInSystem(freshUserData.copy(userName = newUsername, password = freshUserData.password))
+            updateUserInSystem(user.copy(userName = newUsername))
             return
         } else {
             consoleIO.showWithLine("\u001B[31m❌ Username cannot be empty!\u001B[0m")
         }
     }
 
-    @OptIn(ExperimentalUuidApi::class)
     private fun updateUserInSystem(user: User) {
-        try {
-            val updatedUser = updateUser.updateUser(user)
-            consoleIO.showWithLine(
-                """
-            ✅ User updated successfully:
-            ╭─────────────────────────╮
-            │ ID: ${updatedUser.id}
-            │ new name: ${updatedUser.userName}
-            ╰─────────────────────────╯
-        """.trimIndent()
+        updateUser.updateUser(user)
+            .fold(
+                onSuccess = ::onUpdateUserSuccess,
+                onFailure = ::onUpdateUserFailure
             )
-        } catch (invalidUserNameException: InvalidUserNameException) {
-            messageFailure(invalidUserNameException)
-        } catch (invalidPasswordException: InvalidPasswordException) {
-            messageFailure(invalidPasswordException)
-        } catch (unauthorizedUserException: UnauthorizedUserException) {
-            messageFailure(unauthorizedUserException)
-        }
     }
 
-    private fun messageFailure(throwable: Throwable) {
+    @OptIn(ExperimentalUuidApi::class)
+    private fun onUpdateUserSuccess(user: User) {
+        consoleIO.showWithLine(
+            """
+            ✅ User updated successfully:
+            ╭─────────────────────────╮
+            │ ID: ${user.id}
+            ╰─────────────────────────╯
+        """.trimIndent()
+        )
+    }
+
+    private fun onUpdateUserFailure(throwable: Throwable) {
         consoleIO.showWithLine("\u001B[31m❌ Error updating user: ${throwable.message}\u001B[0m")
     }
 
@@ -217,4 +211,5 @@ class UserScreen(
             consoleIO.showWithLine("\u001B[31m❌ Error: ${e.message ?: "User not found"}\u001B[0m")
         }
     }
+
 }

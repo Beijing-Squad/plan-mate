@@ -1,13 +1,12 @@
 package ui.screens
 
 import logic.entities.Audit
+import logic.entities.EntityType
 import logic.useCases.audit.GetAllAuditLogsUseCase
 import logic.useCases.audit.GetAuditLogsByProjectIdUseCase
 import logic.useCases.audit.GetAuditLogsByTaskIdUseCase
-import ui.enums.AuditBoardOption
 import ui.main.BaseScreen
 import ui.main.consoleIO.ConsoleIO
-import ui.main.MenuRenderer
 
 class AuditScreen(
     private val getAllAudits: GetAllAuditLogsUseCase,
@@ -22,16 +21,28 @@ class AuditScreen(
         get() = "Audit Screen"
 
     override fun showOptionService() {
-        MenuRenderer.renderMenu(
+        consoleIO.showWithLine(
             """
         ╔════════════════════════════════════════╗
-        ║       Audit Logs Management System     ║
+        ║      Audit Logs Management System      ║
         ╚════════════════════════════════════════╝
-        """,
-            AuditBoardOption.entries,
-            consoleIO
+
+        ┌─── Available Options ───────────────────┐
+        │                                         │
+        │  1. 📋 List All Audit Logs              │
+        │  2. 🔍 Get Audit Logs For Project       │
+        │  3. 🔍️ Get Audit Logs For Task          │
+        │  0. 🔙 Exit to Main Menu                │
+        │                                         │
+        └─────────────────────────────────────────┘
+
+        """
+                .trimIndent()
         )
+
+        consoleIO.show("Please enter your choice: ")
     }
+
     override fun handleFeatureChoice() {
         when (getInput()) {
             "1" -> onClickGetAllAuditLogs()
@@ -90,10 +101,11 @@ class AuditScreen(
         val action = audit.action.name.padEnd(8)
         val entity = audit.entityType.name.padEnd(8)
         val entityId = audit.entityId.take(13).padEnd(12)
-        val actionDetails = (audit.actionDetails ?: "").padEnd(17)
+        val oldState = (audit.oldState ?: "").padEnd(17)
+        val newState = (audit.newState ?: "").padEnd(17)
         val date = audit.timeStamp.toString()
 
-        return "$role| $userName| $action| $entity| $entityId| $actionDetails| $date"
+        return "$role| $userName| $action| $entity| $entityId| $oldState| $newState| $date"
     }
 
     private fun getIdInput(): String {

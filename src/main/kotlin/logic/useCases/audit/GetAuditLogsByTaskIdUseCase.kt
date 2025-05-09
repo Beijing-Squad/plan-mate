@@ -9,14 +9,16 @@ class GetAuditLogsByTaskIdUseCase(
 ) {
 
     fun getAuditLogsByTaskId(taskId: String): List<Audit> {
-        if (taskId.isBlank()) throw InvalidInputException(INVALID_ID_ERROR)
-
+        validateTaskId(taskId)
         return auditRepository.getAuditLogsByTaskId(taskId)
-            .sortedByDescending { it.timeStamp }
+            .sortedByDescending { auditLog -> auditLog.timeStamp }
+    }
+
+    private fun validateTaskId(taskId: String) {
+        if (taskId.isBlank()) throw InvalidInputException(INVALID_ID_ERROR)
     }
 
     companion object {
         private const val INVALID_ID_ERROR = "Error: ID shouldn't be blank"
     }
-
 }

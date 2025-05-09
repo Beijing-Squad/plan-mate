@@ -1,9 +1,8 @@
 package data.parser
 
 import com.google.common.truth.Truth.assertThat
-import data.local.csvDataSource.parser.AuditCsvParser
 import fake.createAudit
-import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.LocalDate
 import logic.entities.ActionType
 import logic.entities.EntityType
 import logic.entities.UserRole
@@ -35,14 +34,15 @@ class AuditCsvParserTest {
     fun `should serialize Audit object into correct CSV line`() {
         // Given
         val fixedId = Uuid.parse("123e4567-e89b-12d3-a456-426614174000")
-        val fixedTime = LocalDateTime.parse("2024-04-01T00:00")
         val audit = createAudit(
             userRole = UserRole.ADMIN,
             userName = "Ahmed",
             entityId = "task-1",
             entityType = EntityType.TASK,
             action = ActionType.CREATE,
-            timeStamp = fixedTime
+            oldState = null,
+            newState = "new",
+            timeStamp = LocalDate.parse("2024-04-01")
         ).copy(id = fixedId)
 
         // When
@@ -55,7 +55,7 @@ class AuditCsvParserTest {
     @Test
     fun `should deserialize correct CSV line into Audit object`() {
         // Given
-        val line = "123e4567-e89b-12d3-a456-426614174000,ADMIN,Ahmed,task-95,TASK,CREATE,,new,2024-04-01T00:00"
+        val line = "123e4567-e89b-12d3-a456-426614174000,ADMIN,Ahmed,task-95,TASK,CREATE,,new,2024-04-01"
 
         // When
         val result = parser.deserializer(line)
@@ -68,7 +68,9 @@ class AuditCsvParserTest {
             assertThat(entityId).isEqualTo("task-95")
             assertThat(entityType).isEqualTo(EntityType.TASK)
             assertThat(action).isEqualTo(ActionType.CREATE)
-            assertThat(timeStamp).isEqualTo(LocalDateTime(2024, 4, 1, 0, 0))
+            assertThat(oldState).isNull()
+            assertThat(newState).isEqualTo("new")
+            assertThat(timeStamp).isEqualTo(LocalDate(2024, 4, 1))
         }
     }
 
