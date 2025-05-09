@@ -8,7 +8,7 @@ class GetTaskStateByIdUseCase(
     private val statesRepository: StatesRepository
 ) {
     @OptIn(ExperimentalUuidApi::class)
-    fun getStateById(stateId: String): TaskState {
+    suspend fun getStateById(stateId: String): TaskState {
         return statesRepository.getStateById(stateId)
     }
 }

@@ -9,7 +9,7 @@ class GetStatesByProjectIdUseCase(
     private val statesRepository: StatesRepository
 ) {
     @OptIn(ExperimentalUuidApi::class)
-    fun getStatesByProjectId(projectId: String): List<TaskState> {
+    suspend fun getStatesByProjectId(projectId: String): List<TaskState> {
         require(statesRepository.getStatesByProjectId(projectId).isNotEmpty()) {
             throw StateNotFoundException("No States Found")
         }
