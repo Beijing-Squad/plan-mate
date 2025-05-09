@@ -1,12 +1,9 @@
 package di
 
 import com.mongodb.kotlin.client.coroutine.MongoDatabase
-import data.remote.mongoDataSource.*
+import data.remote.mongoDataSource.MongoDBDataSourceImpl
 import data.remote.mongoDataSource.mongoConnection.MongoConnection
-import data.repository.dataSource.*
-import data.repository.mongoDataSource.UserMongoDataSourceImpl
-import data.repository.remoteDataSource.AuthenticationMongoDBDataSource
-import org.koin.core.qualifier.named
+import data.repository.remoteDataSource.MongoDBDataSource
 import org.koin.dsl.module
 
 val mongoModule = module {
@@ -15,31 +12,8 @@ val mongoModule = module {
         MongoConnection.database
     }
 
-    single(named("dbScope")) {
-        MongoConnection.dbScope
+    single<MongoDBDataSource> {
+        MongoDBDataSourceImpl(get())
     }
 
-    single<UserDataSource> {
-        UserMongoDataSourceImpl(get(), get(named("dbScope")))
-    }
-
-    single<TasksDataSource> {
-        TaskMongoDataSourceImpl(get(), get(named("dbScope")))
-    }
-
-    single<ProjectDataSource> {
-        ProjectMongoDataSourceImpl(get(), get(named("dbScope")))
-    }
-
-    single<StatesDataSource> {
-        StateMongoDataSourceImpl(get(), get(named("dbScope")))
-    }
-
-    single<AuditDataSource> {
-        AuditMongoDataSourceImpl(get(), get(named("dbScope")))
-    }
-
-    single<AuthenticationMongoDBDataSource> {
-        AuthenticationMongoDataSourceImpl(get())
-    }
 }
