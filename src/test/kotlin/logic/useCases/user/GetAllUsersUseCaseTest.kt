@@ -17,7 +17,7 @@ class GetAllUsersUseCaseTest {
 
     @BeforeEach
     fun setUp() {
-        userRepository = UserRepositoryImpl(mockk(relaxed = true))
+        userRepository = mockk(relaxed = true)
         getAllUsers = GetAllUsersUseCase(userRepository)
     }
 
@@ -35,7 +35,10 @@ class GetAllUsersUseCaseTest {
         coEvery { userRepository.getAllUsers() } returns users
 
         // Then
-        runTest { assertThat(getAllUsers.getAllUsers()).isEqualTo(users) }
+        runTest {
+            val result = getAllUsers.getAllUsers()
+            assertThat(result).isEqualTo(users)
+        }
 
     }
 }
