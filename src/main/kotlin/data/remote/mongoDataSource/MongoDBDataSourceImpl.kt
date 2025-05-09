@@ -101,9 +101,8 @@ class MongoDBDataSourceImpl(
 
     @OptIn(ExperimentalUuidApi::class)
     override suspend fun getTaskById(taskId: String): TaskDTO {
-        val uuid = Uuid.parse(taskId)
 
-        val queryParams = Filters.eq("_id", uuid)
+        val queryParams = Filters.eq("_id", taskId)
         val task = taskCollection.find<Task>(queryParams).limit(1).firstOrNull()
             ?: throw TaskNotFoundException("Task with id $taskId not found")
         return toTaskDTO(task)
@@ -111,9 +110,7 @@ class MongoDBDataSourceImpl(
 
     override suspend fun addTask(task: TaskDTO) {
         try {
-            taskCollection.insertOne(task).also {
-                println("Task added with id - ${it.insertedId}")
-            }
+            taskCollection.insertOne(task)
         } catch (e: Exception) {
             throw RuntimeException("Failed to add task: ${e.message}", e)
         }
@@ -121,20 +118,14 @@ class MongoDBDataSourceImpl(
 
     @OptIn(ExperimentalUuidApi::class)
     override suspend fun deleteTask(taskId: String) {
-        val uuid = try {
-            Uuid.parse(taskId)
-        } catch (e: Exception) {
-            throw IllegalArgumentException("Invalid task ID format: $taskId")
-        }
-        val queryParams = Filters.eq("_id", uuid)
-        taskCollection.findOneAndDelete(queryParams)?.also {
-            println("Task deleted: $it")
-        } ?: throw TaskNotFoundException("Task with id $taskId not found")
+        val queryParams = Filters.eq("_id", taskId)
+        taskCollection.findOneAndDelete(queryParams)
+         ?: throw TaskNotFoundException("Task with id $taskId not found")
     }
 
     @OptIn(ExperimentalUuidApi::class)
     override suspend fun updateTask(updatedTask: TaskDTO): TaskDTO {
-        val queryParams = Filters.eq("_id", Uuid.parse(updatedTask.id))
+        val queryParams = Filters.eq("_id", updatedTask.id)
         val updateParams = Updates.combine(
             Updates.set("project_id", updatedTask.projectId),
             Updates.set("title", updatedTask.title),
@@ -148,7 +139,6 @@ class MongoDBDataSourceImpl(
         if (result.matchedCount == 0L) {
             throw TaskNotFoundException("Task with id ${updatedTask.id} not found")
         }
-        println("Task updated: ${result.modifiedCount} document(s) modified")
         return updatedTask
     }
 
