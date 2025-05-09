@@ -10,7 +10,7 @@ class UpdateUserUseCase(
     private val userRepository: UserRepository,
 ) {
     @OptIn(ExperimentalUuidApi::class)
-    fun updateUser(user: User): User {
+    suspend fun updateUser(user: User): User {
         return userRepository.updateUser(user)
     }
 }
