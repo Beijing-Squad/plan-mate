@@ -1,34 +1,40 @@
 package data.remote.mongoDataSource.mongoConnection
 
-import com.mongodb.ConnectionString
-import com.mongodb.MongoClientSettings
-import com.mongodb.kotlin.client.coroutine.MongoClient
+
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers import java.io.File
-import java.util.Properties
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import org.litote.kmongo.coroutine.CoroutineClient
+import org.litote.kmongo.coroutine.CoroutineDatabase
+import org.litote.kmongo.coroutine.coroutine
+import org.litote.kmongo.reactivestreams.KMongo
+import java.io.File
+import java.util.*
 
 object MongoConnection {
-    private val client by lazy { createClient() }
-    val database by lazy { client.getDatabase("planMate") }
-    val dbScope by lazy { CoroutineScope(Dispatchers.IO) }
-
-    private fun createClient(): MongoClient {
-        val props = Properties().apply {
+    private val props: Properties by lazy {
+        Properties().apply {
             File("keys.properties").takeIf { it.exists() }
                 ?.inputStream()?.use { load(it) }
                 ?: error("Missing keys.properties")
         }
-
-        val user = props.getProperty("MONGO_USERNAME") ?: error("MONGO_USERNAME not found in keys.properties")
-        val pass = props.getProperty("MONGO_PASSWORD") ?: error("MONGO_PASSWORD not found in keys.properties")
-
-        val uri = "mongodb+srv://$user:$pass@cluster0.pcitphl.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
-
-        return MongoClient.Factory.create(
-            MongoClientSettings.builder()
-                .applyConnectionString(ConnectionString(uri))
-                .build()
-        )
     }
 
+    private val uri by lazy {
+        val user = props.getProperty("MONGO_USERNAME") ?: error("MONGO_USERNAME not found in keys.properties")
+        val pass = props.getProperty("MONGO_PASSWORD") ?: error("MONGO_PASSWORD not found in keys.properties")
+        "mongodb+srv://$user:$pass@cluster0.pcitphl.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+    }
+
+    private val client: CoroutineClient by lazy {
+        KMongo.createClient(uri).coroutine
+    }
+
+    val database: CoroutineDatabase by lazy {
+        client.getDatabase("planMate")
+    }
+
+    val dbScope: CoroutineScope by lazy {
+        CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    }
 }
