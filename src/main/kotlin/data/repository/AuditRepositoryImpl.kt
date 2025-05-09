@@ -1,23 +1,28 @@
 package data.repository
 
-import data.repository.dataSource.AuditDataSource
+import data.remote.mongoDataSource.MongoDBDataSourceImpl
+import data.repository.mapper.toAuditDTO
+import data.repository.mapper.toAuditEntity
 import logic.entities.Audit
 import logic.repository.AuditRepository
 
 class AuditRepositoryImpl(
-    private val auditDataSource: AuditDataSource
+    private val auditDataSource: MongoDBDataSourceImpl
 ) : AuditRepository {
 
-    override fun getAllAuditLogs(): List<Audit> {
-        return auditDataSource.getAllAuditLogs()
+    override suspend fun getAllAuditLogs(): List<Audit> {
+        return auditDataSource.getAllAuditLogs().map { toAuditEntity(it) }
     }
-    override fun addAuditLog(audit: Audit) {
-        auditDataSource.addAuditLog(audit)
+
+    override suspend fun addAuditLog(audit: Audit) {
+        auditDataSource.addAuditLog(toAuditDTO(audit))
     }
-    override fun getAuditLogsByProjectId(projectId: String): List<Audit> {
-        return auditDataSource.getAuditLogsByProjectId(projectId)
+
+    override suspend fun getAuditLogsByProjectId(projectId: String): List<Audit> {
+        return auditDataSource.getAuditLogsByProjectId(projectId).map { toAuditEntity(it) }
     }
-    override fun getAuditLogsByTaskId(taskId: String): List<Audit> {
-        return auditDataSource.getAuditLogsByTaskId(taskId)
+
+    override suspend fun getAuditLogsByTaskId(taskId: String): List<Audit> {
+        return auditDataSource.getAuditLogsByTaskId(taskId).map { toAuditEntity(it) }
     }
 }
