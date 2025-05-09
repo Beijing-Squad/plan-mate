@@ -3,8 +3,9 @@ package logic.useCases.state
 import com.google.common.truth.Truth.assertThat
 import fake.createProject
 import fake.createState
-import io.mockk.every
+import io.mockk.coEvery
 import io.mockk.mockk
+import kotlinx.coroutines.test.runTest
 import logic.entities.exceptions.StateNotFoundException
 import logic.repository.StatesRepository
 import org.junit.jupiter.api.BeforeEach
@@ -30,39 +31,43 @@ class UpdateTaskStateUseCaseTest {
     @OptIn(ExperimentalUuidApi::class)
     @Test
     fun `should update state when state is exist`() {
-        //Given
-        val project = createProject()
-        val state = createState(
-            name = "in progress",
-            projectId = project.id.toString()
-        )
-        val newState = createState(
-            id = state.id,
-            name = "done",
-            projectId = state.projectId.toString()
-        )
+        runTest {
+            //Given
+            val project = createProject()
+            val state = createState(
+                name = "in progress",
+                projectId = project.id.toString()
+            )
+            val newState = createState(
+                id = state.id,
+                name = "done",
+                projectId = state.projectId.toString()
+            )
 
-        every { getTaskStateByIdUseCase.getStateById(newState.id.toString()) } returns state
-        every { statesRepository.updateState(newState) } returns newState
+            coEvery { getTaskStateByIdUseCase.getStateById(newState.id.toString()) } returns state
+            coEvery { statesRepository.updateState(newState) } returns newState
 
-        // when
-        val result = updateTaskStateUseCase.updateState(newState)
+            // when
+            val result = updateTaskStateUseCase.updateState(newState)
 
-        //Then
-        assertThat(result).isEqualTo(newState)
+            //Then
+            assertThat(result).isEqualTo(newState)
+        }
     }
 
     @OptIn(ExperimentalUuidApi::class)
     @Test
     fun `should throw exception when not found state with this state id`() {
-        // Given
-        val newState = createState()
+        runTest {
+            // Given
+            val newState = createState()
 
-        every { statesRepository.getStateById(newState.id.toString()) } throws StateNotFoundException()
+            coEvery { statesRepository.getStateById(newState.id.toString()) } throws StateNotFoundException()
 
-        // When & Then
-        assertThrows<StateNotFoundException> {
-            updateTaskStateUseCase.updateState(newState)
+            // When & Then
+            assertThrows<StateNotFoundException> {
+                updateTaskStateUseCase.updateState(newState)
+            }
         }
     }
 }

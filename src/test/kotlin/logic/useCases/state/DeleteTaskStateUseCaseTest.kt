@@ -2,8 +2,9 @@ package logic.useCases.state
 
 import fake.createProject
 import fake.createState
-import io.mockk.every
+import io.mockk.coEvery
 import io.mockk.mockk
+import kotlinx.coroutines.test.runTest
 import logic.entities.exceptions.StateNotFoundException
 import logic.repository.StatesRepository
 import org.junit.jupiter.api.BeforeEach
@@ -29,34 +30,39 @@ class DeleteTaskStateUseCaseTest {
     @OptIn(ExperimentalUuidApi::class)
     @Test
     fun `should return true when state exists and deleted successfully`() {
-        // Given
-        val fixedId = Uuid.parse("123e4567-e89b-12d3-a456-426614174000")
-        val project = createProject(name = "PlanMate Core Features", createdBy = "adminUser01")
-        val state = createState(id = fixedId, name = "In Progress", projectId = project.id.toString())
-        every { getTaskStateByIdUseCase.getStateById(state.id.toString()) } returns state
-        every { statesRepository.deleteState(state) } returns true
+        runTest {
+            // Given
+            val fixedId = Uuid.parse("123e4567-e89b-12d3-a456-426614174000")
+            val project = createProject(name = "PlanMate Core Features", createdBy = "adminUser01")
+            val state = createState(id = fixedId, name = "In Progress", projectId = project.id.toString())
+            coEvery { getTaskStateByIdUseCase.getStateById(state.id.toString()) } returns state
+            coEvery { statesRepository.deleteState(state) } returns true
 
-        // When
-        val result = deleteTaskStateUseCase.deleteState(state)
+            // When
+            val result = deleteTaskStateUseCase.deleteState(state)
 
-        // Then
-        assertEquals(true, result)
+            // Then
+            assertEquals(true, result)
+        }
+
     }
 
     @OptIn(ExperimentalUuidApi::class)
     @Test
     fun `should throw exception when deleting non existent state`() {
-        // Given
-        val errorMessage = "the name of the new state is empty"
-        val project = createProject(name = "PlanMate Core Features", createdBy = "adminUser01")
-        val state = createState(name = "Archived", projectId = project.id.toString())
+        runTest {
+            // Given
+            val errorMessage = "the name of the new state is empty"
+            val project = createProject(name = "PlanMate Core Features", createdBy = "adminUser01")
+            val state = createState(name = "Archived", projectId = project.id.toString())
 
-        every { statesRepository.getAllStates() } returns listOf()
-        every { statesRepository.getStateById(state.id.toString()) } throws StateNotFoundException(errorMessage)
+            coEvery { statesRepository.getAllStates() } returns listOf()
+            coEvery { statesRepository.getStateById(state.id.toString()) } throws StateNotFoundException(errorMessage)
 
-        // When & Then
-        assertThrows<StateNotFoundException> {
-            deleteTaskStateUseCase.deleteState(state)
+            // When & Then
+            assertThrows<StateNotFoundException> {
+                deleteTaskStateUseCase.deleteState(state)
+            }
         }
     }
 }

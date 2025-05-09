@@ -24,11 +24,11 @@ interface MongoDBDataSource {
     suspend fun updateTask(updatedTask: TaskDTO): TaskDTO
 
     suspend fun getAllStates(): List<TaskStateDTO>
-    suspend fun getStatesByProjectId(projectId: String): List<TaskStateDTO>
-    suspend fun getStateById(stateId: String): TaskStateDTO?
-    suspend fun addState(taskState: TaskStateDTO): Boolean
-    suspend fun updateState(taskState: TaskStateDTO): TaskStateDTO
-    suspend fun deleteState(taskState: TaskStateDTO): Boolean
+    suspend fun getTaskStatesByProjectId(projectId: String): List<TaskStateDTO>
+    suspend fun getTaskStateById(stateId: String): TaskStateDTO?
+    suspend fun addTaskState(taskState: TaskStateDTO): Boolean
+    suspend fun updateTaskState(taskState: TaskStateDTO): TaskStateDTO
+    suspend fun deleteTaskState(taskState: TaskStateDTO): Boolean
 
     suspend fun getAllUsers(): List<UserDTO>
     suspend fun getUserByUserId(userId: String): UserDTO
