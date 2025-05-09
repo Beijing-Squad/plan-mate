@@ -1,13 +1,13 @@
 package data.repository
 
 import data.repository.mapper.toUserEntity
-import data.repository.remoteDataSource.AuthenticationMongoDBDataSource
+import data.repository.remoteDataSource.MongoDBDataSource
 import logic.entities.User
 import logic.entities.UserRole
 import logic.repository.AuthenticationRepository
 
 class AuthenticationRepositoryImpl(
-    private val dataSource: AuthenticationMongoDBDataSource
+    private val dataSource: MongoDBDataSource
 ) : AuthenticationRepository {
 
     override suspend fun registerUser(username: String, password: String, role: UserRole): Boolean =
