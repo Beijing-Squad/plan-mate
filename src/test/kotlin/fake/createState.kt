@@ -1,15 +1,18 @@
 package fake
 
-import logic.entities.State
+import logic.entities.TaskState
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
+@OptIn(ExperimentalUuidApi::class)
 fun createState(
-    id: String = "DefaultStateId",
+    id: Uuid = Uuid.random(),
     name: String = "defaultStateName",
-    projectId: String = "defaultProjectId"
-): State {
-    return State(
+    projectId: String = Uuid.random().toString()
+): TaskState {
+    return TaskState(
         id = id,
         name = name,
-        projectId = projectId
+        projectId = Uuid.parse(projectId)
     )
 }

@@ -1,8 +1,9 @@
 package data.parser
 
 import com.google.common.truth.Truth.assertThat
+import data.local.csvDataSource.parser.ProjectCsvParser
 import fake.createProject
-import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalDateTime
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -33,8 +34,12 @@ class ProjectCsvParserTest {
     fun `should serialize project to correct CSV line`() {
         // Given
         val fixedId = Uuid.parse("123e4567-e89b-12d3-a456-426614174000")
+        val fixedTime = LocalDateTime.parse("2024-04-01T00:00")
         val project = createProject(
-        ).copy(id = fixedId)
+        ).copy(
+            id = fixedId,
+            updatedAt = fixedTime,
+            createdAt = fixedTime)
 
         // When
         val result = parser.serializer(project)
@@ -42,7 +47,7 @@ class ProjectCsvParserTest {
         // Then
         with(result) {
             assertThat(this).isEqualTo(
-                "123e4567-e89b-12d3-a456-426614174000," + "defaultProjectName," + "defaultDescription," + "defaultCreator," + "2023-01-01," + "2023-01-01"
+                "123e4567-e89b-12d3-a456-426614174000," + "defaultProjectName," + "defaultDescription," + "defaultCreator," + "2024-04-01," + "2024-04-01"
             )
         }
 
@@ -51,7 +56,7 @@ class ProjectCsvParserTest {
     @Test
     fun `should deserialize line to correct Project object`() {
         // Given
-        val line = "123e4567-e89b-12d3-a456-426614174000,Mobile,Application,Mada,2024-04-01,2024-04-01"
+        val line = "123e4567-e89b-12d3-a456-426614174000,Mobile,Application,Mada,2024-04-01T00:00,2024-04-01T00:00"
 
         // When
         val result = parser.deserializer(line)
@@ -62,9 +67,10 @@ class ProjectCsvParserTest {
             assertThat(name).isEqualTo("Mobile")
             assertThat(description).isEqualTo("Application")
             assertThat(createdBy).isEqualTo("Mada")
-            assertThat(createdAt).isEqualTo(LocalDate(2024, 4, 1))
-            assertThat(updatedAt).isEqualTo(LocalDate(2024, 4, 1))
+            assertThat(createdAt).isEqualTo(LocalDateTime(2024, 4, 1, 0, 0))
+            assertThat(updatedAt).isEqualTo(LocalDateTime(2024, 4, 1, 0, 0))
         }
+
     }
 
     @Test

@@ -1,6 +1,6 @@
 package logic.entities
 
-import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalDateTime
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -10,6 +10,6 @@ data class Project(
     val name: String,
     val description: String,
     val createdBy: String,
-    val createdAt: LocalDate,
-    val updatedAt: LocalDate
+    val createdAt: LocalDateTime,
+    val updatedAt: LocalDateTime
 )

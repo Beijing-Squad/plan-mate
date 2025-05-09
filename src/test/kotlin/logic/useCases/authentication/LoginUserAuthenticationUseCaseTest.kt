@@ -2,10 +2,11 @@ package logic.useCases.authentication
 
 import com.google.common.truth.Truth.assertThat
 import fake.createUser
-import io.mockk.every
-import io.mockk.mockk
-import logic.entities.exceptions.InvalidPasswordException
+import io.mockk.*
+import kotlinx.coroutines.test.runTest
+import logic.entities.UserRole
 import logic.entities.exceptions.InvalidUserNameException
+import logic.entities.exceptions.UserNotFoundException
 import logic.repository.AuthenticationRepository
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -13,90 +14,134 @@ import org.junit.jupiter.api.assertThrows
 
 class LoginUserAuthenticationUseCaseTest {
 
-    private lateinit var repository: AuthenticationRepository
-    private lateinit var loginUserAuthenticationUseCase: LoginUserAuthenticationUseCase
-    private lateinit var mD5PasswordUseCase: MD5PasswordUseCase
-    private lateinit var sessionManager: SessionManager
+    private val repository = mockk<AuthenticationRepository>()
+    private val sessionManagerUseCase = mockk<SessionManagerUseCase>(relaxed = true)
+    private lateinit var loginUseCase: LoginUserAuthenticationUseCase
 
-    private val testUsername = "john_doe"
-    private val testPassword = "secure123"
+    // Test data
+    private val testUser = createUser(
+        userName = "mohamed",
+        password = "5f4dcc3b5aa765d61d8327deb882cf99", // hashed "password123"
+        role = UserRole.ADMIN
+    )
 
     @BeforeEach
     fun setUp() {
-        repository = mockk(relaxed = true)
-        mD5PasswordUseCase = mockk(relaxed = true)
-        sessionManager = mockk(relaxed = true)
-        loginUserAuthenticationUseCase = LoginUserAuthenticationUseCase(repository,mD5PasswordUseCase,sessionManager)
+        clearAllMocks()
+        loginUseCase = LoginUserAuthenticationUseCase(repository, sessionManagerUseCase)
     }
 
     @Test
-    fun `given blank username, when execute called, then throw InvalidUserNameException`() {
-        // Given
-        val blankUsername = "  "
+    fun `execute should return user when credentials are valid`() {
+        runTest {
+            // Given
+            coEvery { repository.loginUser("mohamed", "password123") } returns testUser
 
-        // When / Then
-        val exception = assertThrows<InvalidUserNameException> {
-            loginUserAuthenticationUseCase.execute(blankUsername, testPassword)
+            // When
+            val result = loginUseCase.execute("mohamed", "password123")
+
+            // Then
+            assertThat(result).isEqualTo(testUser)
+            coVerify(exactly = 1) { repository.loginUser("mohamed", "password123") }
+            verify(exactly = 1) { sessionManagerUseCase.setCurrentUser(testUser) }
         }
-        assertThat(exception.message).isEqualTo(USERNAME_ERROR)
     }
 
     @Test
-    fun `given blank password, when execute called, then throw InvalidPasswordException`() {
-        // Given
-        val blankPassword = ""
+    fun `execute should set current user in session when authentication is successful`() {
+        runTest {
+            // Given
+            coEvery { repository.loginUser("mohamed", "password123") } returns testUser
 
-        // When / Then
-        val exception = assertThrows<InvalidPasswordException> {
-            loginUserAuthenticationUseCase.execute(testUsername, blankPassword)
+            // When
+            loginUseCase.execute("mohamed", "password123")
+
+            // Then
+            verify(exactly = 1) { sessionManagerUseCase.setCurrentUser(testUser) }
         }
-        assertThat(exception.message).isEqualTo(PASSWORD_ERROR)
     }
 
     @Test
-    fun `given username not found, when execute called, then throw InvalidUserNameException`() {
-        // Given
-        every { repository.loginUser(testUsername, testPassword) } returns null
+    fun `execute should propagate exceptions from repository`() {
+        runTest {
+            // Given
+            val exception = UserNotFoundException("Invalid username or password")
+            coEvery {
+                repository
+                    .loginUser("wronguser", "wrongpass")
+            } throws exception
 
-        // When / Then
-        val exception = assertThrows<InvalidUserNameException> {
-            loginUserAuthenticationUseCase.execute(testUsername, testPassword)
+            // When/Then
+            val thrownException = assertThrows<UserNotFoundException> {
+                loginUseCase
+                    .execute("wronguser", "wrongpass")
+            }
+
+            assertThat(thrownException).isEqualTo(exception)
+            coVerify(exactly = 1) { repository.loginUser("wronguser", "wrongpass") }
+            verify(exactly = 0) { sessionManagerUseCase.setCurrentUser(any()) }
         }
-        assertThat(exception.message).isEqualTo(USERNAME_ERROR)
     }
 
     @Test
-    fun `given wrong password, when execute called, then throw InvalidPasswordException`() {
-        // Given
-        val wrongPassword = "wrongPass"
-        val storedUser = createUser(userName = testUsername, password = "someOtherPassword")
-        every { repository.loginUser(testUsername, wrongPassword) } returns storedUser
+    fun `execute should handle different user roles correctly`() {
+        runTest {
+            // Given
+            val regularUser = createUser(
+                userName = "regularuser",
+                password = "5f4dcc3b5aa765d61d8327deb882cf99",
+                role = UserRole.MATE
+            )
+            coEvery {
+                repository
+                    .loginUser("regularuser", "password123")
+            } returns regularUser
 
-        // When / Then
-        val exception = assertThrows<InvalidPasswordException> {
-            loginUserAuthenticationUseCase.execute(testUsername, wrongPassword)
+            // When
+            val result = loginUseCase
+                .execute("regularuser", "password123")
+
+            // Then
+            assertThat(result).isEqualTo(regularUser)
+            verify(exactly = 1) { sessionManagerUseCase.setCurrentUser(regularUser) }
         }
-        assertThat(exception.message).isEqualTo(PASSWORD_ERROR)
     }
 
     @Test
-    fun `given valid username and password, when execute called, then return User`() {
-        // Given
-        val hashedPassword = "hashed_secure123"
-        val expectedUser = createUser(userName = testUsername, password = hashedPassword)
+    fun `execute should handle empty username and password`() {
+        runTest {
+            // Given
+            coEvery {
+                repository
+                    .loginUser("", "")
+            } throws InvalidUserNameException("Username cannot be blank")
 
-        every { repository.loginUser(testUsername, testPassword) } returns expectedUser
-        every { mD5PasswordUseCase.hashPassword(testPassword) } returns hashedPassword
+            // When/Then
+            assertThrows<InvalidUserNameException> {
+                loginUseCase.execute("", "")
+            }
 
-        // When
-        val result = loginUserAuthenticationUseCase.execute(testUsername, testPassword)
-
-        // Then
-        assertThat(result).isEqualTo(expectedUser)
+            coVerify(exactly = 1) { repository.loginUser("", "") }
+            verify(exactly = 0) { sessionManagerUseCase.setCurrentUser(any()) }
+        }
     }
 
-    private companion object {
-        const val USERNAME_ERROR = "Invalid username"
-        const val PASSWORD_ERROR = "Invalid password"
+    @Test
+    fun `execute should handle whitespace username and password`() {
+        runTest {
+            // Given
+            coEvery {
+                repository
+                    .loginUser("   ", "   ")
+            } throws InvalidUserNameException("Username cannot be blank")
+
+            // When/Then
+            assertThrows<InvalidUserNameException> {
+                loginUseCase.execute("   ", "   ")
+            }
+
+            coVerify(exactly = 1) { repository.loginUser("   ", "   ") }
+            verify(exactly = 0) { sessionManagerUseCase.setCurrentUser(any()) }
+        }
     }
 }

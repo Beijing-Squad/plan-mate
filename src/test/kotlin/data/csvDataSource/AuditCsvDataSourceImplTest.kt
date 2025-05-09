@@ -1,12 +1,12 @@
 package data.csvDataSource
 
 import com.google.common.truth.Truth.assertThat
-import data.csvDataSource.csv.CsvDataSourceImpl
+import data.local.csvDataSource.AuditCsvDataSourceImpl
+import data.local.csvDataSource.csv.CsvDataSourceImpl
 import fake.createAudit
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import kotlinx.datetime.LocalDate
 import logic.entities.ActionType
 import logic.entities.Audit
 import logic.entities.EntityType
@@ -37,7 +37,6 @@ class AuditCsvDataSourceImplTest {
                 entityType = EntityType.PROJECT,
                 entityId = "PROJECT-001",
                 action = ActionType.CREATE,
-                timeStamp = LocalDate(2025, 4, 30)
             ),
             createAudit(
                 userRole = UserRole.MATE,
@@ -45,7 +44,6 @@ class AuditCsvDataSourceImplTest {
                 entityType = EntityType.TASK,
                 entityId = "TASK-123",
                 action = ActionType.UPDATE,
-                timeStamp = LocalDate(2025, 4, 29)
             )
         )
         every { csvDataSource.loadAllDataFromFile() } returns auditLogs
@@ -93,7 +91,6 @@ class AuditCsvDataSourceImplTest {
             entityType = EntityType.PROJECT,
             entityId = "PROJECT-001",
             action = ActionType.CREATE,
-            timeStamp = LocalDate(2025, 4, 30)
         )
 
         // When
@@ -112,9 +109,6 @@ class AuditCsvDataSourceImplTest {
             entityType = EntityType.TASK,
             entityId = "TASK-123",
             action = ActionType.UPDATE,
-            oldState = "In Progress",
-            newState = "Completed",
-            timeStamp = LocalDate(2025, 4, 29)
         )
 
         // When
@@ -133,7 +127,6 @@ class AuditCsvDataSourceImplTest {
             entityType = EntityType.PROJECT,
             entityId = "PROJECT-002",
             action = ActionType.DELETE,
-            timeStamp = LocalDate(2025, 4, 28)
         )
         every { csvDataSource.appendToFile(auditLog) } throws DataAccessException("Failed to write to audit.csv")
 
@@ -156,7 +149,6 @@ class AuditCsvDataSourceImplTest {
                 entityType = EntityType.PROJECT,
                 entityId = projectId,
                 action = ActionType.CREATE,
-                timeStamp = LocalDate(2025, 4, 30)
             ),
             createAudit(
                 userRole = UserRole.MATE,
@@ -164,7 +156,6 @@ class AuditCsvDataSourceImplTest {
                 entityType = EntityType.TASK,
                 entityId = "TASK-123",
                 action = ActionType.UPDATE,
-                timeStamp = LocalDate(2025, 4, 29)
             ),
             createAudit(
                 userRole = UserRole.ADMIN,
@@ -172,7 +163,6 @@ class AuditCsvDataSourceImplTest {
                 entityType = EntityType.PROJECT,
                 entityId = projectId,
                 action = ActionType.UPDATE,
-                timeStamp = LocalDate(2025, 4, 28)
             )
         )
         every { csvDataSource.loadAllDataFromFile() } returns auditLogs
@@ -198,7 +188,6 @@ class AuditCsvDataSourceImplTest {
                 entityType = EntityType.TASK,
                 entityId = "TASK-123",
                 action = ActionType.UPDATE,
-                timeStamp = LocalDate(2025, 4, 29)
             )
         )
         every { csvDataSource.loadAllDataFromFile() } returns auditLogs
@@ -222,9 +211,6 @@ class AuditCsvDataSourceImplTest {
                 entityType = EntityType.TASK,
                 entityId = taskId,
                 action = ActionType.UPDATE,
-                oldState = "In Progress",
-                newState = "Completed",
-                timeStamp = LocalDate(2025, 4, 29)
             ),
             createAudit(
                 userRole = UserRole.ADMIN,
@@ -232,7 +218,6 @@ class AuditCsvDataSourceImplTest {
                 entityType = EntityType.PROJECT,
                 entityId = "PROJECT-001",
                 action = ActionType.CREATE,
-                timeStamp = LocalDate(2025, 4, 30)
             ),
             createAudit(
                 userRole = UserRole.MATE,
@@ -240,7 +225,6 @@ class AuditCsvDataSourceImplTest {
                 entityType = EntityType.TASK,
                 entityId = taskId,
                 action = ActionType.DELETE,
-                timeStamp = LocalDate(2025, 4, 28)
             )
         )
         every { csvDataSource.loadAllDataFromFile() } returns auditLogs
@@ -266,7 +250,6 @@ class AuditCsvDataSourceImplTest {
                 entityType = EntityType.PROJECT,
                 entityId = "PROJECT-001",
                 action = ActionType.CREATE,
-                timeStamp = LocalDate(2025, 4, 30)
             )
         )
         every { csvDataSource.loadAllDataFromFile() } returns auditLogs

@@ -1,10 +1,11 @@
 package data.csvDataSource
 
 import com.google.common.truth.Truth.assertThat
-import data.csvDataSource.csv.CsvDataSourceImpl
+import data.local.csvDataSource.TasksCsvDataSourceImpl
+import data.local.csvDataSource.csv.CsvDataSourceImpl
 import fake.createTask
 import io.mockk.*
-import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalDateTime
 import logic.entities.Task
 import logic.entities.exceptions.TaskNotFoundException
 import org.junit.jupiter.api.BeforeEach
@@ -33,8 +34,8 @@ class TasksCsvDataSourceImplTest {
             description = "Description 1",
             createdBy = "user-1",
             stateId = "state-1",
-            createdAt = LocalDate(2023, 1, 1),
-            updatedAt = LocalDate(2023, 1, 1)
+            createdAt = LocalDateTime(2023, 1, 1, 0, 0),
+            updatedAt = LocalDateTime(2023, 1, 1, 0, 0)
         )
         val task2 = createTask(
             projectId = "project-2",
@@ -42,8 +43,8 @@ class TasksCsvDataSourceImplTest {
             description = "Description 2",
             createdBy = "user-2",
             stateId = "state-2",
-            createdAt = LocalDate(2023, 1, 2),
-            updatedAt = LocalDate(2023, 1, 2)
+            createdAt = LocalDateTime(2023, 1, 1, 0, 0),
+            updatedAt = LocalDateTime(2023, 1, 1, 0, 0)
         )
         val tasks = listOf(task1, task2)
         every { csvDataSource.loadAllDataFromFile() } returns tasks
@@ -78,8 +79,8 @@ class TasksCsvDataSourceImplTest {
             description = "Test Description",
             createdBy = "user-1",
             stateId = "state-1",
-            createdAt = LocalDate(2023, 1, 1),
-            updatedAt = LocalDate(2023, 1, 1)
+            createdAt = LocalDateTime(2023, 1, 1, 0, 0),
+            updatedAt = LocalDateTime(2023, 1, 1, 0, 0)
         )
         every { csvDataSource.loadAllDataFromFile() } returns listOf(task)
 
@@ -131,8 +132,8 @@ class TasksCsvDataSourceImplTest {
             description = "Updated Description",
             createdBy = "user-1",
             stateId = "state-1",
-            createdAt = LocalDate(2023, 1, 1),
-            updatedAt = LocalDate(2023, 1, 2)
+            createdAt = LocalDateTime(2023, 1, 1, 0, 0),
+            updatedAt = LocalDateTime(2023, 1, 1, 0, 0)
         )
         val taskId = updatedTask.id.toString()
         every { csvDataSource.loadAllDataFromFile() } returns emptyList()
