@@ -102,8 +102,8 @@ class MongoDBDataSourceImpl(
     @OptIn(ExperimentalUuidApi::class)
     override suspend fun getTaskById(taskId: String): TaskDTO {
 
-        val queryParams = Filters.eq("_id", taskId)
-        val task = taskCollection.find<Task>(queryParams).limit(1).firstOrNull()
+        val taskIdFilter = Filters.eq("_id", taskId)
+        val task = taskCollection.find<Task>(taskIdFilter).limit(1).firstOrNull()
             ?: throw TaskNotFoundException("Task with id $taskId not found")
         return toTaskDTO(task)
     }
@@ -118,15 +118,15 @@ class MongoDBDataSourceImpl(
 
     @OptIn(ExperimentalUuidApi::class)
     override suspend fun deleteTask(taskId: String) {
-        val queryParams = Filters.eq("_id", taskId)
-        taskCollection.findOneAndDelete(queryParams)
+        val taskIdFilter = Filters.eq("_id", taskId)
+        taskCollection.findOneAndDelete(taskIdFilter)
          ?: throw TaskNotFoundException("Task with id $taskId not found")
     }
 
     @OptIn(ExperimentalUuidApi::class)
     override suspend fun updateTask(updatedTask: TaskDTO): TaskDTO {
-        val queryParams = Filters.eq("_id", updatedTask.id)
-        val updateParams = Updates.combine(
+        val taskIdFilter = Filters.eq("_id", updatedTask.id)
+        val updateTask = Updates.combine(
             Updates.set("project_id", updatedTask.projectId),
             Updates.set("title", updatedTask.title),
             Updates.set("description", updatedTask.description),
@@ -135,7 +135,7 @@ class MongoDBDataSourceImpl(
             Updates.set("created_at", updatedTask.createdAt),
             Updates.set("updated_at", updatedTask.updatedAt)
         )
-        val result = taskCollection.updateOne(queryParams, updateParams)
+        val result = taskCollection.updateOne(taskIdFilter, updateTask)
         if (result.matchedCount == 0L) {
             throw TaskNotFoundException("Task with id ${updatedTask.id} not found")
         }
