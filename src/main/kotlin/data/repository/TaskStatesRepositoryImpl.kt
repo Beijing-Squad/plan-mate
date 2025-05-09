@@ -1,36 +1,43 @@
 package data.repository
 
-import data.repository.dataSource.StatesDataSource
+import data.repository.mapper.toTaskStateDto
+import data.repository.mapper.toTaskStateEntity
+import data.repository.remoteDataSource.TaskStateMongoDBDataSource
 import logic.entities.TaskState
+import logic.entities.exceptions.StateNotFoundException
 import logic.repository.StatesRepository
 
 class TaskStatesRepositoryImpl(
-    private val stateDataSource: StatesDataSource
-) : StatesRepository{
+    private val taskStateDataSource: TaskStateMongoDBDataSource
+) : StatesRepository {
 
-    override fun getAllStates(): List<TaskState> {
-        return stateDataSource.getAllStates()
+    override suspend fun getAllStates(): List<TaskState> {
+        return taskStateDataSource.getAllStates()
+            .map { toTaskStateEntity(it) }
     }
 
-    override fun getStatesByProjectId(projectId: String): List<TaskState> {
-        return stateDataSource.getStatesByProjectId(projectId)
+    override suspend fun getStatesByProjectId(projectId: String): List<TaskState> {
+        return taskStateDataSource.getStatesByProjectId(projectId)
+            .map { toTaskStateEntity(it) }
     }
 
-    override fun getStateById(stateId: String): TaskState {
-        return stateDataSource.getStateById(stateId)
+    override suspend fun getStateById(stateId: String): TaskState {
+        return toTaskStateEntity(
+            taskStateDataSource.getStateById(stateId)
+                ?: throw StateNotFoundException()
+        )
     }
 
-    override fun addState(taskState: TaskState): Boolean {
-        return stateDataSource.addState(taskState)
+    override suspend fun addState(taskState: TaskState): Boolean {
+        return taskStateDataSource.addState(toTaskStateDto(taskState))
     }
 
-    override fun updateState(taskState: TaskState): TaskState {
-        return stateDataSource.updateState(taskState)
+    override suspend fun updateState(taskState: TaskState): TaskState {
+        val stateDTO = toTaskStateDto(taskState)
+        return toTaskStateEntity(taskStateDataSource.updateState(stateDTO))
     }
 
-    override fun deleteState(taskState: TaskState): Boolean {
-        return stateDataSource.deleteState(taskState)
+    override suspend fun deleteState(taskState: TaskState): Boolean {
+        return taskStateDataSource.deleteState(toTaskStateDto(taskState))
     }
-
 }
-
