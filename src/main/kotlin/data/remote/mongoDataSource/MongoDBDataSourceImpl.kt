@@ -4,6 +4,8 @@ import com.mongodb.MongoTimeoutException
 import com.mongodb.client.model.Filters
 import com.mongodb.client.model.Filters.eq
 import com.mongodb.client.model.Updates
+import com.mongodb.client.model.Updates.combine
+import com.mongodb.client.model.Updates.set
 import com.mongodb.kotlin.client.coroutine.MongoDatabase
 import data.dto.*
 import data.remote.mongoDataSource.mongoConnection.MongoConnection
@@ -15,6 +17,7 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.withContext
 import logic.entities.exceptions.InvalidLoginException
+import logic.entities.exceptions.StateNotFoundException
 import logic.entities.exceptions.UserNotFoundException
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
@@ -109,27 +112,40 @@ class MongoDBDataSourceImpl(
     }
 
     override suspend fun getAllStates(): List<TaskStateDTO> {
-        TODO("Not yet implemented")
+        return statesCollection.find<TaskStateDTO>().toList()
     }
 
-    override suspend fun getStatesByProjectId(projectId: String): List<TaskStateDTO> {
-        TODO("Not yet implemented")
+    override suspend fun getTaskStatesByProjectId(projectId: String): List<TaskStateDTO> {
+        val projectIdFilter = eq("projectId", projectId)
+        return statesCollection.find(projectIdFilter).toList()
     }
 
-    override suspend fun getStateById(stateId: String): TaskStateDTO? {
-        TODO("Not yet implemented")
+    override suspend fun getTaskStateById(stateId: String): TaskStateDTO? {
+        val stateIdFilter = eq("id", stateId)
+        return statesCollection.find(stateIdFilter).firstOrNull() ?: throw StateNotFoundException()
     }
 
-    override suspend fun addState(taskState: TaskStateDTO): Boolean {
-        TODO("Not yet implemented")
+    override suspend fun addTaskState(taskState: TaskStateDTO): Boolean {
+        return statesCollection.insertOne(taskState).wasAcknowledged()
     }
 
-    override suspend fun updateState(taskState: TaskStateDTO): TaskStateDTO {
-        TODO("Not yet implemented")
+    override suspend fun updateTaskState(taskState: TaskStateDTO): TaskStateDTO {
+        val stateIdFilter = eq("stateId", taskState.id)
+        val updatedState = combine(
+            set("id", taskState.id),
+            set("name", taskState.name),
+            set("project_id", taskState.projectId)
+        )
+        return statesCollection.updateOne(filter = stateIdFilter, update = updatedState)
+            .takeIf { it.matchedCount > 0 }
+            ?.let { taskState }
+            ?: throw StateNotFoundException()
     }
 
-    override suspend fun deleteState(taskState: TaskStateDTO): Boolean {
-        TODO("Not yet implemented")
+    override suspend fun deleteTaskState(taskState: TaskStateDTO): Boolean {
+        val stateIdFilter = eq("stateId", taskState.id)
+
+        return statesCollection.deleteOne(stateIdFilter).deletedCount > 0
     }
 
     override suspend fun getAllUsers(): List<UserDTO> {
