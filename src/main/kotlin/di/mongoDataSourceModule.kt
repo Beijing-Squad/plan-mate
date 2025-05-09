@@ -5,7 +5,7 @@ import data.remote.mongoDataSource.*
 import data.remote.mongoDataSource.mongoConnection.MongoConnection
 import data.repository.dataSource.*
 import data.repository.mongoDataSource.UserMongoDataSourceImpl
-import kotlinx.coroutines.CoroutineScope
+import data.repository.remoteDataSource.TaskStateMongoDBDataSource
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
@@ -31,8 +31,8 @@ val mongoModule = module {
         ProjectMongoDataSourceImpl(get(), get(named("dbScope")))
     }
 
-    single<StatesDataSource> {
-        StateMongoDataSourceImpl(get(), get(named("dbScope")))
+    single<TaskStateMongoDBDataSource> {
+        TaskStateMongoDataSourceImpl(get(), get(named("dbScope")))
     }
 
     single<AuditDataSource> {
