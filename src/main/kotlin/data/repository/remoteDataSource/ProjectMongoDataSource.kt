@@ -1,11 +1,11 @@
 package data.repository.remoteDataSource
 
-import logic.entities.Project
+import data.dto.ProjectDTO
 
 interface ProjectMongoDataSource {
-    suspend fun getAllProjects(): List<Project>
-    suspend fun addProject(project: Project)
+    suspend fun getAllProjects(): List<ProjectDTO>
+    suspend fun addProject(project: ProjectDTO)
     suspend fun deleteProject(projectId: String)
-    suspend fun updateProject(newProject: Project)
-    suspend fun getProjectById(projectId: String): Project
+    suspend fun updateProject(newProject: ProjectDTO)
+    suspend fun getProjectById(projectId: String): ProjectDTO
 }

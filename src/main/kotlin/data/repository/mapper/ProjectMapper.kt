@@ -14,5 +14,15 @@ fun toProjectEntity(projectDto : ProjectDTO) : Project{
         createdAt = projectDto.createdAt,
         updatedAt = projectDto.updatedAt
     )
-
+}
+@OptIn(ExperimentalUuidApi::class)
+fun toProjectDto(project: Project):ProjectDTO{
+    return ProjectDTO(
+        id = project.id,
+        name = project.name,
+        description = project.description,
+        createdBy = project.createdBy,
+        createdAt = project.createdAt,
+        updatedAt = project.updatedAt
+    )
 }

@@ -1,54 +1,32 @@
 package data.remote.mongoDataSource.mongoConnection
 
-import kotlinx.coroutines.*
-import org.bson.Document
-import org.litote.kmongo.coroutine.CoroutineClient
-import org.litote.kmongo.coroutine.CoroutineDatabase
-import org.litote.kmongo.coroutine.coroutine
-import org.litote.kmongo.reactivestreams.KMongo
-import java.io.File
-import java.util.*
-import java.util.logging.Level
-import java.util.logging.Logger
+import com.mongodb.ConnectionString
+import com.mongodb.MongoClientSettings
+import com.mongodb.kotlin.client.coroutine.MongoClient
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers import java.io.File
+import java.util.Properties
 
 object MongoConnection {
+    private val client by lazy { createClient() }
+    val database by lazy { client.getDatabase("planMate") }
+    val dbScope by lazy { CoroutineScope(Dispatchers.IO) }
 
-    private val props: Properties by lazy {
-        Properties().apply {
+    private fun createClient(): MongoClient {
+        val props = Properties().apply {
             File("keys.properties").takeIf { it.exists() }
                 ?.inputStream()?.use { load(it) }
-                ?: error("❌ Missing keys.properties file")
+                ?: error("Missing keys.properties")
         }
-    }
+        val user = props.getProperty("MONGO_USERNAME") ?: error("MONGO_USERNAME not found in keys.properties")
+        val pass = props.getProperty("MONGO_PASSWORD") ?: error("MONGO_PASSWORD not found in keys.properties")
 
-    private val uri by lazy {
-        val user = props.getProperty("MONGO_USERNAME") ?: error("❌ MONGO_USERNAME not found in keys.properties")
-        val pass = props.getProperty("MONGO_PASSWORD") ?: error("❌ MONGO_PASSWORD not found in keys.properties")
-        "mongodb+srv://$user:$pass@cluster0.pcitphl.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
-    }
+        val uri = "mongodb+srv://$user:$pass@cluster0.pcitphl.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
 
-    val dbScope: CoroutineScope by lazy {
-        CoroutineScope(SupervisorJob() + Dispatchers.IO)
-    }
-
-    val database: CoroutineDatabase? by lazy {
-        Logger.getLogger("org.mongodb.driver").level = Level.WARNING
-
-        try {
-            println("🔌 Attempting MongoDB connection...")
-            val client: CoroutineClient = KMongo.createClient(uri).coroutine
-            val db = client.getDatabase("planMate")
-
-            runBlocking {
-                db.runCommand<Document>(Document("ping", 1))
-            }
-
-
-            println("✅ MongoDB connection successful.")
-            db
-        } catch (e: Exception) {
-            println("❌ MongoDB connection failed: ${e.message}")
-            null
-        }
+        return MongoClient.Factory.create(
+            MongoClientSettings.builder()
+                .applyConnectionString(ConnectionString(uri))
+                .build()
+        )
     }
 }

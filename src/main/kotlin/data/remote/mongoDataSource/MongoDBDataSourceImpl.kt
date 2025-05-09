@@ -11,19 +11,16 @@ import data.repository.PasswordHashingDataSource
 import data.repository.ValidationUserDataSource
 import data.repository.remoteDataSource.MongoDBDataSource
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.withContext
 import logic.entities.exceptions.InvalidLoginException
 import logic.entities.exceptions.UserNotFoundException
-import logic.entities.exceptions.ProjectNotFoundException
-import org.litote.kmongo.coroutine.CoroutineDatabase
-import java.util.*
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
 class MongoDBDataSourceImpl(
-    database: CoroutineDatabase? = MongoConnection.database
     database: MongoDatabase = MongoConnection.database,
     private val validationUserDataSource: ValidationUserDataSource,
     private val passwordHashingDataSource: PasswordHashingDataSource
@@ -78,24 +75,18 @@ class MongoDBDataSourceImpl(
     }
 
     override suspend fun deleteProject(projectId: String) {
-        val result = projectCollection.deleteOneById(UUID.fromString(projectId))
-        if (result.deletedCount == 0L) {
-            throw ProjectNotFoundException("Project with ID $projectId not found.")
-        }
+        projectCollection.findOneAndDelete(eq("id", projectId))
     }
 
     @OptIn(ExperimentalUuidApi::class)
     override suspend fun updateProject(newProjects: ProjectDTO) {
-        val result = projectCollection.replaceOneById(newProjects.id, newProjects)
-        if (result.matchedCount == 0L) {
-            throw ProjectNotFoundException("Project with ID ${newProjects.id} not found.")
-        }
+        projectCollection.replaceOne(eq("id", newProjects.id.toString()), newProjects)
     }
 
     override suspend fun getProjectById(projectId: String): ProjectDTO {
-        return projectCollection.findOneById(UUID.fromString(projectId))
-            ?: throw ProjectNotFoundException("Project with ID $projectId not found.")
+        return projectCollection.find(eq("id", projectId)).first()
     }
+
 
     override suspend fun getAllTasks(): List<TaskDTO> {
         TODO("Not yet implemented")
