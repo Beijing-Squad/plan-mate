@@ -2,26 +2,26 @@ package data.repository
 
 import data.repository.mapper.toProjectDto
 import data.repository.mapper.toProjectEntity
-import data.repository.remoteDataSource.ProjectMongoDataSource
+import data.repository.remoteDataSource.MongoDBDataSource
 import logic.entities.Project
 import logic.repository.ProjectsRepository
 
 class ProjectsRepositoryImpl(
-    private val projectMongoDataSource: ProjectMongoDataSource
+    private val mongoDBDataSource: MongoDBDataSource
 ) : ProjectsRepository {
 
     override suspend fun getAllProjects(): List<Project> =
-        projectMongoDataSource.getAllProjects().map { toProjectEntity(it) }
+        mongoDBDataSource.getAllProjects().map { toProjectEntity(it) }
 
     override suspend fun addProject(project: Project) =
-        projectMongoDataSource.addProject(toProjectDto(project))
+        mongoDBDataSource.addProject(toProjectDto(project))
 
     override suspend fun deleteProject(projectId: String) =
-        projectMongoDataSource.deleteProject(projectId)
+        mongoDBDataSource.deleteProject(projectId)
 
     override suspend fun updateProject(newProjects: Project) =
-        projectMongoDataSource.updateProject(toProjectDto(newProjects))
+        mongoDBDataSource.updateProject(toProjectDto(newProjects))
 
     override suspend fun getProjectById(projectId: String): Project =
-        toProjectEntity(projectMongoDataSource.getProjectById(projectId))
+        toProjectEntity(mongoDBDataSource.getProjectById(projectId))
 }
