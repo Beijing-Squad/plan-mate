@@ -1,5 +1,6 @@
 package ui.screens
 
+import kotlinx.coroutines.runBlocking
 import logic.entities.Audit
 import logic.useCases.audit.GetAllAuditLogsUseCase
 import logic.useCases.audit.GetAuditLogsByProjectIdUseCase
@@ -32,6 +33,7 @@ class AuditScreen(
             consoleIO
         )
     }
+
     override fun handleFeatureChoice() {
         when (getInput()) {
             "1" -> onClickGetAllAuditLogs()
@@ -42,7 +44,7 @@ class AuditScreen(
         }
     }
 
-    private fun onClickGetAllAuditLogs() {
+    private fun onClickGetAllAuditLogs() = runBlocking {
         val allAudits = getAllAudits.getAllAuditLogs()
         if (allAudits.isEmpty()) {
             consoleIO.showWithLine("❌ No Audit Logs Found")
@@ -54,13 +56,13 @@ class AuditScreen(
         }
     }
 
-    private fun onClickGetAuditLogsForProject() {
+    private fun onClickGetAuditLogsForProject() = runBlocking {
         val projectId = getIdInput()
         val auditLogs = try {
             getAuditLogsByProjectId.getAuditLogsByProjectId(projectId)
         } catch (exception: Exception) {
             consoleIO.showWithLine("❌ ${exception.message}")
-            return
+            return@runBlocking
         }
 
         consoleIO.showWithLine("\n🔍 Audit Logs For Project ID: $projectId\n")
@@ -69,13 +71,13 @@ class AuditScreen(
         }
     }
 
-    private fun onClickGetAuditLogsForTask() {
+    private fun onClickGetAuditLogsForTask() = runBlocking {
         val taskId = getIdInput()
         val auditLogs = try {
             getAuditLogsByTaskId.getAuditLogsByTaskId(taskId)
         } catch (exception: Exception) {
             consoleIO.showWithLine("❌ ${exception.message}")
-            return
+            return@runBlocking
         }
 
         consoleIO.showWithLine("\n🔍 Audit Logs For Task ID: $taskId\n")
@@ -100,5 +102,4 @@ class AuditScreen(
         consoleIO.show("Enter ID: ")
         return consoleIO.read()?.trim() ?: ""
     }
-
 }
