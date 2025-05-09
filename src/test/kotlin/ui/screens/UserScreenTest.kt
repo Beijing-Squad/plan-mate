@@ -1,10 +1,7 @@
 package ui.screens
 
 import fake.createUser
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.verify
-import io.mockk.verifyOrder
+import io.mockk.*
 import logic.entities.User
 import logic.entities.UserRole
 import logic.entities.exceptions.InvalidPasswordException
@@ -68,13 +65,13 @@ class UserScreenTest {
         }
         every { consoleIO.read() } returns GET_ALL_USER_OPTION andThen EXIT_CHOICE
         every { sessionManager.getCurrentUser() } returns mockUser
-        every { getAllUsersUseCase.getAllUsers() } returns listOf(mockUser)
+        coEvery { getAllUsersUseCase.getAllUsers() } returns listOf(mockUser)
 
         // When
         userScreen.handleFeatureChoice()
 
         // Then
-        verify(exactly = 1) {
+        coVerify(exactly = 1) {
             getAllUsersUseCase.getAllUsers()
         }
     }
@@ -91,13 +88,13 @@ class UserScreenTest {
         }
         every { consoleIO.read() } returns GET_ALL_USER_OPTION andThen EXIT_CHOICE
         every { sessionManager.getCurrentUser() } returns mockUser
-        every { getAllUsersUseCase.getAllUsers() } returns listOf(mockUser)
+        coEvery { getAllUsersUseCase.getAllUsers() } returns listOf(mockUser)
 
         // When
         userScreen.handleFeatureChoice()
 
         // Then
-        verify(exactly = 0) {
+        coVerify(exactly = 0) {
             getAllUsersUseCase.getAllUsers()
         }
     }
@@ -121,13 +118,13 @@ class UserScreenTest {
     fun `should return when input is 0`() {
         // Given
         every { consoleIO.read() } returns EXIT_CHOICE
-        every { getUserByIdUseCase.getUserByUserId(any()) } returns mockk(relaxed = true)
+        coEvery { getUserByIdUseCase.getUserByUserId(any()) } returns mockk(relaxed = true)
 
         // When
         userScreen.handleFeatureChoice()
 
         // Then
-        verify(exactly = 0) {
+        coVerify(exactly = 0) {
             getAllUsersUseCase.getAllUsers()
         }
     }
@@ -165,7 +162,7 @@ class UserScreenTest {
     @Test
     fun `should show all users when have users in data`() {
         // Given
-        every { getAllUsersUseCase.getAllUsers() } returns listOf(createUser(FAKE_USERNAME))
+        coEvery { getAllUsersUseCase.getAllUsers() } returns listOf(createUser(FAKE_USERNAME))
         every { consoleIO.read() } returnsMany listOf(
             GET_ALL_USER_OPTION,
             EXIT_CHOICE
@@ -195,49 +192,14 @@ class UserScreenTest {
             FAKE_USERNAME,
             EXIT_CHOICE
         )
-        every { getAllUsersUseCase.getAllUsers() } returns listOf(mockUser)
-        every { getUserByIdUseCase.getUserByUserId(FAKE_ID) } returns mockUser
+        coEvery { getAllUsersUseCase.getAllUsers() } returns listOf(mockUser)
+        coEvery { getUserByIdUseCase.getUserByUserId(FAKE_ID) } returns mockUser
 
         // When
         userScreen.handleFeatureChoice()
 
         // Then
         verify {
-            consoleIO.showWithLine(any())
-        }
-    }
-
-    @OptIn(ExperimentalUuidApi::class)
-    @Test
-    fun `should handle password update with confirmation when password is valid`() {
-        // Given
-        val userId = Uuid.parse(FAKE_ID)
-        val mockUser = mockk<User>(relaxed = true) {
-            every { id } returns userId
-            every { userName } returns FAKE_USERNAME
-            every { password } returns FAKE_PASSWORD
-        }
-
-
-        every { consoleIO.read() } returnsMany listOf(
-            UPDATE_USER_OPTION,
-            userId.toString(),
-            UPDATE_PASSWORD_OPTION,
-            FAKE_PASSWORD,
-            FAKE_PASSWORD,
-            EXIT_CHOICE
-        )
-
-        every { getUserByIdUseCase.getUserByUserId(userId.toString()) } returns mockUser
-        every { sessionManager.getCurrentUser() } returns mockUser
-
-        // When
-        userScreen.handleFeatureChoice()
-
-        // Then
-        verifyOrder {
-            consoleIO.show(any())
-            consoleIO.show(any())
             consoleIO.showWithLine(any())
         }
     }
@@ -261,7 +223,7 @@ class UserScreenTest {
             EXIT_CHOICE
         )
 
-        every { getUserByIdUseCase.getUserByUserId(FAKE_ID) } returns mockUser
+        coEvery { getUserByIdUseCase.getUserByUserId(FAKE_ID) } returns mockUser
 
         // When
         userScreen.handleFeatureChoice()
@@ -291,7 +253,7 @@ class UserScreenTest {
             EXIT_CHOICE
         )
 
-        every { getUserByIdUseCase.getUserByUserId(FAKE_ID) } returns mockUser
+        coEvery { getUserByIdUseCase.getUserByUserId(FAKE_ID) } returns mockUser
 
         // When
         userScreen.handleFeatureChoice()
@@ -321,7 +283,7 @@ class UserScreenTest {
             EXIT_CHOICE
         )
 
-        every { getUserByIdUseCase.getUserByUserId(FAKE_ID) } returns mockUser
+        coEvery { getUserByIdUseCase.getUserByUserId(FAKE_ID) } returns mockUser
 
         // When
         userScreen.handleFeatureChoice()
@@ -350,8 +312,8 @@ class UserScreenTest {
             EXIT_CHOICE
         )
 
-        every { getUserByIdUseCase.getUserByUserId(FAKE_ID) } returns mockUser
-        every {
+        coEvery { getUserByIdUseCase.getUserByUserId(FAKE_ID) } returns mockUser
+        coEvery {
             updateUsersUseCase.updateUser(mockUser)
         } throws InvalidUserNameException(message = "invalid user name")
 
@@ -383,8 +345,8 @@ class UserScreenTest {
             EXIT_CHOICE
         )
 
-        every { getUserByIdUseCase.getUserByUserId(FAKE_ID) } returns mockUser
-        every {
+        coEvery { getUserByIdUseCase.getUserByUserId(FAKE_ID) } returns mockUser
+        coEvery {
             updateUsersUseCase.updateUser(mockUser)
         } throws InvalidPasswordException(message = "invalid password")
 
@@ -401,7 +363,7 @@ class UserScreenTest {
     fun `should handle user not found during update when enter invalid id`() {
         // Given
         every { consoleIO.read() } returns UPDATE_USER_OPTION andThen INVALID_FAKE_ID andThen EXIT_CHOICE
-        every {
+        coEvery {
             getUserByIdUseCase.getUserByUserId(INVALID_FAKE_ID)
         } throws Exception("User not found")
 

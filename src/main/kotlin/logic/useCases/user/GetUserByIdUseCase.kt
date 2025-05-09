@@ -8,7 +8,7 @@ class GetUserByIdUseCase(
     private val userRepository: UserRepository
 ) {
     @OptIn(ExperimentalUuidApi::class)
-    fun getUserByUserId(userId: String): User {
+    suspend fun getUserByUserId(userId: String): User {
         return userRepository.getUserByUserId(userId = userId)
     }
 }

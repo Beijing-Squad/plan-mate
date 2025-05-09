@@ -1,22 +1,25 @@
 package data.repository
 
-import data.repository.dataSource.UserDataSource
+import data.repository.mapper.toUserDto
+import data.repository.mapper.toUserEntity
+import data.repository.remoteDataSource.UserMongoDataSource
 import logic.entities.User
 import logic.repository.UserRepository
 
 class UserRepositoryImpl(
-    private val userDataSource: UserDataSource
+    private val userMongoDataSource: UserMongoDataSource
 ): UserRepository{
-    override fun getAllUsers(): List<User> {
-        return userDataSource.getAllUsers()
+    override suspend fun getAllUsers(): List<User> {
+        return userMongoDataSource.getAllUsers().map { toUserEntity(it) }
     }
 
-    override fun getUserByUserId(userId: String): User {
-        return userDataSource.getUserByUserId(userId)
+    override suspend fun getUserByUserId(userId: String): User {
+        return toUserEntity(userMongoDataSource.getUserByUserId(userId))
     }
 
-    override fun updateUser(user: User): User {
-        return userDataSource.updateUser(user)
+    override suspend fun updateUser(user: User): User {
+        val userDto = toUserDto(user)
+        return toUserEntity(userMongoDataSource.updateUser(userDto))
     }
 
 }
