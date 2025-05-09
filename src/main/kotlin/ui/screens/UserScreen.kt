@@ -1,9 +1,6 @@
 package ui.screens
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import logic.entities.User
 import logic.entities.UserRole
 import logic.entities.exceptions.InvalidPasswordException
@@ -77,9 +74,7 @@ class UserScreen(
         consoleIO.showWithLine("\n\u001B[36m📋 All Users:\u001B[0m")
 
         try {
-            uiScope.launch {
-
-
+            runBlocking {
                 val users = getAllUsers.getAllUsers()
 
                 if (users.isEmpty()) {
@@ -109,7 +104,7 @@ class UserScreen(
         consoleIO.showWithLine("\n\u001B[36m✏️ Update User\u001B[0m")
         val userId = Uuid.parse("ba0e1b3c-2239-4755-97fe-202d8619bd79")
 
-        uiScope.launch {
+        runBlocking {
             try {
                 val user = getUserByUserId.getUserByUserId(userId.toString())
 
