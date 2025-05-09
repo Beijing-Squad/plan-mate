@@ -1,5 +1,6 @@
 package ui.screens
 
+import kotlinx.coroutines.runBlocking
 import logic.entities.User
 import logic.entities.UserRole
 import logic.useCases.authentication.LoginUserAuthenticationUseCase
@@ -26,18 +27,18 @@ class AuthenticationScreen(
 
             when (consoleIO.read()!!.trim()) {
                 "1" -> {
-                    val user = login()
+                    val user = runBlocking { login() }
                     if (user != null) return user
                 }
 
-                "2" -> register()
+                "2" -> runBlocking { register() }
                 "0" -> exitProcess(0)
                 else -> consoleIO.showWithLine("❌ Invalid option. Please try again.")
             }
         }
     }
 
-    private fun login(): User? {
+    private suspend fun login(): User? {
         consoleIO.showWithLine("\n--- Login ---")
         consoleIO.show("Username: ")
         val username = consoleIO.read()!!.trim()
@@ -67,7 +68,7 @@ class AuthenticationScreen(
         }
     }
 
-    private fun register() {
+    private suspend fun register() {
         consoleIO.showWithLine("\n--- Register ---")
         consoleIO.show("Username: ")
         val username = consoleIO.read()!!.trim()

@@ -4,7 +4,8 @@ import com.mongodb.kotlin.client.coroutine.MongoDatabase
 import data.remote.mongoDataSource.*
 import data.remote.mongoDataSource.mongoConnection.MongoConnection
 import data.repository.dataSource.*
-import data.repository.remoteDataSource.UserMongoDataSource
+import data.repository.mongoDataSource.UserMongoDataSourceImpl
+import data.repository.remoteDataSource.AuthenticationMongoDBDataSource
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
@@ -18,7 +19,7 @@ val mongoModule = module {
         MongoConnection.dbScope
     }
 
-    single<UserMongoDataSource> {
+    single<UserDataSource> {
         UserMongoDataSourceImpl(get(), get(named("dbScope")))
     }
 
@@ -38,7 +39,7 @@ val mongoModule = module {
         AuditMongoDataSourceImpl(get(), get(named("dbScope")))
     }
 
-    single<AuthenticationDataSource> {
-        AuthenticationMongoDataSourceImpl(get(), get(named("dbScope")))
+    single<AuthenticationMongoDBDataSource> {
+        AuthenticationMongoDataSourceImpl(get())
     }
 }
