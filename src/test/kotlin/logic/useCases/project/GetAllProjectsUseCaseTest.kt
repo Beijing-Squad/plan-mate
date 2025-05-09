@@ -2,8 +2,9 @@ package logic.useCases.project
 
 import com.google.common.truth.Truth.assertThat
 import fake.createProject
-import io.mockk.every
+import io.mockk.coEvery
 import io.mockk.mockk
+import kotlinx.coroutines.test.runTest
 import logic.entities.exceptions.CsvReadException
 import logic.repository.ProjectsRepository
 import org.junit.jupiter.api.BeforeEach
@@ -20,32 +21,40 @@ class GetAllProjectsUseCaseTest {
         projectRepository = mockk(relaxed = true)
         getAllProjectsUseCase = GetAllProjectsUseCase(projectRepository)
     }
+
     @Test
-    fun `should return projects when there is projects in repository`(){
-        //Given
-        val projects=listOf(createProject(),createProject())
-        every { projectRepository.getAllProjects() } returns projects
-        // When
-        val result = getAllProjectsUseCase.getAllProjects()
-        // Then
-        assertThat(result).containsExactlyElementsIn(projects)
+    fun `should return projects when there is projects in repository`() {
+        runTest {
+            //Given
+            val projects = listOf(createProject(), createProject())
+            coEvery { projectRepository.getAllProjects() } returns projects
+            // When
+            val result = getAllProjectsUseCase.getAllProjects()
+            // Then
+            assertThat(result).containsExactlyElementsIn(projects)
+        }
     }
 
     @Test
-    fun `should return empty list when there is no projects in repository`(){
-        //Given
-        every { projectRepository.getAllProjects() } returns emptyList()
-        // When
-        val result = getAllProjectsUseCase.getAllProjects()
-        // Then
-        assertThat(result).isEmpty()
+    fun `should return empty list when there is no projects in repository`() {
+        runTest {
+            //Given
+            coEvery { projectRepository.getAllProjects() } returns emptyList()
+            // When
+            val result = getAllProjectsUseCase.getAllProjects()
+            // Then
+            assertThat(result).isEmpty()
+        }
     }
+
     @Test
     fun `should throw exception when there is error in csv file`() {
-        // Given
-        every { projectRepository.getAllProjects() } throws CsvReadException("")
+        runTest {
+            // Given
+            coEvery { projectRepository.getAllProjects() } throws CsvReadException("")
 
-        // When && Then
-        assertThrows<CsvReadException> { getAllProjectsUseCase.getAllProjects() }
+            // When && Then
+            assertThrows<CsvReadException> { getAllProjectsUseCase.getAllProjects() }
+        }
     }
 }

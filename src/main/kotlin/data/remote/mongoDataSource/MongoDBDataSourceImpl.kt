@@ -13,6 +13,7 @@ import data.repository.PasswordHashingDataSource
 import data.repository.ValidationUserDataSource
 import data.repository.remoteDataSource.MongoDBDataSource
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.withContext
@@ -70,26 +71,25 @@ class MongoDBDataSourceImpl(
     override suspend fun getAuditLogsByTaskId(taskId: String): List<AuditDTO> {
         TODO("Not yet implemented")
     }
-
-    override suspend fun getAllProjects(): List<ProjectDTO> {
-        TODO("Not yet implemented")
-    }
+    override suspend fun getAllProjects(): List<ProjectDTO> = projectCollection.find().toList()
 
     override suspend fun addProject(project: ProjectDTO) {
-        TODO("Not yet implemented")
+        projectCollection.insertOne(project)
     }
 
     override suspend fun deleteProject(projectId: String) {
-        TODO("Not yet implemented")
+        projectCollection.findOneAndDelete(eq("id", projectId))
     }
 
+    @OptIn(ExperimentalUuidApi::class)
     override suspend fun updateProject(newProjects: ProjectDTO) {
-        TODO("Not yet implemented")
+        projectCollection.replaceOne(eq("id", newProjects.id.toString()), newProjects)
     }
 
     override suspend fun getProjectById(projectId: String): ProjectDTO {
-        TODO("Not yet implemented")
+        return projectCollection.find(eq("id", projectId)).first()
     }
+
 
     override suspend fun getAllTasks(): List<TaskDTO> {
         TODO("Not yet implemented")

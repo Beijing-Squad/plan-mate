@@ -1,11 +1,8 @@
 package logic.useCases.project
 
-import io.mockk.verify
 import fake.createProject
-import io.mockk.Runs
-import io.mockk.every
-import io.mockk.just
-import io.mockk.mockk
+import io.mockk.*
+import kotlinx.coroutines.test.runTest
 import logic.entities.exceptions.CsvWriteException
 import logic.repository.ProjectsRepository
 import org.junit.jupiter.api.BeforeEach
@@ -25,26 +22,30 @@ class AddProjectUseCaseTest {
 
     @Test
     fun `should add project successfully`() {
-        // Given
-        val project = createProject()
-        every { projectRepository.addProject(project) } just Runs
+        runTest {
+            // Given
+            val project = createProject()
+            coEvery { projectRepository.addProject(project) } just Runs
 
-        // When
-        addProject.addProject(project)
+            // When
+            addProject.addProject(project)
 
-        // Then
-        verify { projectRepository.addProject(project) }}
-
+            // Then
+            coVerify { projectRepository.addProject(project) }
+        }
+    }
 
     @Test
     fun `should throw CsvWriteException when repository throws`() {
-        // Given
-        val project = createProject()
-        every { projectRepository.addProject(project) } throws CsvWriteException("Failed to write CSV")
+        runTest {
+            // Given
+            val project = createProject()
+            coEvery { projectRepository.addProject(project) } throws CsvWriteException("Failed to write CSV")
 
-        // When && Then
-        assertThrows<CsvWriteException> {
-            addProject.addProject(project)
+            // When && Then
+            assertThrows<CsvWriteException> {
+                addProject.addProject(project)
+            }
         }
     }
 }

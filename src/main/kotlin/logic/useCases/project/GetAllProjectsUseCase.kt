@@ -6,5 +6,5 @@ import logic.repository.ProjectsRepository
 class GetAllProjectsUseCase(
     private val projectsRepository: ProjectsRepository
 ) {
-    fun getAllProjects(): List<Project> = projectsRepository.getAllProjects()
+    suspend fun getAllProjects(): List<Project> = projectsRepository.getAllProjects()
 }

@@ -1,6 +1,7 @@
 package ui.screens
 
 import format
+import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -66,7 +67,7 @@ class ProjectManagementScreen(
         }
     }
 
-    private fun listAllProjects() {
+    private fun listAllProjects() = runBlocking{
         try {
             val projects = getAllProjectsUseCase.getAllProjects()
             if (projects.isEmpty()) {
@@ -81,10 +82,10 @@ class ProjectManagementScreen(
         }
     }
 
-    private fun findProjectById() {
+    private fun findProjectById() = runBlocking{
         try {
             consoleIO.show("\u001B[32mEnter project ID: \u001B[0m")
-            val id = getInput() ?: return
+            val id = getInput() ?: return@runBlocking
             val project = getProjectByIdUseCase.getProjectById(id)
             showProjectInfo(project)
         } catch (e: Exception) {
@@ -92,16 +93,16 @@ class ProjectManagementScreen(
         }
     }
 
-    private fun updateProject() {
+    private fun updateProject() = runBlocking{
         try {
             consoleIO.show("\u001B[32mEnter project ID to update: \u001B[0m")
-            val id = getInput() ?: return
+            val id = getInput() ?: return@runBlocking
             val project = getProjectByIdUseCase.getProjectById(id)
 
             consoleIO.show("\u001B[32mEnter new name: \u001B[0m")
-            val name = getInput() ?: return
+            val name = getInput() ?: return@runBlocking
             consoleIO.show("\u001B[32mEnter new description: \u001B[0m")
-            val desc = getInput() ?: return
+            val desc = getInput() ?: return@runBlocking
 
             val updated = project.copy(
                 name = name,
@@ -132,14 +133,14 @@ class ProjectManagementScreen(
         }
     }
 
-    private fun addProject() {
+    private fun addProject()  = runBlocking{
         try {
             consoleIO.show("\u001B[32mEnter project name: \u001B[0m")
-            val name = getInput() ?: return
+            val name = getInput() ?: return@runBlocking
             consoleIO.show("\u001B[32mEnter description: \u001B[0m")
-            val desc = getInput() ?: return
+            val desc = getInput() ?: return@runBlocking
             consoleIO.show("\u001B[32mEnter created by (user ID): \u001B[0m")
-            val createdBy = getInput() ?: return
+            val createdBy = getInput() ?: return@runBlocking
             val newProject = Project(
                 name = name,
                 description = desc,
@@ -172,10 +173,10 @@ class ProjectManagementScreen(
         }
     }
 
-    private fun deleteProject() {
+    private fun deleteProject()= runBlocking {
         try {
             consoleIO.show("\u001B[32mEnter project ID to delete: \u001B[0m")
-            val id = getInput() ?: return
+            val id = getInput() ?: return@runBlocking
             val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
             deleteProjectUseCase.deleteProject(id)
             consoleIO.showWithLine("\u001B[32m✅ Project deleted successfully.\u001B[0m")
