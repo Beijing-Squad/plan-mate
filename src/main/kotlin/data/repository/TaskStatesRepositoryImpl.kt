@@ -2,13 +2,13 @@ package data.repository
 
 import data.repository.mapper.toTaskStateDto
 import data.repository.mapper.toTaskStateEntity
-import data.repository.remoteDataSource.TaskStateMongoDBDataSource
+import data.repository.remoteDataSource.MongoDBDataSource
 import logic.entities.TaskState
 import logic.entities.exceptions.StateNotFoundException
 import logic.repository.StatesRepository
 
 class TaskStatesRepositoryImpl(
-    private val taskStateDataSource: TaskStateMongoDBDataSource
+    private val taskStateDataSource: MongoDBDataSource
 ) : StatesRepository {
 
     override suspend fun getAllStates(): List<TaskState> {
@@ -17,27 +17,27 @@ class TaskStatesRepositoryImpl(
     }
 
     override suspend fun getStatesByProjectId(projectId: String): List<TaskState> {
-        return taskStateDataSource.getStatesByProjectId(projectId)
+        return taskStateDataSource.getTaskStatesByProjectId(projectId)
             .map { toTaskStateEntity(it) }
     }
 
     override suspend fun getStateById(stateId: String): TaskState {
         return toTaskStateEntity(
-            taskStateDataSource.getStateById(stateId)
+            taskStateDataSource.getTaskStateById(stateId)
                 ?: throw StateNotFoundException()
         )
     }
 
     override suspend fun addState(taskState: TaskState): Boolean {
-        return taskStateDataSource.addState(toTaskStateDto(taskState))
+        return taskStateDataSource.addTaskState(toTaskStateDto(taskState))
     }
 
     override suspend fun updateState(taskState: TaskState): TaskState {
         val stateDTO = toTaskStateDto(taskState)
-        return toTaskStateEntity(taskStateDataSource.updateState(stateDTO))
+        return toTaskStateEntity(taskStateDataSource.updateTaskState(stateDTO))
     }
 
     override suspend fun deleteState(taskState: TaskState): Boolean {
-        return taskStateDataSource.deleteState(toTaskStateDto(taskState))
+        return taskStateDataSource.deleteTaskState(toTaskStateDto(taskState))
     }
 }
