@@ -1,11 +1,12 @@
 package logic.useCases.task
 
-import io.mockk.verify
 import fake.createTask
+import io.mockk.coVerify
 import io.mockk.mockk
+import kotlinx.coroutines.test.runTest
 import logic.repository.TasksRepository
 import org.junit.jupiter.api.BeforeEach
-import kotlin.test.Test
+import org.junit.jupiter.api.Test
 
 class AddTaskUseCaseTest {
 
@@ -18,9 +19,8 @@ class AddTaskUseCaseTest {
         useCase = AddTaskUseCase(repository)
     }
 
-
     @Test
-    fun `addTask should call repository addTask`() {
+    fun `addTask should call repository addTask`() = runTest {
         // Given
         val task = createTask()
 
@@ -28,6 +28,6 @@ class AddTaskUseCaseTest {
         useCase.addTask(task)
 
         // Then
-        verify { repository.addTask(task) }
+        coVerify { repository.addTask(task) }
     }
 }

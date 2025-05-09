@@ -1,12 +1,13 @@
 package logic.useCases.task
 
+import data.repository.mapper.toTaskEntity
 import logic.entities.Task
 import logic.repository.TasksRepository
 
 class GetAllTasksUseCase(
     private val tasksRepository: TasksRepository
 ) {
-      fun getAllTasks(): List<Task> {
-        return tasksRepository.getAllTasks()
+      suspend fun getAllTasks(): List<Task> {
+          toTaskEntity(return tasksRepository.getAllTasks())
     }
 }

@@ -11,13 +11,16 @@ import data.dto.*
 import data.remote.mongoDataSource.mongoConnection.MongoConnection
 import data.repository.PasswordHashingDataSource
 import data.repository.ValidationUserDataSource
+import data.repository.mapper.toTaskDTO
 import data.repository.remoteDataSource.MongoDBDataSource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.withContext
+import logic.entities.Task
 import logic.entities.exceptions.InvalidLoginException
+import logic.entities.exceptions.TaskNotFoundException
 import logic.entities.exceptions.StateNotFoundException
 import logic.entities.exceptions.UserNotFoundException
 import kotlin.uuid.ExperimentalUuidApi
@@ -33,7 +36,7 @@ class MongoDBDataSourceImpl(
     private val auditsCollection = database.getCollection<AuditDTO>("audits")
     private val projectCollection = database.getCollection<ProjectDTO>("projects")
     private val statesCollection = database.getCollection<TaskStateDTO>("states")
-    private val taskCollection = database.getCollection<TaskStateDTO>("users")
+    private val taskCollection = database.getCollection<TaskDTO>("tasks")
 
     @OptIn(ExperimentalUuidApi::class)
     override suspend fun saveUser(
@@ -92,24 +95,53 @@ class MongoDBDataSourceImpl(
 
 
     override suspend fun getAllTasks(): List<TaskDTO> {
-        TODO("Not yet implemented")
+        return taskCollection.find<TaskDTO>().toList()
     }
 
+
+    @OptIn(ExperimentalUuidApi::class)
     override suspend fun getTaskById(taskId: String): TaskDTO {
-        TODO("Not yet implemented")
+
+        val queryParams = Filters.eq("_id", taskId)
+        val task = taskCollection.find<Task>(queryParams).limit(1).firstOrNull()
+            ?: throw TaskNotFoundException("Task with id $taskId not found")
+        return toTaskDTO(task)
     }
 
     override suspend fun addTask(task: TaskDTO) {
-        TODO("Not yet implemented")
+        try {
+            taskCollection.insertOne(task)
+        } catch (e: Exception) {
+            throw RuntimeException("Failed to add task: ${e.message}", e)
+        }
     }
 
+    @OptIn(ExperimentalUuidApi::class)
     override suspend fun deleteTask(taskId: String) {
-        TODO("Not yet implemented")
+        val queryParams = Filters.eq("_id", taskId)
+        taskCollection.findOneAndDelete(queryParams)
+         ?: throw TaskNotFoundException("Task with id $taskId not found")
     }
 
+    @OptIn(ExperimentalUuidApi::class)
     override suspend fun updateTask(updatedTask: TaskDTO): TaskDTO {
-        TODO("Not yet implemented")
+        val queryParams = Filters.eq("_id", updatedTask.id)
+        val updateParams = Updates.combine(
+            Updates.set("project_id", updatedTask.projectId),
+            Updates.set("title", updatedTask.title),
+            Updates.set("description", updatedTask.description),
+            Updates.set("created_by", updatedTask.createdBy),
+            Updates.set("state_id", updatedTask.stateId),
+            Updates.set("created_at", updatedTask.createdAt),
+            Updates.set("updated_at", updatedTask.updatedAt)
+        )
+        val result = taskCollection.updateOne(queryParams, updateParams)
+        if (result.matchedCount == 0L) {
+            throw TaskNotFoundException("Task with id ${updatedTask.id} not found")
+        }
+        return updatedTask
     }
+
 
     override suspend fun getAllStates(): List<TaskStateDTO> {
         return statesCollection.find<TaskStateDTO>().toList()

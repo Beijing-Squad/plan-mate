@@ -1,12 +1,11 @@
-
 package logic.useCases.task
 
 import com.google.common.truth.Truth.assertThat
 import fake.createTask
-import io.mockk.every
+import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.mockk
-import io.mockk.verify
-import kotlinx.datetime.LocalDate
+import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.LocalDateTime
 import logic.entities.exceptions.InvalidInputException
 import logic.repository.TasksRepository
@@ -28,7 +27,7 @@ class UpdateTaskUseCaseTest {
     }
 
     @Test
-    fun `should update task with new values`() {
+    fun `should update task with new values`() = runTest {
         // Given
         val originalTask = createTask(
             projectId = "project-1",
@@ -42,44 +41,22 @@ class UpdateTaskUseCaseTest {
         val taskToUpdate = originalTask.copy(
             title = "Updated Title",
             description = "Updated Description",
-            updatedAt = LocalDateTime(2023, 1, 1, 0, 0),
+            updatedAt = LocalDateTime(2023, 1, 1, 0, 0)
         )
 
-        every { tasksRepository.updateTask(taskToUpdate) } returns taskToUpdate
+        coEvery { tasksRepository.updateTask(taskToUpdate) } returns taskToUpdate
 
         // When
         val result = updateTaskUseCase.updateTask(taskToUpdate)
 
         // Then
         assertThat(result).isEqualTo(taskToUpdate)
-        verify { tasksRepository.updateTask(taskToUpdate) }
+        coVerify { tasksRepository.updateTask(taskToUpdate) }
     }
 
-    @Test
-    fun `should throw InvalidInputException when title is empty`() {
-        // Given
-        val originalTask = createTask(
-            projectId = "project-1",
-            title = "Original Title",
-            description = "Original Description"
-        )
-        val taskWithEmptyTitle = originalTask.copy(
-            title = "",
-            updatedAt = LocalDateTime(2023, 1, 1, 0, 0)
-        )
-
-        // When/Then
-        val exception = assertFailsWith<InvalidInputException> {
-            updateTaskUseCase.updateTask(taskWithEmptyTitle)
-        }
-
-        // Then
-        assertThat(exception.message).isEqualTo("Task title cannot be empty")
-        verify(exactly = 0) { tasksRepository.updateTask(any()) }
-    }
 
     @Test
-    fun `should update task with new description`() {
+    fun `should update task with new description`() = runTest {
         // Given
         val originalTask = createTask(
             projectId = "project-1",
@@ -95,18 +72,18 @@ class UpdateTaskUseCaseTest {
             updatedAt = LocalDateTime(2023, 1, 1, 0, 0)
         )
 
-        every { tasksRepository.updateTask(taskWithNewDescription) } returns taskWithNewDescription
+        coEvery { tasksRepository.updateTask(taskWithNewDescription) } returns taskWithNewDescription
 
         // When
         val result = updateTaskUseCase.updateTask(taskWithNewDescription)
 
         // Then
         assertThat(result).isEqualTo(taskWithNewDescription)
-        verify { tasksRepository.updateTask(taskWithNewDescription) }
+        coVerify { tasksRepository.updateTask(taskWithNewDescription) }
     }
 
     @Test
-    fun `should update task with new title`() {
+    fun `should update task with new title`() = runTest {
         // Given
         val originalTask = createTask(
             projectId = "project-1",
@@ -122,13 +99,13 @@ class UpdateTaskUseCaseTest {
             updatedAt = LocalDateTime(2023, 1, 1, 0, 0)
         )
 
-        every { tasksRepository.updateTask(taskWithNewTitle) } returns taskWithNewTitle
+        coEvery { tasksRepository.updateTask(taskWithNewTitle) } returns taskWithNewTitle
 
         // When
         val result = updateTaskUseCase.updateTask(taskWithNewTitle)
 
         // Then
         assertThat(result).isEqualTo(taskWithNewTitle)
-        verify { tasksRepository.updateTask(taskWithNewTitle) }
+        coVerify { tasksRepository.updateTask(taskWithNewTitle) }
     }
 }

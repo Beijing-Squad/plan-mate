@@ -1,12 +1,14 @@
 package data.dto
 
+import org.bson.codecs.pojo.annotations.BsonProperty
+
 data class TaskDTO(
-    val id: String? = null,
+    @BsonProperty("id") val id: String,
     val projectId: String,
     val title: String,
     val description: String,
     val createdBy: String,
     val stateId: String,
-    val createdAt: String,
-    val updatedAt: String
+    @BsonProperty("createdAt") val createdAt: String,
+    @BsonProperty("updatedAt") val updatedAt: String
 )
