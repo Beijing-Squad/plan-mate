@@ -1,10 +1,10 @@
 package logic.useCases.audit
 
 import com.google.common.truth.Truth.assertThat
-import data.repository.AuditRepositoryImpl
 import fake.createAudit
-import io.mockk.every
+import io.mockk.coEvery
 import io.mockk.mockk
+import kotlinx.coroutines.test.runTest
 import logic.entities.ActionType
 import logic.entities.EntityType
 import logic.entities.UserRole
@@ -19,14 +19,14 @@ class GetAllAuditLogsUseCaseTest {
 
     @BeforeEach
     fun setUp() {
-        auditRepository = AuditRepositoryImpl(mockk(relaxed = true))
+        auditRepository = mockk(relaxed = true)
         getAllAuditLogsUseCase = GetAllAuditLogsUseCase(auditRepository)
     }
 
     @Test
-    fun `should return all audit logs when called`() {
+    fun `should return all audit logs when called`() = runTest {
         // Given
-        every { auditRepository.getAllAuditLogs() } returns listOf(
+        coEvery { auditRepository.getAllAuditLogs() } returns listOf(
             createAudit(
                 userRole = UserRole.ADMIN,
                 userName = "Admin",
@@ -47,21 +47,21 @@ class GetAllAuditLogsUseCaseTest {
     }
 
     @Test
-    fun `should return empty list when audit repo is empty`() {
+    fun `should return empty list when audit repo is empty`() = runTest {
         // Given
-        every { auditRepository.getAllAuditLogs() } returns emptyList()
+        coEvery { auditRepository.getAllAuditLogs() } returns emptyList()
 
         // When
         val result = getAllAuditLogsUseCase.getAllAuditLogs()
 
         // Then
-        assertThat(result.size).isEqualTo(0)
+        assertThat(result).isEmpty()
     }
 
     @Test
-    fun `should return audit logs when different action types is provided`() {
+    fun `should return audit logs when different action types is provided`() = runTest {
         // Given
-        every { auditRepository.getAllAuditLogs() } returns listOf(
+        coEvery { auditRepository.getAllAuditLogs() } returns listOf(
             createAudit(
                 userRole = UserRole.ADMIN,
                 userName = "Admin",
@@ -73,14 +73,15 @@ class GetAllAuditLogsUseCaseTest {
                 userName = "User1",
                 entityType = EntityType.TASK,
                 action = ActionType.UPDATE,
-                           ),
+            ),
             createAudit(
                 userRole = UserRole.MATE,
                 userName = "User2",
                 entityType = EntityType.PROJECT,
                 action = ActionType.DELETE,
-                           )
+            )
         )
+
         // When
         val result = getAllAuditLogsUseCase.getAllAuditLogs()
 
@@ -92,10 +93,11 @@ class GetAllAuditLogsUseCaseTest {
             ActionType.DELETE
         )
     }
+
     @Test
-    fun `should return audit logs for both project and task entities when they exist`() {
+    fun `should return audit logs for both project and task entities when they exist`() = runTest {
         // Given
-        every { auditRepository.getAllAuditLogs() } returns listOf(
+        coEvery { auditRepository.getAllAuditLogs() } returns listOf(
             createAudit(
                 userRole = UserRole.ADMIN,
                 userName = "Admin",
@@ -109,7 +111,7 @@ class GetAllAuditLogsUseCaseTest {
                 entityType = EntityType.TASK,
                 entityId = "task-456",
                 action = ActionType.CREATE,
-                           )
+            )
         )
 
         // When

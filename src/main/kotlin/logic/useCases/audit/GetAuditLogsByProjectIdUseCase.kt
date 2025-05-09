@@ -8,7 +8,7 @@ import logic.repository.AuditRepository
 class GetAuditLogsByProjectIdUseCase(
     private val auditRepository: AuditRepository
 ) {
-    fun getAuditLogsByProjectId(projectId: String): List<Audit> {
+    suspend fun getAuditLogsByProjectId(projectId: String): List<Audit> {
         if (projectId.isBlank()) throw InvalidInputException(INVALID_ID_ERROR)
 
         return auditRepository.getAuditLogsByProjectId(projectId)

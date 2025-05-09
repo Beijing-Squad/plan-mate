@@ -8,7 +8,7 @@ class GetAuditLogsByTaskIdUseCase(
     private val auditRepository: AuditRepository
 ) {
 
-    fun getAuditLogsByTaskId(taskId: String): List<Audit> {
+    suspend fun getAuditLogsByTaskId(taskId: String): List<Audit> {
         if (taskId.isBlank()) throw InvalidInputException(INVALID_ID_ERROR)
 
         return auditRepository.getAuditLogsByTaskId(taskId)

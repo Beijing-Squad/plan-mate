@@ -3,12 +3,12 @@ package logic.repository
 import logic.entities.Audit
 
 interface AuditRepository{
-    fun getAllAuditLogs(): List<Audit>
+    suspend fun getAllAuditLogs(): List<Audit>
 
-    fun addAuditLog(audit: Audit)
+    suspend fun addAuditLog(audit: Audit)
 
-    fun getAuditLogsByProjectId(projectId: String): List<Audit>
+    suspend fun getAuditLogsByProjectId(projectId: String): List<Audit>
 
-    fun getAuditLogsByTaskId(taskId: String): List<Audit>
+    suspend fun getAuditLogsByTaskId(taskId: String): List<Audit>
 
 }

@@ -7,7 +7,7 @@ class GetAllAuditLogsUseCase(
     private val auditRepository: AuditRepository
 ) {
 
-    fun getAllAuditLogs(): List<Audit> {
+    suspend fun getAllAuditLogs(): List<Audit> {
         return auditRepository.getAllAuditLogs()
             .sortedByDescending { auditLog -> auditLog.timeStamp }
     }

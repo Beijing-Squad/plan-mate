@@ -1,17 +1,15 @@
 package data.dto
 
-import logic.entities.ActionType
-import logic.entities.EntityType
-import logic.entities.UserRole
+import org.bson.codecs.pojo.annotations.BsonProperty
+
 
 data class AuditDTO(
-    val id: String? = null,
-    val userRole: UserRole,
+    @BsonProperty("id") val id: String,
+    @BsonProperty("userRole") val userRole: String,
     val userName: String,
     val entityId: String,
-    val entityType: EntityType,
-    val action: ActionType,
-    val oldState: String?,
-    val newState: String?,
+    @BsonProperty("entityType") val entityType: String,
+    @BsonProperty("action") val action: String,
+    val actionDetails: String?,
     val timeStamp: String
 )
