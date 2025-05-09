@@ -1,27 +1,36 @@
 package data.repository
 
-import data.repository.dataSource.TasksDataSource
+import data.repository.remoteDataSource.TaskMongoDBDataSource
+import data.repository.mapper.toTaskDTO
+import data.repository.mapper.toTaskEntity
 import logic.entities.Task
 import logic.repository.TasksRepository
+
 class TasksRepositoryImpl(
-    private val tasksDataSource: TasksDataSource
+    private val taskMongoDBDataSource: TaskMongoDBDataSource
 ) : TasksRepository {
 
-    override  fun getAllTasks(): List<Task> {
-        return tasksDataSource.getAllTasks()
+    override suspend fun getAllTasks(): List<Task> {
+        return try {
+            taskMongoDBDataSource.getAllTasks().map { toTaskEntity(it) }
+        } catch (e: Exception) {
+            throw RuntimeException("Failed to retrieve tasks: ${e.message}", e)
+        }
     }
 
-    override  fun getTaskById(taskId: String): Task {
-        return tasksDataSource.getTaskById(taskId)
-
+    override suspend fun getTaskById(taskId: String): Task {
+        return toTaskEntity(taskMongoDBDataSource.getTaskById(taskId))
     }
 
-    override  fun addTask(task: Task) = tasksDataSource.addTask(task)
+    override suspend fun addTask(task: Task) {
+        taskMongoDBDataSource.addTask(toTaskDTO(task))
+    }
 
-    override  fun deleteTask(taskId: String) = tasksDataSource.deleteTask(taskId)
+    override suspend fun deleteTask(taskId: String) {
+        taskMongoDBDataSource.deleteTask(taskId)
+    }
 
-    override  fun updateTask(updatedTask: Task): Task {
-        return tasksDataSource.updateTask(updatedTask)
-
+    override suspend fun updateTask(updatedTask: Task): Task {
+        return toTaskEntity(taskMongoDBDataSource.updateTask(updatedTask))
     }
 }

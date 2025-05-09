@@ -5,11 +5,11 @@ import logic.entities.Task
 
 interface TaskMongoDBDataSource {
 
-   suspend fun getAllTasks(): List<Task>
+   suspend fun getAllTasks(): List<TaskDTO>
 
     suspend fun getTaskById(taskId: String): TaskDTO
 
-    suspend fun addTask(task: Task)
+    suspend fun addTask(task: TaskDTO)
 
     suspend fun deleteTask(taskId: String)
 

@@ -1,4 +1,3 @@
-// data/remote/mongoDataSource/codecs/LocalDateTimeCodec.kt
 package data.remote.mongoDataSource.mongoConnection
 
 import kotlinx.datetime.LocalDateTime
@@ -7,17 +6,20 @@ import org.bson.BsonWriter
 import org.bson.codecs.Codec
 import org.bson.codecs.DecoderContext
 import org.bson.codecs.EncoderContext
-import java.time.format.DateTimeFormatter
 
 class LocalDateTimeCodec : Codec<LocalDateTime> {
-    private val formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME
 
     override fun encode(writer: BsonWriter, value: LocalDateTime, encoderContext: EncoderContext) {
-        writer.writeString(value.toString()) // تحويل LocalDateTime إلى String
+        writer.writeString(value.toString())
     }
 
     override fun decode(reader: BsonReader, decoderContext: DecoderContext): LocalDateTime {
-        return LocalDateTime.parse(reader.readString()) // تحويل String إلى LocalDateTime
+        val dateString = reader.readString()
+        return try {
+            LocalDateTime.parse(dateString)
+        } catch (e: Exception) {
+            throw IllegalArgumentException("Failed to parse LocalDateTime from string: $dateString", e)
+        }
     }
 
     override fun getEncoderClass(): Class<LocalDateTime> {

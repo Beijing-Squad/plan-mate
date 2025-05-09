@@ -1,14 +1,14 @@
 package data.dto
 
-import kotlinx.datetime.LocalDateTime
+import org.bson.codecs.pojo.annotations.BsonProperty
 
 data class TaskDTO(
-    val id: String,
+    @BsonProperty("id") val id: String,
     val projectId: String,
     val title: String,
     val description: String,
     val createdBy: String,
     val stateId: String,
-    val createdAt: LocalDateTime,
-    val updatedAt: LocalDateTime
+    @BsonProperty("createdAt") val createdAt: String,
+    @BsonProperty("updatedAt") val updatedAt: String
 )

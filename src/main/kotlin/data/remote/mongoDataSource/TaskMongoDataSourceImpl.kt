@@ -12,34 +12,47 @@ import kotlinx.coroutines.flow.toList
 import logic.entities.Task
 import logic.entities.exceptions.TaskNotFoundException
 import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
 class TaskMongoDataSourceImpl(
     database: MongoDatabase = MongoConnection.database
 ) : TaskMongoDBDataSource {
 
-    private val collection = database.getCollection<Task>("tasks")
+    private val collection = database.getCollection<TaskDTO>("tasks")
 
-    override suspend fun getAllTasks(): List<Task> {
-        return collection.find<Task>().toList()
+    override suspend fun getAllTasks(): List<TaskDTO> {
+        return collection.find<TaskDTO>().toList()
     }
+
 
     @OptIn(ExperimentalUuidApi::class)
     override suspend fun getTaskById(taskId: String): TaskDTO {
-        val queryParams = Filters.eq("_id", taskId)
+        val uuid = Uuid.parse(taskId)
+
+        val queryParams = Filters.eq("_id", uuid)
         val task = collection.find<Task>(queryParams).limit(1).firstOrNull()
             ?: throw TaskNotFoundException("Task with id $taskId not found")
         return toTaskDTO(task)
     }
 
-    override suspend fun addTask(task: Task) {
-        collection.insertOne(task).also {
-            println("Task added with id - ${it.insertedId}")
+    override suspend fun addTask(task: TaskDTO) {
+        try {
+            collection.insertOne(task).also {
+                println("Task added with id - ${it.insertedId}")
+            }
+        } catch (e: Exception) {
+            throw RuntimeException("Failed to add task: ${e.message}", e)
         }
     }
 
     @OptIn(ExperimentalUuidApi::class)
     override suspend fun deleteTask(taskId: String) {
-        val queryParams = Filters.eq("_id", taskId)
+        val uuid = try {
+            Uuid.parse(taskId)
+        } catch (e: Exception) {
+            throw IllegalArgumentException("Invalid task ID format: $taskId")
+        }
+        val queryParams = Filters.eq("_id", uuid)
         collection.findOneAndDelete(queryParams)?.also {
             println("Task deleted: $it")
         } ?: throw TaskNotFoundException("Task with id $taskId not found")
@@ -47,7 +60,8 @@ class TaskMongoDataSourceImpl(
 
     @OptIn(ExperimentalUuidApi::class)
     override suspend fun updateTask(updatedTask: Task): TaskDTO {
-        val queryParams = Filters.eq("_id", updatedTask.id.toString())
+        val taskDto = toTaskDTO(updatedTask)
+        val queryParams = Filters.eq("_id",taskDto.id.let { Uuid.parse(it) })
         val updateParams = Updates.combine(
             Updates.set("project_id", updatedTask.projectId),
             Updates.set("title", updatedTask.title),
@@ -65,3 +79,4 @@ class TaskMongoDataSourceImpl(
         return toTaskDTO(updatedTask)
     }
 }
+
