@@ -15,7 +15,6 @@ import ui.main.BaseScreen
 import ui.main.MenuRenderer
 import ui.main.consoleIO.ConsoleIO
 import kotlin.uuid.ExperimentalUuidApi
-import kotlin.uuid.Uuid
 
 class UserScreen(
     private val getAllUsers: GetAllUsersUseCase,
@@ -46,17 +45,11 @@ class UserScreen(
     override fun handleFeatureChoice() {
         when (getInput()) {
             "1" -> {
-                val currentUser = sessionManagerUseCase.getCurrentUser() ?: User(
-                    id = Uuid.parse("ba0e1b3c-2239-4755-97fe-202d8619bd79"),
-                    userName = "a",
-                    password = "a",
-                    role = UserRole.ADMIN
-                )
-                if (currentUser.role == UserRole.ADMIN) {
+                val currentUser = sessionManagerUseCase.getCurrentUser()
+                if (currentUser?.role == UserRole.ADMIN) {
                     runBlocking {
                         onClickGetAllUsers()
                     }
-                    showOptionService()
                 } else {
                     consoleIO.showWithLine("\u001B[31m❌ You don't have permission\u001B[0m")
                 }
@@ -74,7 +67,8 @@ class UserScreen(
         consoleIO.showWithLine("\n\u001B[36m📋 All Users:\u001B[0m")
 
         try {
-            runBlocking {
+
+            showAnimation("get all users...") {
                 val users = getAllUsers.getAllUsers()
 
                 if (users.isEmpty()) {
@@ -102,7 +96,7 @@ class UserScreen(
     @OptIn(ExperimentalUuidApi::class)
     private fun onClickUpdateUser() {
         consoleIO.showWithLine("\n\u001B[36m✏️ Update User\u001B[0m")
-        val userId = Uuid.parse("ba0e1b3c-2239-4755-97fe-202d8619bd79")
+        val userId = sessionManagerUseCase.getCurrentUser()?.id
 
         runBlocking {
             try {
@@ -169,7 +163,7 @@ class UserScreen(
             } else if (newPassword != confirmPassword) {
                 consoleIO.showWithLine("\u001B[31m❌ Passwords do not match! Please try again.\u001B[0m")
             } else {
-                runBlocking {
+                showAnimation("update password...") {
                     val freshUserData = getUserByUserId.getUserByUserId(user.id.toString())
 
                     updateUserInSystem(freshUserData.copy(userName = freshUserData.userName, password = newPassword))
@@ -184,7 +178,7 @@ class UserScreen(
         consoleIO.show("\u001B[32mEnter new username: \u001B[0m")
         val newUsername = getInput()
         if (!newUsername.isNullOrBlank()) {
-            runBlocking {
+            showAnimation("update user name...") {
                 val freshUserData = getUserByUserId.getUserByUserId(user.id.toString())
 
                 updateUserInSystem(freshUserData.copy(userName = newUsername, password = freshUserData.password))
@@ -227,7 +221,7 @@ class UserScreen(
         consoleIO.show("\u001B[32mEnter user ID: \u001B[0m")
         val userId = getInput()
 
-        runBlocking {
+        showAnimation("get user by id...") {
             try {
 
                 val user = userId?.let { getUserByUserId.getUserByUserId(it) }
@@ -246,6 +240,5 @@ class UserScreen(
                 consoleIO.showWithLine("\u001B[31m❌ Error: ${e.message ?: "User not found"}\u001B[0m")
             }
         }
-        showOptionService()
     }
 }

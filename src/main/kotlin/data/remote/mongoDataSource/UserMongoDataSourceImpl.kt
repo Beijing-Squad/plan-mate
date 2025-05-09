@@ -6,8 +6,9 @@ import com.mongodb.client.model.Updates
 import com.mongodb.kotlin.client.coroutine.MongoDatabase
 import data.dto.UserDTO
 import data.remote.mongoDataSource.mongoConnection.MongoConnection
+import data.repository.PasswordHashingDataSource
+import data.repository.ValidationUserDataSource
 import data.repository.remoteDataSource.UserMongoDataSource
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.toList
@@ -15,8 +16,9 @@ import kotlinx.coroutines.withContext
 import logic.entities.exceptions.UserNotFoundException
 
 class UserMongoDataSourceImpl(
-    private val database: MongoDatabase = MongoConnection.database,
-    private val dbScope: CoroutineScope = MongoConnection.dbScope
+    database: MongoDatabase = MongoConnection.database,
+    private val passwordHashingDataSource: PasswordHashingDataSource,
+    private val validationUserDataSource: ValidationUserDataSource,
 ) : UserMongoDataSource {
 
     private val collection = database.getCollection<UserDTO>(USER_COLLECTION)
@@ -43,12 +45,16 @@ class UserMongoDataSourceImpl(
         val filters = Filters.eq(UserDTO::id.name, user.id)
         val existingUser = collection.find(filters).firstOrNull() ?: throw UserNotFoundException()
 
+        validationUserDataSource.validateUsername(user.userName)
+        validationUserDataSource.validatePassword(user.password)
         val updates = buildList {
-            if (user.userName.isNotBlank() && user.userName != existingUser.userName) {
+            if (user.userName != existingUser.userName) {
                 add(Updates.set(UserDTO::userName.name, user.userName))
             }
-            if (user.password.isNotBlank() && user.password != existingUser.password) {
-                add(Updates.set(UserDTO::password.name, user.password))
+            if (passwordHashingDataSource.hashPassword(user.password)
+                != passwordHashingDataSource.hashPassword(existingUser.password)
+            ) {
+                add(Updates.set(UserDTO::password.name, passwordHashingDataSource.hashPassword(user.password)))
             }
         }
 
