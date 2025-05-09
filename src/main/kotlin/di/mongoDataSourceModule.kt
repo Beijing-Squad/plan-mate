@@ -6,6 +6,7 @@ import data.remote.mongoDataSource.mongoConnection.MongoConnection
 import data.repository.dataSource.*
 import data.repository.mongoDataSource.UserMongoDataSourceImpl
 import data.repository.remoteDataSource.AuthenticationMongoDBDataSource
+import data.repository.remoteDataSource.TaskMongoDBDataSource
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
@@ -23,8 +24,8 @@ val mongoModule = module {
         UserMongoDataSourceImpl(get(), get(named("dbScope")))
     }
 
-    single<TasksDataSource> {
-        TaskMongoDataSourceImpl(get(), get(named("dbScope")))
+    single<TaskMongoDBDataSource> {
+        TaskMongoDataSourceImpl(get())
     }
 
     single<ProjectDataSource> {
