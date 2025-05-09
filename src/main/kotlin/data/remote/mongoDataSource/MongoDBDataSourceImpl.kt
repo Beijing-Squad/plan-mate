@@ -20,8 +20,8 @@ import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.withContext
 import logic.entities.Task
 import logic.entities.exceptions.InvalidLoginException
-import logic.entities.exceptions.TaskNotFoundException
 import logic.entities.exceptions.StateNotFoundException
+import logic.entities.exceptions.TaskNotFoundException
 import logic.entities.exceptions.UserNotFoundException
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
@@ -38,6 +38,7 @@ class MongoDBDataSourceImpl(
     private val statesCollection = database.getCollection<TaskStateDTO>("states")
     private val taskCollection = database.getCollection<TaskDTO>("tasks")
 
+    //region authentication operations
     @OptIn(ExperimentalUuidApi::class)
     override suspend fun saveUser(
         username: String,
@@ -58,7 +59,9 @@ class MongoDBDataSourceImpl(
         val query = Filters.and(eq("userName", username), eq("password", password))
         return userCollection.find(query).firstOrNull() ?: throw InvalidLoginException()
     }
+    //endregion
 
+    //region audit operations
     override suspend fun getAllAuditLogs(): List<AuditDTO> {
         TODO("Not yet implemented")
     }
@@ -74,6 +77,9 @@ class MongoDBDataSourceImpl(
     override suspend fun getAuditLogsByTaskId(taskId: String): List<AuditDTO> {
         TODO("Not yet implemented")
     }
+    //endregion
+
+    //region project operations
     override suspend fun getAllProjects(): List<ProjectDTO> = projectCollection.find().toList()
 
     override suspend fun addProject(project: ProjectDTO) {
@@ -92,12 +98,12 @@ class MongoDBDataSourceImpl(
     override suspend fun getProjectById(projectId: String): ProjectDTO {
         return projectCollection.find(eq("id", projectId)).first()
     }
+    //endregion
 
-
+    //region task operations
     override suspend fun getAllTasks(): List<TaskDTO> {
         return taskCollection.find<TaskDTO>().toList()
     }
-
 
     @OptIn(ExperimentalUuidApi::class)
     override suspend fun getTaskById(taskId: String): TaskDTO {
@@ -141,8 +147,9 @@ class MongoDBDataSourceImpl(
         }
         return updatedTask
     }
+    //endregion
 
-
+    //region task state operations
     override suspend fun getAllStates(): List<TaskStateDTO> {
         return statesCollection.find<TaskStateDTO>().toList()
     }
@@ -179,7 +186,9 @@ class MongoDBDataSourceImpl(
 
         return statesCollection.deleteOne(stateIdFilter).deletedCount > 0
     }
+    //endregion
 
+    //region user operations
     override suspend fun getAllUsers(): List<UserDTO> {
         return withContext(Dispatchers.IO) {
             try {
@@ -222,4 +231,5 @@ class MongoDBDataSourceImpl(
 
         return userCollection.find(filters).firstOrNull() ?: throw UserNotFoundException()
     }
+    //endregion
 }
