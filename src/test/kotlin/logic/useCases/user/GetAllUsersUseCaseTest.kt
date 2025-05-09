@@ -3,11 +3,13 @@ package logic.useCases.user
 import com.google.common.truth.Truth.assertThat
 import data.repository.UserRepositoryImpl
 import fake.createUser
-import io.mockk.every
+import io.mockk.coEvery
 import io.mockk.mockk
+import kotlinx.coroutines.test.runTest
 import logic.repository.UserRepository
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import kotlin.uuid.ExperimentalUuidApi
 
 class GetAllUsersUseCaseTest {
     private lateinit var getAllUsers: GetAllUsersUseCase
@@ -15,10 +17,11 @@ class GetAllUsersUseCaseTest {
 
     @BeforeEach
     fun setUp() {
-        userRepository = UserRepositoryImpl(mockk(relaxed = true))
+        userRepository = mockk(relaxed = true)
         getAllUsers = GetAllUsersUseCase(userRepository)
     }
 
+    @OptIn(ExperimentalUuidApi::class)
     @Test
     fun `should return all users when have users`() {
         // Given && When
@@ -29,10 +32,13 @@ class GetAllUsersUseCaseTest {
             createUser(userName = "mohammed123423424", password = "12345678"),
         )
 
-        every {   userRepository.getAllUsers() } returns users
+        coEvery { userRepository.getAllUsers() } returns users
 
         // Then
-        assertThat(getAllUsers.getAllUsers()).isEqualTo(users)
+        runTest {
+            val result = getAllUsers.getAllUsers()
+            assertThat(result).isEqualTo(users)
+        }
 
     }
 }
