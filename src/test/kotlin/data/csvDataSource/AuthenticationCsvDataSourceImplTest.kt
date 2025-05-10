@@ -3,9 +3,7 @@ package data.csvDataSource
 import com.google.common.truth.Truth.assertThat
 import data.local.csvDataSource.AuthenticationCsvDataSourceImpl
 import data.local.csvDataSource.csv.CsvDataSourceImpl
-import data.repository.PasswordHashingDataSource
-import data.repository.ValidationUserDataSource
-import data.repository.dataSource.UserDataSource
+import data.repository.localDataSource.UserDataSource
 import fake.createUser
 import io.mockk.clearAllMocks
 import io.mockk.every
@@ -13,10 +11,9 @@ import io.mockk.mockk
 import io.mockk.verify
 import logic.entities.User
 import logic.entities.UserRole
-import logic.entities.exceptions.InvalidPasswordException
-import logic.entities.exceptions.InvalidUserNameException
-import logic.entities.exceptions.UserExistsException
-import logic.entities.exceptions.UserNotFoundException
+import logic.exceptions.InvalidPasswordException
+import logic.exceptions.UserExistsException
+import logic.exceptions.UserNotFoundException
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -25,8 +22,6 @@ class AuthenticationCsvDataSourceImplTest {
 
     private val csvDataSource = mockk<CsvDataSourceImpl<User>>(relaxed = true)
     private val userDataSource = mockk<UserDataSource>()
-    private lateinit var validationUserDataSource: ValidationUserDataSource
-    private lateinit var passwordHashingDataSource: PasswordHashingDataSource
     private lateinit var authDataSource: AuthenticationCsvDataSourceImpl
 
     private val testUser = createUser(
@@ -38,9 +33,7 @@ class AuthenticationCsvDataSourceImplTest {
     @BeforeEach
     fun setUp() {
         clearAllMocks()
-        validationUserDataSource = mockk(relaxed = true)
-        passwordHashingDataSource = mockk(relaxed = true)
-        authDataSource = AuthenticationCsvDataSourceImpl(csvDataSource, userDataSource,validationUserDataSource,passwordHashingDataSource)
+        authDataSource = AuthenticationCsvDataSourceImpl(csvDataSource, userDataSource)
     }
 
     @Test
@@ -66,33 +59,6 @@ class AuthenticationCsvDataSourceImplTest {
             authDataSource.getAuthenticatedUser("mohamed", "wrongpassword")
         }
         verify(exactly = 1) { userDataSource.getAllUsers() }
-    }
-
-    @Test
-    fun `getAuthenticatedUser should throw InvalidUserNameException when username is blank`() {
-        // Given
-        every { validationUserDataSource.validateUsername("") } throws InvalidUserNameException("Invalid username")
-
-        // When/Then
-        assertThrows<InvalidUserNameException> {
-            authDataSource.getAuthenticatedUser("", "password123")
-        }
-        verify(exactly = 1) { validationUserDataSource.validateUsername("") }
-        verify(exactly = 0) { userDataSource.getAllUsers() }
-    }
-
-
-    @Test
-    fun `getAuthenticatedUser should throw InvalidPasswordException when password is blank`() {
-        // Given
-        every { validationUserDataSource.validatePassword("") } throws InvalidPasswordException("Invalid password")
-
-        // When/Then
-        assertThrows<InvalidPasswordException> {
-            authDataSource.getAuthenticatedUser("mohamed", "")
-        }
-        verify(exactly = 1) { validationUserDataSource.validatePassword("") }
-        verify(exactly = 0) { userDataSource.getAllUsers() }
     }
 
     @Test
