@@ -1,18 +1,29 @@
 package ui.screens
 
 import com.mongodb.client.model.Filters
+import com.mongodb.kotlin.client.coroutine.MongoDatabase
+import data.dto.TaskDTO
+import data.remote.mongoDataSource.mongoConnection.MongoConnection
+import data.repository.mapper.toTaskDTO
+import data.repository.mapper.toTaskEntity
+import format
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Clock
+import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import logic.entities.ActionType
 import logic.entities.Audit
 import logic.entities.EntityType
 import logic.entities.Task
+import logic.exceptions.TaskNotFoundException
 import logic.useCases.audit.AddAuditLogUseCase
 import logic.useCases.authentication.SessionManagerUseCase
 import logic.useCases.state.GetAllTaskStatesUseCase
 import logic.useCases.task.*
+import org.bson.Document
 import ui.console.SwimlanesRenderer
 import ui.enums.TaskBoardOption
 import ui.main.BaseScreen
@@ -20,17 +31,6 @@ import ui.main.MenuRenderer
 import ui.main.consoleIO.ConsoleIO
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
-import data.dto.TaskDTO
-import data.repository.mapper.toTaskDTO
-import data.repository.mapper.toTaskEntity
-import format
-import logic.entities.exceptions.TaskNotFoundException
-import org.bson.Document
-import com.mongodb.kotlin.client.coroutine.MongoDatabase
-import data.remote.mongoDataSource.mongoConnection.MongoConnection
-import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.toList
-import kotlinx.datetime.LocalDateTime
 
 @OptIn(ExperimentalUuidApi::class)
 class TaskManagementScreen(

@@ -2,13 +2,13 @@ package data.repository
 
 import data.repository.mapper.toTaskStateDto
 import data.repository.mapper.toTaskStateEntity
-import data.repository.remoteDataSource.MongoDBDataSource
+import data.repository.remoteDataSource.RemoteDataSource
 import logic.entities.TaskState
-import logic.entities.exceptions.StateNotFoundException
+import logic.exceptions.StateNotFoundException
 import logic.repository.StatesRepository
 
 class TaskStatesRepositoryImpl(
-    private val taskStateDataSource: MongoDBDataSource
+    private val taskStateDataSource: RemoteDataSource
 ) : StatesRepository {
 
     override suspend fun getAllStates(): List<TaskState> {

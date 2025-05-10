@@ -5,8 +5,8 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
-import logic.entities.exceptions.CsvWriteException
-import logic.entities.exceptions.ProjectNotFoundException
+import logic.exceptions.DataWriteException
+import logic.exceptions.ProjectNotFoundException
 import logic.repository.ProjectsRepository
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -60,11 +60,11 @@ class DeleteProjectUseCaseTest {
             val desiredProject = createProject()
             val allProjects = listOf(desiredProject, createProject())
 
-            coEvery { projectRepository.deleteProject(desiredProject.id.toString()) } throws CsvWriteException("")
+            coEvery { projectRepository.deleteProject(desiredProject.id.toString()) } throws DataWriteException("")
             coEvery { projectRepository.getAllProjects() } returns allProjects
 
             // When && Then
-            assertThrows<CsvWriteException> { deleteProject.deleteProject(desiredProject.id.toString()) }
+            assertThrows<DataWriteException> { deleteProject.deleteProject(desiredProject.id.toString()) }
         }
     }
 }

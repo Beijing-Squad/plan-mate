@@ -7,30 +7,27 @@ import com.mongodb.client.model.Updates
 import com.mongodb.client.model.Updates.combine
 import com.mongodb.client.model.Updates.set
 import com.mongodb.kotlin.client.coroutine.MongoDatabase
+import data.common.hashPassword
 import data.dto.*
 import data.remote.mongoDataSource.mongoConnection.MongoConnection
-import data.repository.PasswordHashingDataSource
-import data.repository.ValidationUserDataSource
 import data.repository.mapper.toTaskDTO
-import data.repository.remoteDataSource.MongoDBDataSource
+import data.repository.remoteDataSource.RemoteDataSource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.withContext
 import logic.entities.Task
-import logic.entities.exceptions.InvalidLoginException
-import logic.entities.exceptions.StateNotFoundException
-import logic.entities.exceptions.TaskNotFoundException
-import logic.entities.exceptions.UserNotFoundException
+import logic.exceptions.InvalidLoginException
+import logic.exceptions.StateNotFoundException
+import logic.exceptions.TaskNotFoundException
+import logic.exceptions.UserNotFoundException
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
 class MongoDBDataSourceImpl(
-    database: MongoDatabase = MongoConnection.database,
-    private val validationUserDataSource: ValidationUserDataSource,
-    private val passwordHashingDataSource: PasswordHashingDataSource
-) : MongoDBDataSource {
+    database: MongoDatabase = MongoConnection.database
+) : RemoteDataSource {
 
     private val userCollection = database.getCollection<UserDTO>("users")
     private val auditsCollection = database.getCollection<AuditDTO>("audits")
@@ -48,7 +45,7 @@ class MongoDBDataSourceImpl(
         val newUser = UserDTO(
             id = Uuid.random().toString(),
             userName = username,
-            password = password,
+            password = hashPassword(password),
             role = role
         )
         val result = userCollection.insertOne(newUser)
@@ -56,7 +53,12 @@ class MongoDBDataSourceImpl(
     }
 
     override suspend fun getAuthenticatedUser(username: String, password: String): UserDTO {
-        val query = Filters.and(eq("userName", username), eq("password", password))
+        val query = Filters.and(
+            eq("userName", username), eq(
+                "password",
+                hashPassword(password)
+            )
+        )
         return userCollection.find(query).firstOrNull() ?: throw InvalidLoginException()
     }
     //endregion
@@ -126,7 +128,7 @@ class MongoDBDataSourceImpl(
     override suspend fun deleteTask(taskId: String) {
         val taskIdFilter = Filters.eq("_id", taskId)
         taskCollection.findOneAndDelete(taskIdFilter)
-         ?: throw TaskNotFoundException("Task with id $taskId not found")
+            ?: throw TaskNotFoundException("Task with id $taskId not found")
     }
 
     @OptIn(ExperimentalUuidApi::class)
@@ -211,16 +213,14 @@ class MongoDBDataSourceImpl(
         val filters = Filters.eq(UserDTO::id.name, user.id)
         val existingUser = userCollection.find(filters).firstOrNull() ?: throw UserNotFoundException()
 
-        validationUserDataSource.validateUsername(user.userName)
-        validationUserDataSource.validatePassword(user.password)
         val updates = buildList {
             if (user.userName != existingUser.userName) {
                 add(Updates.set(UserDTO::userName.name, user.userName))
             }
-            if (passwordHashingDataSource.hashPassword(user.password)
-                != passwordHashingDataSource.hashPassword(existingUser.password)
+            if (hashPassword(user.password)
+                != hashPassword(existingUser.password)
             ) {
-                add(Updates.set(UserDTO::password.name, passwordHashingDataSource.hashPassword(user.password)))
+                add(Updates.set(UserDTO::password.name, hashPassword(user.password)))
             }
         }
 

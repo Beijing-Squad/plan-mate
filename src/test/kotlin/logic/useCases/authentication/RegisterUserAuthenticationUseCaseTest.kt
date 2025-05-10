@@ -1,12 +1,15 @@
 package logic.useCases.authentication
 
 import com.google.common.truth.Truth.assertThat
-import io.mockk.*
+import io.mockk.clearAllMocks
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import logic.entities.UserRole
-import logic.entities.exceptions.InvalidPasswordException
-import logic.entities.exceptions.InvalidUserNameException
-import logic.entities.exceptions.UserExistsException
+import logic.exceptions.InvalidPasswordException
+import logic.exceptions.InvalidUserNameException
+import logic.exceptions.UserExistsException
 import logic.repository.AuthenticationRepository
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test

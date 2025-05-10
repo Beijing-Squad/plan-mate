@@ -1,7 +1,7 @@
 package logic.useCases.state
 
 import logic.entities.TaskState
-import logic.entities.exceptions.StateNotFoundException
+import logic.exceptions.StateNotFoundException
 import logic.repository.StatesRepository
 import kotlin.uuid.ExperimentalUuidApi
 

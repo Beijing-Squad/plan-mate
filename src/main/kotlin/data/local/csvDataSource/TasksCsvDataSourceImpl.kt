@@ -1,10 +1,10 @@
 package data.local.csvDataSource
 
 import data.local.csvDataSource.csv.CsvDataSourceImpl
-import data.repository.dataSource.TasksDataSource
+import data.repository.localDataSource.TasksDataSource
 import logic.entities.Task
-import logic.entities.exceptions.InvalidInputException
-import logic.entities.exceptions.TaskNotFoundException
+import logic.exceptions.InvalidInputException
+import logic.exceptions.TaskNotFoundException
 import kotlin.uuid.ExperimentalUuidApi
 
 @OptIn(ExperimentalUuidApi::class)

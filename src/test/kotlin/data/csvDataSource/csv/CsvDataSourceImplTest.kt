@@ -7,12 +7,12 @@ import data.local.csvDataSource.csv.CsvReader
 import data.local.csvDataSource.csv.CsvWriter
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.verify
 import io.mockk.verifyOrder
+import logic.exceptions.DataReadException
+import logic.exceptions.DataWriteException
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import io.mockk.verify
-import logic.entities.exceptions.CsvReadException
-import logic.entities.exceptions.CsvWriteException
 import org.junit.jupiter.api.assertThrows
 
 
@@ -100,7 +100,7 @@ class CsvDataSourceImplTest {
         every { reader.readCsv() } throws Exception("File read error")
 
         // When & Then
-        val exception = assertThrows<CsvReadException> {
+        val exception = assertThrows<DataReadException> {
             csvDataSource.loadAllDataFromFile()
         }
         assertThat(exception.message).isEqualTo("Error reading CSV file: File read error")
@@ -131,7 +131,7 @@ class CsvDataSourceImplTest {
         every { writer.appendLine(any()) } throws Exception("Write error")
 
         // When & Then
-        val exception = assertThrows<CsvWriteException> {
+        val exception = assertThrows<DataWriteException> {
             csvDataSource.appendToFile(item)
         }
 
@@ -163,7 +163,7 @@ class CsvDataSourceImplTest {
         every { writer.updateLines(any()) } throws Exception("Save error")
 
         // When & Then
-        val exception = assertThrows<CsvWriteException> {
+        val exception = assertThrows<DataWriteException> {
             csvDataSource.updateFile(items)
         }
 
@@ -217,7 +217,7 @@ class CsvDataSourceImplTest {
         every { parser.getId(item) } returns "111"
 
         // When & Then
-        val exception = assertThrows<CsvWriteException> {
+        val exception = assertThrows<DataWriteException> {
             csvDataSource.deleteById("999")
         }
 

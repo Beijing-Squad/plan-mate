@@ -1,7 +1,7 @@
 package data.local.csvDataSource
 
 import data.local.csvDataSource.csv.CsvDataSourceImpl
-import data.repository.dataSource.ProjectDataSource
+import data.repository.localDataSource.ProjectDataSource
 import logic.entities.Project
 
 

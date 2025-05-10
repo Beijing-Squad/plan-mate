@@ -7,7 +7,7 @@ import data.local.csvDataSource.csv.CsvDataSourceImpl
 import fake.createProject
 import io.mockk.*
 import logic.entities.Project
-import logic.entities.exceptions.CsvWriteException
+import logic.exceptions.DataWriteException
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import kotlin.test.BeforeTest
@@ -88,10 +88,10 @@ class ProjectCsvDataSourceImplTest {
         val newProjects = createProject()
         every {
             csvDataSource.updateItem (newProjects)
-        } throws CsvWriteException("Error saving to CSV file")
+        } throws DataWriteException("Error saving to CSV file")
 
         // When & Then
-        assertThrows<CsvWriteException> {
+        assertThrows<DataWriteException> {
             projectCsvDataSource.updateProject(newProjects)
         }
     }

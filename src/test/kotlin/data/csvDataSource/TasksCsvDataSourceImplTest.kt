@@ -4,10 +4,12 @@ import com.google.common.truth.Truth.assertThat
 import data.local.csvDataSource.TasksCsvDataSourceImpl
 import data.local.csvDataSource.csv.CsvDataSourceImpl
 import fake.createTask
-import io.mockk.*
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
 import kotlinx.datetime.LocalDateTime
 import logic.entities.Task
-import logic.entities.exceptions.TaskNotFoundException
+import logic.exceptions.TaskNotFoundException
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import kotlin.test.assertFailsWith
