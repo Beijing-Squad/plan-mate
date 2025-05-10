@@ -2,7 +2,7 @@ package data.csvDataSource.csv
 
 import com.google.common.truth.Truth.assertThat
 import data.local.csvDataSource.csv.CsvWriter
-import logic.exceptions.CsvFileExceptions
+import logic.exceptions.DataSourceException
 import logic.exceptions.EmptyHeaderException
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -34,7 +34,7 @@ class CsvWriterTest {
         val nonCsvFile = File("test.txt")
 
         //When
-        val exception = assertThrows<CsvFileExceptions> {
+        val exception = assertThrows<DataSourceException> {
             CsvWriter(nonCsvFile)
         }
 
@@ -48,7 +48,7 @@ class CsvWriterTest {
         val nonCsvFile = File("test.txt")
 
         //When
-        val exception = assertThrows<CsvFileExceptions> {
+        val exception = assertThrows<DataSourceException> {
             CsvWriter(nonCsvFile)
             CsvWriter(nonCsvFile).appendLine("Some record")
         }
@@ -63,7 +63,7 @@ class CsvWriterTest {
         val nonCsvFile = File("test.txt")
 
         //When
-        val exception = assertThrows<CsvFileExceptions> {
+        val exception = assertThrows<DataSourceException> {
             CsvWriter(nonCsvFile)
             CsvWriter(nonCsvFile).updateLines(listOf("Header", "Row 1", "Row 2"))
         }
