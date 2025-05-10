@@ -8,6 +8,6 @@ class GetTaskByIdUseCase(
     private val tasksRepository: TasksRepository
 ) {
       suspend fun getTaskById(taskId: String): Task {
-          toTaskEntity(return tasksRepository.getTaskById(taskId))
+          return tasksRepository.getTaskById(taskId)
     }
 }

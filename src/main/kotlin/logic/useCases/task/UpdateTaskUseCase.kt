@@ -8,6 +8,6 @@ class UpdateTaskUseCase(
     private val tasksRepository: TasksRepository
 ) {
       suspend fun updateTask(task: Task): Task {
-          toTaskEntity(return tasksRepository.updateTask(task))
+          return tasksRepository.updateTask(task)
     }
 }

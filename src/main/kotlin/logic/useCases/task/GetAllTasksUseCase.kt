@@ -8,6 +8,6 @@ class GetAllTasksUseCase(
     private val tasksRepository: TasksRepository
 ) {
       suspend fun getAllTasks(): List<Task> {
-          toTaskEntity(return tasksRepository.getAllTasks())
+          return tasksRepository.getAllTasks()
     }
 }
