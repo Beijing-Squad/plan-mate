@@ -208,19 +208,19 @@ class MongoDBDataSourceImpl(
     }
 
     override suspend fun updateUser(user: UserDTO): UserDTO {
-        val filters = Filters.eq(UserDTO::id.name, user.id)
+        val filters = eq(UserDTO::id.name, user.id)
         val existingUser = userCollection.find(filters).firstOrNull() ?: throw UserNotFoundException()
 
         validationUserDataSource.validateUsername(user.userName)
         validationUserDataSource.validatePassword(user.password)
         val updates = buildList {
             if (user.userName != existingUser.userName) {
-                add(Updates.set(UserDTO::userName.name, user.userName))
+                add(set(UserDTO::userName.name, user.userName))
             }
             if (passwordHashingDataSource.hashPassword(user.password)
                 != passwordHashingDataSource.hashPassword(existingUser.password)
             ) {
-                add(Updates.set(UserDTO::password.name, passwordHashingDataSource.hashPassword(user.password)))
+                add(set(UserDTO::password.name, passwordHashingDataSource.hashPassword(user.password)))
             }
         }
 
@@ -229,7 +229,9 @@ class MongoDBDataSourceImpl(
             require(result.matchedCount.toInt() != 0) { throw UserNotFoundException() }
         }
 
-        return userCollection.find(filters).firstOrNull() ?: throw UserNotFoundException()
+        return withContext(Dispatchers.IO) {
+            userCollection.find(filters).firstOrNull() ?: throw UserNotFoundException()
+        }
     }
     //endregion
 }
