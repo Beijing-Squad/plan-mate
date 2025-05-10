@@ -1,14 +1,14 @@
 package data.repository
 
+import data.remote.mongoDataSource.MongoDBDataSourceImpl
 import data.repository.mapper.toUserDto
 import data.repository.mapper.toUserEntity
-import data.repository.remoteDataSource.UserMongoDataSource
 import logic.entities.User
 import logic.repository.UserRepository
 
 class UserRepositoryImpl(
-    private val userMongoDataSource: UserMongoDataSource
-): UserRepository{
+    private val userMongoDataSource: MongoDBDataSourceImpl
+) : UserRepository {
     override suspend fun getAllUsers(): List<User> {
         return userMongoDataSource.getAllUsers().map { toUserEntity(it) }
     }

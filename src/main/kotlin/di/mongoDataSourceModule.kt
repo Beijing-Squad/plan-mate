@@ -8,6 +8,7 @@ import data.remote.mongoDataSource.mongoConnection.MongoConnection
 import data.repository.PasswordHashingDataSource
 import data.repository.ValidationUserDataSource
 import data.repository.remoteDataSource.MongoDBDataSource
+import org.koin.dsl.bind
 import org.koin.dsl.module
 
 val mongoModule = module {
@@ -19,8 +20,8 @@ val mongoModule = module {
     single<PasswordHashingDataSource> { MD5HashPasswordImpl() }
     single<ValidationUserDataSource> { ValidationUserDataSourceImpl() }
 
-    single<MongoDBDataSource> {
+    single {
         MongoDBDataSourceImpl(get(), get(), get())
-    }
+    } bind MongoDBDataSource::class
 
 }
