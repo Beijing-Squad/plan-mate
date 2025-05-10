@@ -1,8 +1,10 @@
 package data.dto
 
+import org.bson.codecs.pojo.annotations.BsonProperty
+
 data class UserDTO(
-    val id: String,
-    val userName: String,
-    val password: String,
-    val role: String
+    @BsonProperty("id") val id: String,
+    @BsonProperty("userName") val userName: String,
+    @BsonProperty("password") val password: String,
+    @BsonProperty("role") val role: String
 )
