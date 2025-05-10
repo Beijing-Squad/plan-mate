@@ -25,35 +25,35 @@ import org.koin.dsl.module
 val dataSourceModule = module {
     // CsvDataSourceImpl
     single(named("projectDataSource")) {
-        CsvDataSourceImpl<Project>(
+        CsvDataSourceImpl(
             get(named("projectReader")),
             get(named("projectWriter")),
             get<ProjectCsvParser>()
         )
     }
     single(named("userDataSource")) {
-        CsvDataSourceImpl<User>(
+        CsvDataSourceImpl(
             get(named("userReader")),
             get(named("userWriter")),
             get<UserCsvParser>()
         )
     }
     single(named("taskDataSource")) {
-        CsvDataSourceImpl<Task>(
+        CsvDataSourceImpl(
             get(named("taskReader")),
             get(named("taskWriter")),
             get<TaskCsvParser>()
         )
     }
     single(named("stateDataSource")) {
-        CsvDataSourceImpl<TaskState>(
+        CsvDataSourceImpl(
             get(named("stateReader")),
             get(named("stateWriter")),
             get<TaskStateCsvParser>()
         )
     }
     single(named("auditDataSource")) {
-        CsvDataSourceImpl<Audit>(
+        CsvDataSourceImpl(
             get(named("auditReader")),
             get(named("auditWriter")),
             get<AuditCsvParser>()
