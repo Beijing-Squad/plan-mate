@@ -4,8 +4,8 @@ import fake.createUser
 import io.mockk.*
 import logic.entities.User
 import logic.entities.UserRole
-import logic.entities.exceptions.InvalidPasswordException
-import logic.entities.exceptions.InvalidUserNameException
+import logic.exceptions.InvalidPasswordException
+import logic.exceptions.InvalidUserNameException
 import logic.useCases.authentication.SessionManagerUseCase
 import logic.useCases.user.GetAllUsersUseCase
 import logic.useCases.user.GetUserByIdUseCase

@@ -7,12 +7,12 @@ import data.local.csvDataSource.csv.CsvReader
 import data.local.csvDataSource.csv.CsvWriter
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.verify
 import io.mockk.verifyOrder
+import logic.exceptions.CsvReadException
+import logic.exceptions.CsvWriteException
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import io.mockk.verify
-import logic.entities.exceptions.CsvReadException
-import logic.entities.exceptions.CsvWriteException
 import org.junit.jupiter.api.assertThrows
 
 

@@ -6,9 +6,9 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import logic.entities.*
-import logic.entities.exceptions.InvalidStateNameException
-import logic.entities.exceptions.ProjectNotFoundException
-import logic.entities.exceptions.StateAlreadyExistException
+import logic.exceptions.InvalidStateNameException
+import logic.exceptions.ProjectNotFoundException
+import logic.exceptions.StateAlreadyExistException
 import logic.useCases.audit.AddAuditLogUseCase
 import logic.useCases.authentication.SessionManagerUseCase
 import logic.useCases.state.*

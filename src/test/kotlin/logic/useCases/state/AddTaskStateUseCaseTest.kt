@@ -6,9 +6,9 @@ import fake.createState
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
-import logic.entities.exceptions.InvalidStateNameException
-import logic.entities.exceptions.ProjectNotFoundException
-import logic.entities.exceptions.StateAlreadyExistException
+import logic.exceptions.InvalidStateNameException
+import logic.exceptions.ProjectNotFoundException
+import logic.exceptions.StateAlreadyExistException
 import logic.repository.ProjectsRepository
 import logic.repository.StatesRepository
 import logic.useCases.project.GetAllProjectsUseCase

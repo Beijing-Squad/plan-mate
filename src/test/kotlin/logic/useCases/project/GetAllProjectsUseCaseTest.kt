@@ -5,7 +5,7 @@ import fake.createProject
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
-import logic.entities.exceptions.CsvReadException
+import logic.exceptions.CsvReadException
 import logic.repository.ProjectsRepository
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test

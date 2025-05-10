@@ -3,7 +3,7 @@ package logic.useCases.project
 import fake.createProject
 import io.mockk.*
 import kotlinx.coroutines.test.runTest
-import logic.entities.exceptions.CsvWriteException
+import logic.exceptions.CsvWriteException
 import logic.repository.ProjectsRepository
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test

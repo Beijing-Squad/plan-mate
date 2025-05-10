@@ -5,7 +5,7 @@ import fake.createState
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
-import logic.entities.exceptions.StateNotFoundException
+import logic.exceptions.StateNotFoundException
 import logic.repository.StatesRepository
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.assertThrows

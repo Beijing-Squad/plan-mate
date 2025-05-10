@@ -8,7 +8,7 @@ import kotlinx.coroutines.test.runTest
 import logic.entities.ActionType
 import logic.entities.EntityType
 import logic.entities.UserRole
-import logic.entities.exceptions.InvalidInputException
+import logic.exceptions.InvalidInputException
 import logic.repository.AuditRepository
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test

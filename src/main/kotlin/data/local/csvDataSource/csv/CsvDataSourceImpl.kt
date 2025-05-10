@@ -1,8 +1,8 @@
 package data.local.csvDataSource.csv
 
-import logic.entities.exceptions.CsvReadException
-import logic.entities.exceptions.CsvWriteException
-import logic.entities.exceptions.ProjectNotFoundException
+import logic.exceptions.CsvReadException
+import logic.exceptions.CsvWriteException
+import logic.exceptions.ProjectNotFoundException
 
 class CsvDataSourceImpl<T>(
     private var csvFileReader: CsvReader,

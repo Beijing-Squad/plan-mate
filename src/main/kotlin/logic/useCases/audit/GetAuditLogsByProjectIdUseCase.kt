@@ -1,8 +1,8 @@
 package logic.useCases.audit
 
 import logic.entities.Audit
-import logic.entities.exceptions.InvalidInputException
-import logic.entities.exceptions.ProjectNotFoundException
+import logic.exceptions.InvalidInputException
+import logic.exceptions.ProjectNotFoundException
 import logic.repository.AuditRepository
 
 class GetAuditLogsByProjectIdUseCase(

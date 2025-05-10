@@ -1,7 +1,7 @@
 package data.local.csvDataSource.csv
 
-import logic.entities.exceptions.CsvFileExceptions
-import logic.entities.exceptions.EmptyHeaderException
+import logic.exceptions.CsvFileExceptions
+import logic.exceptions.EmptyHeaderException
 import java.io.File
 
 class CsvWriter(private val file: File) {

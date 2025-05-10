@@ -7,7 +7,7 @@ import data.local.csvDataSource.csv.CsvDataSourceImpl
 import fake.createProject
 import io.mockk.*
 import logic.entities.Project
-import logic.entities.exceptions.CsvWriteException
+import logic.exceptions.CsvWriteException
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import kotlin.test.BeforeTest
