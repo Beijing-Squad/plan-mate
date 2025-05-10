@@ -41,9 +41,20 @@ class AuthenticationScreen(
     private suspend fun login(): User? {
         consoleIO.showWithLine("\n--- Login ---")
         consoleIO.show("Username: ")
-        val username = consoleIO.read()!!.trim()
+        val username = consoleIO.read()?.trim()
+
+        if (username.isNullOrBlank()) {
+            consoleIO.showWithLine("❌ Username cannot be empty.")
+            return null
+        }
+
         consoleIO.show("Password: ")
-        val password = consoleIO.read()!!.trim()
+        val password = consoleIO.read()?.trim()
+
+        if (password.isNullOrBlank()) {
+            consoleIO.showWithLine("❌ Password cannot be empty.")
+            return null
+        }
 
         return try {
             val user = loginUseCase.execute(username, password)
@@ -71,9 +82,21 @@ class AuthenticationScreen(
     private suspend fun register() {
         consoleIO.showWithLine("\n--- Register ---")
         consoleIO.show("Username: ")
-        val username = consoleIO.read()!!.trim()
+        val username = consoleIO.read()?.trim()
+
+        if (username.isNullOrBlank()) {
+            consoleIO.showWithLine("❌ Username cannot be empty.")
+            return
+        }
+
         consoleIO.show("Password: ")
-        val password = consoleIO.read()!!.trim()
+        val password = consoleIO.read()?.trim()
+
+        if (password.isNullOrBlank()) {
+            consoleIO.showWithLine("❌ Password cannot be empty.")
+            return
+        }
+
         val role = selectRole()
 
         try {
