@@ -1,7 +1,7 @@
 package data.local.csvDataSource
 
 import data.local.csvDataSource.csv.CsvDataSourceImpl
-import data.repository.PasswordHashingDataSource
+import data.common.PasswordHashingDataSource
 import data.repository.ValidationUserDataSource
 import data.repository.dataSource.UserDataSource
 import logic.entities.User

@@ -1,11 +1,11 @@
 package di
 
 import com.mongodb.kotlin.client.coroutine.MongoDatabase
-import data.local.csvDataSource.MD5HashPasswordImpl
-import data.local.csvDataSource.ValidationUserDataSourceImpl
+import data.common.MD5HashPasswordImpl
 import data.remote.mongoDataSource.MongoDBDataSourceImpl
 import data.remote.mongoDataSource.mongoConnection.MongoConnection
-import data.repository.PasswordHashingDataSource
+import data.common.PasswordHashingDataSource
+import data.local.csvDataSource.ValidationUserDataSourceImpl
 import data.repository.ValidationUserDataSource
 import data.repository.remoteDataSource.MongoDBDataSource
 import org.koin.dsl.bind
@@ -21,7 +21,7 @@ val mongoModule = module {
     single<ValidationUserDataSource> { ValidationUserDataSourceImpl() }
 
     single {
-        MongoDBDataSourceImpl(get(), get(), get())
+        MongoDBDataSourceImpl(get(), get())
     } bind MongoDBDataSource::class
 
 }

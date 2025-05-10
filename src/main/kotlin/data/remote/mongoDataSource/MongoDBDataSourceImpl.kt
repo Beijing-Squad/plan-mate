@@ -9,8 +9,7 @@ import com.mongodb.client.model.Updates.set
 import com.mongodb.kotlin.client.coroutine.MongoDatabase
 import data.dto.*
 import data.remote.mongoDataSource.mongoConnection.MongoConnection
-import data.repository.PasswordHashingDataSource
-import data.repository.ValidationUserDataSource
+import data.common.PasswordHashingDataSource
 import data.repository.mapper.toTaskDTO
 import data.repository.remoteDataSource.MongoDBDataSource
 import kotlinx.coroutines.Dispatchers
@@ -23,12 +22,12 @@ import logic.entities.exceptions.InvalidLoginException
 import logic.entities.exceptions.StateNotFoundException
 import logic.entities.exceptions.TaskNotFoundException
 import logic.entities.exceptions.UserNotFoundException
+import org.bson.conversions.Bson
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
 class MongoDBDataSourceImpl(
     database: MongoDatabase = MongoConnection.database,
-    private val validationUserDataSource: ValidationUserDataSource,
     private val passwordHashingDataSource: PasswordHashingDataSource
 ) : MongoDBDataSource {
 
@@ -126,7 +125,7 @@ class MongoDBDataSourceImpl(
     override suspend fun deleteTask(taskId: String) {
         val taskIdFilter = Filters.eq("_id", taskId)
         taskCollection.findOneAndDelete(taskIdFilter)
-         ?: throw TaskNotFoundException("Task with id $taskId not found")
+            ?: throw TaskNotFoundException("Task with id $taskId not found")
     }
 
     @OptIn(ExperimentalUuidApi::class)
@@ -210,28 +209,40 @@ class MongoDBDataSourceImpl(
     override suspend fun updateUser(user: UserDTO): UserDTO {
         val filters = eq(UserDTO::id.name, user.id)
         val existingUser = userCollection.find(filters).firstOrNull() ?: throw UserNotFoundException()
-
-        validationUserDataSource.validateUsername(user.userName)
-        validationUserDataSource.validatePassword(user.password)
         val updates = buildList {
-            if (user.userName != existingUser.userName) {
-                add(set(UserDTO::userName.name, user.userName))
-            }
-            if (passwordHashingDataSource.hashPassword(user.password)
-                != passwordHashingDataSource.hashPassword(existingUser.password)
-            ) {
-                add(set(UserDTO::password.name, passwordHashingDataSource.hashPassword(user.password)))
-            }
+            addAll(buildUsernameUpdates(user.userName, existingUser.userName))
+            addAll(buildPasswordUpdates(user.password, existingUser.password))
         }
-
-        if (updates.isNotEmpty()) {
-            val result = userCollection.updateOne(filters, Updates.combine(updates))
-            require(result.matchedCount.toInt() != 0) { throw UserNotFoundException() }
-        }
-
+        checkUpdateUserIfEmpty(updates, filters)
         return withContext(Dispatchers.IO) {
             userCollection.find(filters).firstOrNull() ?: throw UserNotFoundException()
         }
     }
+
+    private fun buildUsernameUpdates(newUserName: String, existingUserName: String): List<Bson> {
+        return if (newUserName != existingUserName) {
+            listOf(set(UserDTO::userName.name, newUserName))
+        } else {
+            emptyList()
+        }
+    }
+
+    private fun buildPasswordUpdates(newPassword: String, existingPassword: String): List<Bson> {
+        return if (passwordHashingDataSource.hashPassword(newPassword)
+            != passwordHashingDataSource.hashPassword(existingPassword)
+        ) {
+            listOf(set(UserDTO::password.name, passwordHashingDataSource.hashPassword(newPassword)))
+        } else {
+            emptyList()
+        }
+    }
+
+    private suspend fun checkUpdateUserIfEmpty(updates: List<Bson>, filters: Bson) {
+        if (updates.isNotEmpty()) {
+            val result = userCollection.updateOne(filters, Updates.combine(updates))
+            require(result.matchedCount.toInt() != 0) { throw UserNotFoundException() }
+        }
+    }
+
     //endregion
 }
