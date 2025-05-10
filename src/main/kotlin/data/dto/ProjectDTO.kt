@@ -1,12 +1,13 @@
 package data.dto
 
-import kotlinx.datetime.LocalDateTime
+import org.bson.codecs.pojo.annotations.BsonId
+import org.bson.codecs.pojo.annotations.BsonProperty
 
 data class ProjectDTO (
-    val id: String,
-    val name: String,
-    val description: String,
-    val createdBy: String,
-    val createdAt: LocalDateTime,
-    val updatedAt: LocalDateTime
+    @BsonId val id: String,
+    @BsonProperty("name") val name: String,
+    @BsonProperty("description") val description: String,
+    @BsonProperty("createdBy") val createdBy: String,
+    @BsonProperty("createdAt") val createdAt: String,
+    @BsonProperty("updatedAt") val updatedAt: String
 )
