@@ -161,8 +161,8 @@ class MongoDBDataSourceImpl(
         return statesCollection.find(projectIdFilter).toList()
     }
 
-    override suspend fun getTaskStateById(stateId: String): TaskStateDTO? {
-        val stateIdFilter = eq("id", stateId)
+    override suspend fun getTaskStateById(stateId: String): TaskStateDTO {
+        val stateIdFilter = eq("_id", stateId)
         return statesCollection.find(stateIdFilter).firstOrNull() ?: throw StateNotFoundException()
     }
 
@@ -171,11 +171,10 @@ class MongoDBDataSourceImpl(
     }
 
     override suspend fun updateTaskState(taskState: TaskStateDTO): TaskStateDTO {
-        val stateIdFilter = eq("stateId", taskState.id)
+        val stateIdFilter = eq("_id", taskState.id)
         val updatedState = combine(
-            set("id", taskState.id),
             set("name", taskState.name),
-            set("project_id", taskState.projectId)
+            set("projectId", taskState.projectId)
         )
         return statesCollection.updateOne(filter = stateIdFilter, update = updatedState)
             .takeIf { it.matchedCount > 0 }
@@ -184,7 +183,7 @@ class MongoDBDataSourceImpl(
     }
 
     override suspend fun deleteTaskState(taskState: TaskStateDTO): Boolean {
-        val stateIdFilter = eq("stateId", taskState.id)
+        val stateIdFilter = eq("_id", taskState.id)
 
         return statesCollection.deleteOne(stateIdFilter).deletedCount > 0
     }
