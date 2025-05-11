@@ -1,6 +1,6 @@
 package di
 
-import logic.entities.UserRole
+import logic.entities.type.UserRole
 import org.koin.dsl.module
 import ui.console.SwimlanesRenderer
 import ui.main.consoleIO.ConsoleIO

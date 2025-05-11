@@ -1,13 +1,13 @@
 package data.repository.mapper
 
-import data.dto.TaskDTO
+import data.remote.mongoDataSource.dto.TaskDto
 import kotlinx.datetime.LocalDateTime
 import logic.entities.Task
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
 @OptIn(ExperimentalUuidApi::class)
-fun toTaskEntity(taskDTO: TaskDTO): Task {
+fun toTaskEntity(taskDTO: TaskDto): Task {
     return Task(
         id = Uuid.parse(taskDTO.id),
         projectId = taskDTO.projectId,
@@ -20,8 +20,8 @@ fun toTaskEntity(taskDTO: TaskDTO): Task {
     )
 }
 @OptIn(ExperimentalUuidApi::class)
-fun toTaskDTO(task: Task): TaskDTO {
-    return TaskDTO(
+fun toTaskDTO(task: Task): TaskDto {
+    return TaskDto(
         id = task.id.toString(),
         projectId = task.projectId,
         title = task.title,
