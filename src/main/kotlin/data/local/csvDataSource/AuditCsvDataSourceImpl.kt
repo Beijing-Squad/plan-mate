@@ -4,7 +4,6 @@ package data.local.csvDataSource
 import data.local.csvDataSource.csv.CsvDataSourceImpl
 import data.repository.localDataSource.AuditDataSource
 import logic.entities.Audit
-import logic.entities.EntityType
 
 class AuditCsvDataSourceImpl(
     private val csvDataSource: CsvDataSourceImpl<Audit>
@@ -25,11 +24,11 @@ class AuditCsvDataSourceImpl(
     override fun getAuditLogsByTaskId(taskId: String): List<Audit> {
         return getAllAuditLogs().filter { audit: Audit ->
             audit.entityId == taskId
-                    && audit.entityType == EntityType.TASK
+                    && audit.entityType == Audit.EntityType.TASK
         }
     }
 
     private fun isMatchingProject(audit: Audit, projectId: String): Boolean {
-        return audit.entityId == projectId && audit.entityType == EntityType.PROJECT
+        return audit.entityId == projectId && audit.entityType == Audit.EntityType.PROJECT
     }
 }

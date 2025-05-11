@@ -1,7 +1,7 @@
 package fake
 
 import logic.entities.User
-import logic.entities.UserRole
+import logic.entities.type.UserRole
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 

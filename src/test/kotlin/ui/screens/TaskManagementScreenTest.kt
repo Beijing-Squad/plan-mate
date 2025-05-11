@@ -7,7 +7,10 @@ import fake.createTask
 import io.mockk.*
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.LocalDateTime
-import logic.entities.*
+import logic.entities.Audit
+import logic.entities.Task
+import logic.entities.User
+import logic.entities.type.UserRole
 import logic.useCases.audit.AddAuditLogUseCase
 import logic.useCases.authentication.SessionManagerUseCase
 import logic.useCases.state.GetAllTaskStatesUseCase
@@ -78,8 +81,8 @@ class TaskManagementScreenTest {
         }
         with(auditSlot.captured) {
             assertThat(userName).isEqualTo("Zeinab")
-            assertThat(action).isEqualTo(ActionType.CREATE)
-            assertThat(entityType).isEqualTo(EntityType.TASK)
+            assertThat(action).isEqualTo(Audit.ActionType.CREATE)
+            assertThat(entityType).isEqualTo(Audit.EntityType.TASK)
         }
         coVerify { consoleIO.showWithLine("✅ Task added successfully.") }
     }
@@ -124,7 +127,7 @@ class TaskManagementScreenTest {
         coVerify { deleteTaskUseCase.deleteTask(task.id.toString()) }
         coVerify { consoleIO.showWithLine("✅ Task deleted successfully.") }
         with(auditSlot.captured) {
-            assertThat(action).isEqualTo(ActionType.DELETE)
+            assertThat(action).isEqualTo(Audit.ActionType.DELETE)
             assertThat(entityId).isEqualTo(task.id.toString())
         }
     }
@@ -163,7 +166,7 @@ class TaskManagementScreenTest {
             consoleIO.showWithLine(match { it.contains("✅ Task updated successfully") })
         }
         with(auditSlot.captured) {
-            assertThat(action).isEqualTo(ActionType.UPDATE)
+            assertThat(action).isEqualTo(Audit.ActionType.UPDATE)
             assertThat(entityId).isEqualTo(oldTask.id.toString())
         }
     }
@@ -208,7 +211,7 @@ class TaskManagementScreenTest {
             consoleIO.showWithLine(match { it.contains("✅ Task updated successfully") })
         }
         with(auditSlot.captured) {
-            assertThat(action).isEqualTo(ActionType.UPDATE)
+            assertThat(action).isEqualTo(Audit.ActionType.UPDATE)
             assertThat(entityId).isEqualTo(task.id.toString())
         }
     }

@@ -2,7 +2,7 @@ package ui.screens
 
 import kotlinx.coroutines.runBlocking
 import logic.entities.User
-import logic.entities.UserRole
+import logic.entities.type.UserRole
 import logic.exceptions.InvalidPasswordException
 import logic.exceptions.InvalidUserNameException
 import logic.exceptions.UnauthorizedUserException
@@ -47,9 +47,7 @@ class UserScreen(
             "1" -> {
                 val currentUser = sessionManagerUseCase.getCurrentUser()
                 if (currentUser?.role == UserRole.ADMIN) {
-                    runBlocking {
-                        onClickGetAllUsers()
-                    }
+                    onClickGetAllUsers()
                 } else {
                     consoleIO.showWithLine("\u001B[31m❌ You don't have permission\u001B[0m")
                 }

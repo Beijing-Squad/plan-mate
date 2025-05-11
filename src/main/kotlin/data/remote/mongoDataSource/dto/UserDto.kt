@@ -1,9 +1,9 @@
-package data.dto
+package data.remote.mongoDataSource.dto
 
 import org.bson.codecs.pojo.annotations.BsonId
 import org.bson.codecs.pojo.annotations.BsonProperty
 
-data class UserDTO(
+data class UserDto(
     @BsonId val id: String,
     @BsonProperty("userName") val userName: String,
     @BsonProperty("password") val password: String,

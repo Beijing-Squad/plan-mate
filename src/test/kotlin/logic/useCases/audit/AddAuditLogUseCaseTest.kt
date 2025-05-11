@@ -1,13 +1,11 @@
 package logic.useCases.audit
 
-import com.google.common.truth.Truth.assertThat
 import fake.createAudit
 import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
-import logic.entities.ActionType
-import logic.entities.EntityType
-import logic.entities.UserRole
+import logic.entities.Audit
+import logic.entities.type.UserRole
 import logic.repository.AuditRepository
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -29,8 +27,8 @@ class AddAuditLogUseCaseTest {
         val auditLog = createAudit(
             userRole = UserRole.ADMIN,
             userName = "Adel",
-            action = ActionType.CREATE,
-            entityType = EntityType.PROJECT,
+            action = Audit.ActionType.CREATE,
+            entityType = Audit.EntityType.PROJECT,
             entityId = "PROJECT-001"
         )
 
@@ -47,8 +45,8 @@ class AddAuditLogUseCaseTest {
         val auditLog = createAudit(
             userRole = UserRole.MATE,
             userName = "User1",
-            action = ActionType.UPDATE,
-            entityType = EntityType.TASK,
+            action = Audit.ActionType.UPDATE,
+            entityType = Audit.EntityType.TASK,
             entityId = "TASK-123"
         )
 
@@ -65,8 +63,8 @@ class AddAuditLogUseCaseTest {
         val auditLog = createAudit(
             userRole = UserRole.ADMIN,
             userName = "Admin",
-            action = ActionType.DELETE,
-            entityType = EntityType.PROJECT,
+            action = Audit.ActionType.DELETE,
+            entityType = Audit.EntityType.PROJECT,
             entityId = "PROJECT-002"
         )
 
@@ -83,15 +81,15 @@ class AddAuditLogUseCaseTest {
         val auditLog1 = createAudit(
             userRole = UserRole.MATE,
             userName = "User1",
-            action = ActionType.CREATE,
-            entityType = EntityType.TASK,
+            action = Audit.ActionType.CREATE,
+            entityType = Audit.EntityType.TASK,
             entityId = "TASK-456"
         )
         val auditLog2 = createAudit(
             userRole = UserRole.ADMIN,
             userName = "Admin",
-            action = ActionType.UPDATE,
-            entityType = EntityType.TASK,
+            action = Audit.ActionType.UPDATE,
+            entityType = Audit.EntityType.TASK,
             entityId = "TASK-456"
         )
 
@@ -112,8 +110,8 @@ class AddAuditLogUseCaseTest {
         val auditLog = createAudit(
             userRole = UserRole.MATE,
             userName = "User3",
-            action = ActionType.CREATE,
-            entityType = EntityType.TASK,
+            action = Audit.ActionType.CREATE,
+            entityType = Audit.EntityType.TASK,
             entityId = "TASK-789"
         )
 
