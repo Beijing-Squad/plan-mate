@@ -7,6 +7,7 @@ import kotlinx.coroutines.test.runTest
 import logic.entities.Audit
 import logic.entities.type.UserRole
 import logic.repository.AuditRepository
+import logic.useCases.authentication.SessionManagerUseCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
@@ -14,11 +15,12 @@ class AddAuditLogUseCaseTest {
 
     private lateinit var auditRepository: AuditRepository
     private lateinit var addAuditLogUseCase: AddAuditLogUseCase
+    private lateinit var sessionManagerUseCase: SessionManagerUseCase
 
     @BeforeEach
     fun setUp() {
         auditRepository = mockk(relaxed = true)
-        addAuditLogUseCase = AddAuditLogUseCase(auditRepository)
+        addAuditLogUseCase = AddAuditLogUseCase(auditRepository,sessionManagerUseCase)
     }
 
     @Test

@@ -8,7 +8,7 @@ data class ProjectDto (
     val id: String,
     @BsonProperty("name")
     val name: String,
-    @BsonProperty("name")
+    @BsonProperty("description")
     val description: String,
     @BsonProperty("createdBy")
     val createdBy: String,
