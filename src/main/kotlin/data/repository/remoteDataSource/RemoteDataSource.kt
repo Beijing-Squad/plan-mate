@@ -11,11 +11,11 @@ interface RemoteDataSource {
     suspend fun getAuditLogsByProjectId(projectId: String): List<AuditDTO>
     suspend fun getAuditLogsByTaskId(taskId: String): List<AuditDTO>
 
-    suspend fun getAllProjects(): List<ProjectDTO>
-    suspend fun addProject(project: ProjectDTO)
+    suspend fun getAllProjects(): List<ProjectDto>
+    suspend fun addProject(project: ProjectDto)
     suspend fun deleteProject(projectId: String)
-    suspend fun updateProject(newProjects: ProjectDTO)
-    suspend fun getProjectById(projectId: String): ProjectDTO
+    suspend fun updateProject(newProjects: ProjectDto)
+    suspend fun getProjectById(projectId: String): ProjectDto
 
     suspend fun getAllTasks(): List<TaskDTO>
     suspend fun getTaskById(taskId: String): TaskDTO
