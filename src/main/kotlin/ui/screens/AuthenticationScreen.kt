@@ -2,7 +2,7 @@ package ui.screens
 
 import kotlinx.coroutines.runBlocking
 import logic.entities.User
-import logic.entities.UserRole
+import logic.entities.type.UserRole
 import logic.useCases.authentication.LoginUserAuthenticationUseCase
 import logic.useCases.authentication.RegisterUserAuthenticationUseCase
 import logic.useCases.authentication.SessionManagerUseCase

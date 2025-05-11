@@ -1,11 +1,10 @@
 package ui.screens
 
-import format
 import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import logic.entities.*
+import logic.entities.TaskState
 import logic.exceptions.InvalidStateNameException
 import logic.exceptions.ProjectNotFoundException
 import logic.exceptions.StateAlreadyExistException
@@ -74,23 +73,23 @@ class TaskStateScreen(
                 val result = addTaskStateUseCase.addState(taskState)
                 val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
 
-                sessionManagerUseCase.getCurrentUser()?.userName?.let { userName ->
-                    val actionDetails =
-                        "Admin $userName added new state ${taskState.id} with name '$name' at ${now.format()}"
-
-                    addAudit.addAuditLog(
-                        Audit(
-                            id = Uuid.random(),
-                            userRole = UserRole.ADMIN,
-                            userName = sessionManagerUseCase.getCurrentUser()!!.userName,
-                            action = ActionType.UPDATE,
-                            entityType = EntityType.PROJECT,
-                            entityId = projectId.toString(),
-                            actionDetails = actionDetails,
-                            timeStamp = now
-                        )
-                    )
-                }
+//                sessionManagerUseCase.getCurrentUser()?.userName?.let { userName ->
+//                    val actionDetails =
+//                        "Admin $userName added new state ${taskState.id} with name '$name' at ${now.format()}"
+//
+//                    addAudit.addAuditLog(
+//                        Audit(
+//                            id = Uuid.random(),
+//                            userRole = UserRole.ADMIN,
+//                            userName = sessionManagerUseCase.getCurrentUser()!!.userName,
+//                            action = ActionType.UPDATE,
+//                            entityType = EntityType.PROJECT,
+//                            entityId = projectId.toString(),
+//                            actionDetails = actionDetails,
+//                            timeStamp = now
+//                        )
+//                    )
+//                }
 
                 showResult(result, "added")
             } catch (e: StateAlreadyExistException) {
@@ -110,8 +109,8 @@ class TaskStateScreen(
         runBlocking {
             try {
                 val id = Uuid.parse(getInputWithLabel("🆔 Enter State ID to delete: "))
-                val taskState = TaskState(id = id, name = "", projectId = Uuid.parse(""))
-                val result = deleteTaskStateUseCase.deleteState(taskState)
+//                val taskState = TaskState(id = id, name = "", projectId = Uuid.parse(""))
+                val result = deleteTaskStateUseCase.deleteState(id)
                 showResult(result, "deleted")
             } catch (e: Exception) {
                 consoleIO.showWithLine("❌ ${e.message}")
@@ -129,22 +128,22 @@ class TaskStateScreen(
                 val taskState = TaskState(id = id, name = name, projectId = projectId)
                 val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
                 val updated = updateTaskStateUseCase.updateState(taskState)
-                sessionManagerUseCase.getCurrentUser()?.userName?.let { userName ->
-                    val actionDetails =
-                        "Admin $userName updated state ${taskState.id} with name '$name' at ${now.format()}"
-                    addAudit.addAuditLog(
-                        Audit(
-                            id = Uuid.random(),
-                            userRole = UserRole.ADMIN,
-                            userName = sessionManagerUseCase.getCurrentUser()!!.userName,
-                            action = ActionType.UPDATE,
-                            entityType = EntityType.PROJECT,
-                            entityId = projectId.toString(),
-                            actionDetails = actionDetails,
-                            timeStamp = now
-                        )
-                    )
-                }
+//                sessionManagerUseCase.getCurrentUser()?.userName?.let { userName ->
+//                    val actionDetails =
+//                        "Admin $userName updated state ${taskState.id} with name '$name' at ${now.format()}"
+//                    addAudit.addAuditLog(
+//                        Audit(
+//                            id = Uuid.random(),
+//                            userRole = UserRole.ADMIN,
+//                            userName = sessionManagerUseCase.getCurrentUser()!!.userName,
+//                            action = ActionType.UPDATE,
+//                            entityType = EntityType.PROJECT,
+//                            entityId = projectId.toString(),
+//                            actionDetails = actionDetails,
+//                            timeStamp = now
+//                        )
+//                    )
+//                }
                 consoleIO.showWithLine("✅ State updated:\n${formatState(updated)}")
             } catch (e: Exception) {
                 consoleIO.showWithLine("❌ ${e.message}")

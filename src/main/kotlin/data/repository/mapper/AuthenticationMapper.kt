@@ -1,17 +1,17 @@
 package data.repository.mapper
 
-import data.dto.UserDTO
+import data.remote.mongoDataSource.dto.UserDto
 import logic.entities.User
-import logic.entities.UserRole
+import logic.entities.type.UserRole
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
 @OptIn(ExperimentalUuidApi::class)
-fun toUserEntity (userDTO: UserDTO): User{
+fun UserDto.toUserEntity(): User {
     return User(
-        id = Uuid.parse(userDTO.id),
-        userName = userDTO.userName,
-        password = userDTO.password,
-        role = UserRole.valueOf(userDTO.role),
+        id = Uuid.parse(this.id),
+        userName = this.userName,
+        password = this.password,
+        role = UserRole.valueOf(this.role),
     )
 }
