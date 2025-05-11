@@ -26,7 +26,6 @@ class ProjectManagementScreen(
     private val getProjectByIdUseCase: GetProjectByIdUseCase,
     private val updateProjectUseCase: UpdateProjectUseCase,
     private val addAudit: AddAuditLogUseCase,
-    private val userRole: UserRole = UserRole.ADMIN,
     private val consoleIO: ConsoleIO
 ) : BaseScreen(consoleIO) {
 
@@ -120,7 +119,7 @@ class ProjectManagementScreen(
                 addAudit.addAuditLog(
                     Audit(
                         id = Uuid.random(),
-                        userRole = userRole,
+                        userRole = UserRole.ADMIN,
                         userName = userName,
                         action = Audit.ActionType.UPDATE,
                         entityType = Audit.EntityType.PROJECT,
@@ -160,7 +159,7 @@ class ProjectManagementScreen(
                 addAudit.addAuditLog(
                     Audit(
                         id = Uuid.random(),
-                        userRole = userRole,
+                        userRole = UserRole.ADMIN,
                         userName = createdBy,
                         action = Audit.ActionType.CREATE,
                         entityType = Audit.EntityType.PROJECT,

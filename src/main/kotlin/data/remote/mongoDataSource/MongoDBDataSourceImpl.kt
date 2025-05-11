@@ -101,13 +101,12 @@ class MongoDBDataSourceImpl(
         projectCollection.findOneAndDelete(eq("id", projectId))
     }
 
-    @OptIn(ExperimentalUuidApi::class)
     override suspend fun updateProject(newProjects: ProjectDto) {
-        projectCollection.replaceOne(eq("id", newProjects.id.toString()), newProjects)
+        projectCollection.replaceOne(eq("_id", newProjects.id), newProjects)
     }
 
     override suspend fun getProjectById(projectId: String): ProjectDto {
-        return projectCollection.find(eq("id", projectId)).first()
+        return projectCollection.find(eq("_id", projectId)).first()
     }
     //endregion
 

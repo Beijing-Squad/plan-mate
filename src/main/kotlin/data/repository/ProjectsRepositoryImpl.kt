@@ -1,7 +1,7 @@
 package data.repository
 
-import data.repository.mapper.toProjectDto
-import data.repository.mapper.toProjectEntity
+import data.repository.mapper.toDto
+import data.repository.mapper.toEntity
 import data.repository.remoteDataSource.RemoteDataSource
 import logic.entities.Project
 import logic.repository.ProjectsRepository
@@ -11,17 +11,17 @@ class ProjectsRepositoryImpl(
 ) : ProjectsRepository {
 
     override suspend fun getAllProjects(): List<Project> =
-        remoteDataSource.getAllProjects().map { toProjectEntity(it) }
+        remoteDataSource.getAllProjects().map { it.toEntity() }
 
     override suspend fun addProject(project: Project) =
-        remoteDataSource.addProject(toProjectDto(project))
+        remoteDataSource.addProject(project.toDto())
 
     override suspend fun deleteProject(projectId: String) =
         remoteDataSource.deleteProject(projectId)
 
     override suspend fun updateProject(newProjects: Project) =
-        remoteDataSource.updateProject(toProjectDto(newProjects))
+        remoteDataSource.updateProject(newProjects.toDto())
 
     override suspend fun getProjectById(projectId: String): Project =
-        toProjectEntity(remoteDataSource.getProjectById(projectId))
+        remoteDataSource.getProjectById(projectId).toEntity()
 }
