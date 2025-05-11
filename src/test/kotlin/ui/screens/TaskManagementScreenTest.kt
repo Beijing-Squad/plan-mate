@@ -8,6 +8,7 @@ import io.mockk.*
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.LocalDateTime
 import logic.entities.*
+import logic.entities.type.UserRole
 import logic.useCases.audit.AddAuditLogUseCase
 import logic.useCases.authentication.SessionManagerUseCase
 import logic.useCases.state.GetAllTaskStatesUseCase

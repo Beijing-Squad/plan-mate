@@ -10,7 +10,7 @@ import io.mockk.verify
 import logic.entities.ActionType
 import logic.entities.Audit
 import logic.entities.EntityType
-import logic.entities.UserRole
+import logic.entities.type.UserRole
 import logic.exceptions.DataAccessException
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test

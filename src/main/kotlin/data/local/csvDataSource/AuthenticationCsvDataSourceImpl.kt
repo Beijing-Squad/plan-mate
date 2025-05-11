@@ -5,7 +5,7 @@ import data.local.csvDataSource.csv.CsvDataSourceImpl
 import data.repository.localDataSource.AuthenticationDataSource
 import data.repository.localDataSource.UserDataSource
 import logic.entities.User
-import logic.entities.UserRole
+import logic.entities.type.UserRole
 import logic.exceptions.InvalidPasswordException
 import logic.exceptions.UserExistsException
 import logic.exceptions.UserNotFoundException

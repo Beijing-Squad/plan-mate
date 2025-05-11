@@ -5,7 +5,7 @@ import kotlinx.datetime.LocalDateTime
 import logic.entities.ActionType
 import logic.entities.Audit
 import logic.entities.EntityType
-import logic.entities.UserRole
+import logic.entities.type.UserRole
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 

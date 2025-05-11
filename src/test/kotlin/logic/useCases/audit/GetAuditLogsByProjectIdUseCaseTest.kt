@@ -7,7 +7,7 @@ import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import logic.entities.ActionType
 import logic.entities.EntityType
-import logic.entities.UserRole
+import logic.entities.type.UserRole
 import logic.exceptions.InvalidInputException
 import logic.exceptions.ProjectNotFoundException
 import logic.repository.AuditRepository

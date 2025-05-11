@@ -1,7 +1,7 @@
 package data.repository.localDataSource
 
 import logic.entities.User
-import logic.entities.UserRole
+import logic.entities.type.UserRole
 
 interface AuthenticationDataSource {
     fun saveUser(username: String, password: String, role: UserRole): Boolean

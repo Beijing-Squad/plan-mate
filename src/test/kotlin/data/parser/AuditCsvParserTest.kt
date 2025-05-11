@@ -6,7 +6,7 @@ import fake.createAudit
 import kotlinx.datetime.LocalDateTime
 import logic.entities.ActionType
 import logic.entities.EntityType
-import logic.entities.UserRole
+import logic.entities.type.UserRole
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
