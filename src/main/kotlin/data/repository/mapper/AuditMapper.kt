@@ -1,6 +1,6 @@
 package data.repository.mapper
 
-import data.dto.AuditDTO
+import data.remote.mongoDataSource.dto.AuditDto
 import kotlinx.datetime.LocalDateTime
 import logic.entities.ActionType
 import logic.entities.Audit
@@ -10,7 +10,7 @@ import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
 @OptIn(ExperimentalUuidApi::class)
-fun toAuditEntity(audit: AuditDTO): Audit {
+fun toAuditEntity(audit: AuditDto): Audit {
     return Audit(
         id = Uuid.parse(audit.id),
         userRole = UserRole.valueOf(audit.userRole),
@@ -24,8 +24,8 @@ fun toAuditEntity(audit: AuditDTO): Audit {
 }
 
 @OptIn(ExperimentalUuidApi::class)
-fun toAuditDTO(audit: Audit): AuditDTO {
-    return AuditDTO(
+fun toAuditDTO(audit: Audit): AuditDto {
+    return AuditDto(
         id = audit.id.toString(),
         userRole = audit.userRole.toString(),
         userName = audit.userName,

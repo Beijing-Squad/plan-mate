@@ -1,4 +1,4 @@
-package data.dto
+package data.remote.mongoDataSource.dto
 
 import org.bson.codecs.pojo.annotations.BsonId
 import org.bson.codecs.pojo.annotations.BsonProperty

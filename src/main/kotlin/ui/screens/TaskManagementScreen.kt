@@ -2,7 +2,7 @@ package ui.screens
 
 import com.mongodb.client.model.Filters
 import com.mongodb.kotlin.client.coroutine.MongoDatabase
-import data.dto.TaskDTO
+import data.remote.mongoDataSource.dto.TaskDto
 import data.remote.mongoDataSource.mongoConnection.MongoConnection
 import data.repository.mapper.toTaskDTO
 import data.repository.mapper.toTaskEntity
@@ -251,7 +251,7 @@ class TaskManagementScreen(
 
         val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
 
-        val taskDTO = TaskDTO(
+        val taskDTO = TaskDto(
             id = Uuid.random().toString(),
             projectId = projectId,
             title = title,
@@ -310,7 +310,7 @@ class TaskManagementScreen(
             val newStateIdInput = consoleIO.read()?.trim()
             val newStateId = newStateIdInput.takeIf { !it.isNullOrBlank() } ?: existingTaskDTO.stateId
 
-            val updatedTaskDTO = TaskDTO(
+            val updatedTaskDto = TaskDto(
                 id = existingTaskDTO.id.toString(),
                 projectId = existingTaskDTO.projectId,
                 title = newTitle,
@@ -321,7 +321,7 @@ class TaskManagementScreen(
                 updatedAt = now.toString()
             )
 
-            val updatedTask = toTaskEntity(updatedTaskDTO)
+            val updatedTask = toTaskEntity(updatedTaskDto)
             val resultTaskDTO = updateTaskUseCase.updateTask(updatedTask)
 
             consoleIO.showWithLine("✅ Task updated successfully:\n📌 Title: ${resultTaskDTO.title}, 📝 Description: ${resultTaskDTO.description}, 🔄 State: ${resultTaskDTO.stateId}")
