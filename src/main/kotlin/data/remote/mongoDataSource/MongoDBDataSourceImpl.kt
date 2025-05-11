@@ -31,7 +31,7 @@ class MongoDBDataSourceImpl(
 
     private val userCollection = database.getCollection<UserDTO>("users")
     private val auditsCollection = database.getCollection<AuditDTO>("audits")
-    private val projectCollection = database.getCollection<ProjectDTO>("projects")
+    private val projectCollection = database.getCollection<ProjectDto>("projects")
     private val statesCollection = database.getCollection<TaskStateDTO>("states")
     private val taskCollection = database.getCollection<TaskDTO>("tasks")
 
@@ -82,9 +82,9 @@ class MongoDBDataSourceImpl(
     //endregion
 
     //region project operations
-    override suspend fun getAllProjects(): List<ProjectDTO> = projectCollection.find().toList()
+    override suspend fun getAllProjects(): List<ProjectDto> = projectCollection.find().toList()
 
-    override suspend fun addProject(project: ProjectDTO) {
+    override suspend fun addProject(project: ProjectDto) {
         projectCollection.insertOne(project)
     }
 
@@ -92,12 +92,11 @@ class MongoDBDataSourceImpl(
         projectCollection.findOneAndDelete(eq("id", projectId))
     }
 
-    @OptIn(ExperimentalUuidApi::class)
-    override suspend fun updateProject(newProjects: ProjectDTO) {
-        projectCollection.replaceOne(eq("id", newProjects.id.toString()), newProjects)
+    override suspend fun updateProject(newProjects: ProjectDto) {
+        projectCollection.replaceOne(eq("id", newProjects.id), newProjects)
     }
 
-    override suspend fun getProjectById(projectId: String): ProjectDTO {
+    override suspend fun getProjectById(projectId: String): ProjectDto {
         return projectCollection.find(eq("id", projectId)).first()
     }
     //endregion
