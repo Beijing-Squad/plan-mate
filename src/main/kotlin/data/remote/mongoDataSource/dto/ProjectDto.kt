@@ -4,7 +4,7 @@ import org.bson.codecs.pojo.annotations.BsonId
 import org.bson.codecs.pojo.annotations.BsonProperty
 
 data class ProjectDto (
-    @BsonId("id")
+    @BsonId
     val id: String,
     @BsonProperty("name")
     val name: String,
