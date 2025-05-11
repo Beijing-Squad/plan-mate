@@ -33,7 +33,7 @@ abstract class BaseScreen(
             var i = 0
             while (isActive) {
                 val frame = frames[i % frames.size]
-                consoleIO.showWithLine("\r\u001B[36m$frame $message\u001B[0m")
+                consoleIO.show("\r\u001B[36m$frame $message\u001B[0m")
                 i++
                 delay(100)
             }
