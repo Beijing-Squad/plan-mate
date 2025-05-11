@@ -15,15 +15,15 @@ data class Audit(
     val action: ActionType,
     val actionDetails : String?,
     val timeStamp: LocalDateTime
-)
+) {
+    enum class ActionType {
+        CREATE,
+        UPDATE,
+        DELETE
+    }
 
-enum class ActionType {
-    CREATE,
-    UPDATE,
-    DELETE
-}
-
-enum class EntityType {
-    PROJECT,
-    TASK
+    enum class EntityType {
+        PROJECT,
+        TASK
+    }
 }
