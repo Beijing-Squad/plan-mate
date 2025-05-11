@@ -5,8 +5,7 @@ import fake.createAudit
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
-import logic.entities.ActionType
-import logic.entities.EntityType
+import logic.entities.Audit
 import logic.entities.type.UserRole
 import logic.exceptions.InvalidInputException
 import logic.repository.AuditRepository
@@ -32,16 +31,16 @@ class GetAuditLogsByTaskIdUseCaseTest {
             createAudit(
                 userRole = UserRole.ADMIN,
                 userName = "Admin",
-                entityType = EntityType.TASK,
+                entityType = Audit.EntityType.TASK,
                 entityId = taskId,
-                action = ActionType.CREATE,
+                action = Audit.ActionType.CREATE,
             ),
             createAudit(
                 userRole = UserRole.MATE,
                 userName = "User1",
-                entityType = EntityType.TASK,
+                entityType = Audit.EntityType.TASK,
                 entityId = taskId,
-                action = ActionType.UPDATE,
+                action = Audit.ActionType.UPDATE,
             )
         )
 
@@ -49,7 +48,7 @@ class GetAuditLogsByTaskIdUseCaseTest {
 
         assertThat(result.size).isEqualTo(2)
         assertThat(result.all { it.entityId == taskId }).isTrue()
-        assertThat(result.all { it.entityType == EntityType.TASK }).isTrue()
+        assertThat(result.all { it.entityType == Audit.EntityType.TASK }).isTrue()
     }
 
     @Test
@@ -69,23 +68,23 @@ class GetAuditLogsByTaskIdUseCaseTest {
             createAudit(
                 userRole = UserRole.ADMIN,
                 userName = "Admin",
-                entityType = EntityType.TASK,
+                entityType = Audit.EntityType.TASK,
                 entityId = taskId,
-                action = ActionType.CREATE,
+                action = Audit.ActionType.CREATE,
             ),
             createAudit(
                 userRole = UserRole.MATE,
                 userName = "User1",
-                entityType = EntityType.TASK,
+                entityType = Audit.EntityType.TASK,
                 entityId = taskId,
-                action = ActionType.UPDATE,
+                action = Audit.ActionType.UPDATE,
             ),
             createAudit(
                 userRole = UserRole.MATE,
                 userName = "User2",
-                entityType = EntityType.TASK,
+                entityType = Audit.EntityType.TASK,
                 entityId = taskId,
-                action = ActionType.DELETE,
+                action = Audit.ActionType.DELETE,
             )
         )
 
@@ -93,9 +92,9 @@ class GetAuditLogsByTaskIdUseCaseTest {
 
         assertThat(result.size).isEqualTo(3)
         assertThat(result.map { it.action }).containsExactly(
-            ActionType.CREATE,
-            ActionType.UPDATE,
-            ActionType.DELETE
+            Audit.ActionType.CREATE,
+            Audit.ActionType.UPDATE,
+            Audit.ActionType.DELETE
         )
         assertThat(result.all { it.entityId == taskId }).isTrue()
     }
@@ -108,18 +107,18 @@ class GetAuditLogsByTaskIdUseCaseTest {
             createAudit(
                 userRole = UserRole.ADMIN,
                 userName = "Admin",
-                entityType = EntityType.TASK,
+                entityType = Audit.EntityType.TASK,
                 entityId = taskId,
-                action = ActionType.CREATE,
+                action = Audit.ActionType.CREATE,
             )
         )
         coEvery { auditRepository.getAuditLogsByTaskId(otherTaskId) } returns listOf(
             createAudit(
                 userRole = UserRole.MATE,
                 userName = "User1",
-                entityType = EntityType.TASK,
+                entityType = Audit.EntityType.TASK,
                 entityId = otherTaskId,
-                action = ActionType.CREATE,
+                action = Audit.ActionType.CREATE,
             )
         )
 
@@ -127,7 +126,7 @@ class GetAuditLogsByTaskIdUseCaseTest {
 
         assertThat(result.size).isEqualTo(1)
         assertThat(result[0].entityId).isEqualTo(taskId)
-        assertThat(result[0].entityType).isEqualTo(EntityType.TASK)
+        assertThat(result[0].entityType).isEqualTo(Audit.EntityType.TASK)
     }
 
     @Test

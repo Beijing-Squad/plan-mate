@@ -14,9 +14,7 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import logic.entities.ActionType
 import logic.entities.Audit
-import logic.entities.EntityType
 import logic.entities.Task
 import logic.exceptions.TaskNotFoundException
 import logic.useCases.audit.AddAuditLogUseCase
@@ -272,8 +270,8 @@ class TaskManagementScreen(
                     id = Uuid.random(),
                     userRole = currentUser.role,
                     userName = currentUser.userName,
-                    action = ActionType.CREATE,
-                    entityType = EntityType.TASK,
+                    action = Audit.ActionType.CREATE,
+                    entityType = Audit.EntityType.TASK,
                     entityId = task.id.toString(),
                     actionDetails = actionDetails,
                     timeStamp = now
@@ -332,8 +330,8 @@ class TaskManagementScreen(
                         id = Uuid.random(),
                         userRole = user.role,
                         userName = user.userName,
-                        action = ActionType.UPDATE,
-                        entityType = EntityType.TASK,
+                        action = Audit.ActionType.UPDATE,
+                        entityType = Audit.EntityType.TASK,
                         entityId = id,
                         actionDetails = actionDetails,
                         timeStamp = now
@@ -369,8 +367,8 @@ class TaskManagementScreen(
                         id = Uuid.random(),
                         userRole = user.role,
                         userName = user.userName,
-                        action = ActionType.DELETE,
-                        entityType = EntityType.TASK,
+                        action = Audit.ActionType.DELETE,
+                        entityType = Audit.EntityType.TASK,
                         entityId = id,
                         actionDetails = actionDetails,
                         timeStamp = now

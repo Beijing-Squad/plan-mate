@@ -3,8 +3,7 @@ package ui.screens
 import fake.createAudit
 import io.mockk.*
 import kotlinx.coroutines.runBlocking
-import logic.entities.ActionType
-import logic.entities.EntityType
+import logic.entities.Audit
 import logic.entities.type.UserRole
 import logic.exceptions.InvalidInputException
 import logic.exceptions.ProjectNotFoundException
@@ -27,20 +26,20 @@ class AuditScreenTest {
         createAudit(
             userRole = UserRole.ADMIN,
             userName = "Adel",
-            action = ActionType.CREATE,
-            entityType = EntityType.PROJECT,
+            action = Audit.ActionType.CREATE,
+            entityType = Audit.EntityType.PROJECT,
         ),
         createAudit(
             userRole = UserRole.ADMIN,
             userName = "Adel",
-            action = ActionType.UPDATE,
-            entityType = EntityType.TASK,
+            action = Audit.ActionType.UPDATE,
+            entityType = Audit.EntityType.TASK,
         ),
         createAudit(
             userRole = UserRole.ADMIN,
             userName = "Adel",
-            action = ActionType.UPDATE,
-            entityType = EntityType.PROJECT,
+            action = Audit.ActionType.UPDATE,
+            entityType = Audit.EntityType.PROJECT,
         )
     )
 

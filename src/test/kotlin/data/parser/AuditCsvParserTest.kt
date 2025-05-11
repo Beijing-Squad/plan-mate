@@ -4,8 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import data.local.csvDataSource.parser.AuditCsvParser
 import fake.createAudit
 import kotlinx.datetime.LocalDateTime
-import logic.entities.ActionType
-import logic.entities.EntityType
+import logic.entities.Audit
 import logic.entities.type.UserRole
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -40,8 +39,8 @@ class AuditCsvParserTest {
             userRole = UserRole.ADMIN,
             userName = "Ahmed",
             entityId = "task-1",
-            entityType = EntityType.TASK,
-            action = ActionType.CREATE,
+            entityType = Audit.EntityType.TASK,
+            action = Audit.ActionType.CREATE,
             timeStamp = fixedTime
         ).copy(id = fixedId)
 
@@ -66,8 +65,8 @@ class AuditCsvParserTest {
             assertThat(userRole).isEqualTo(UserRole.ADMIN)
             assertThat(userName).isEqualTo("Ahmed")
             assertThat(entityId).isEqualTo("task-95")
-            assertThat(entityType).isEqualTo(EntityType.TASK)
-            assertThat(action).isEqualTo(ActionType.CREATE)
+            assertThat(entityType).isEqualTo(Audit.EntityType.TASK)
+            assertThat(action).isEqualTo(Audit.ActionType.CREATE)
             assertThat(timeStamp).isEqualTo(LocalDateTime(2024, 4, 1, 0, 0))
         }
     }

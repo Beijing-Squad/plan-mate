@@ -5,8 +5,7 @@ import fake.createAudit
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
-import logic.entities.ActionType
-import logic.entities.EntityType
+import logic.entities.Audit
 import logic.entities.type.UserRole
 import logic.exceptions.InvalidInputException
 import logic.exceptions.ProjectNotFoundException
@@ -24,20 +23,20 @@ class GetAuditLogsByProjectIdUseCaseTest {
         createAudit(
             userRole = UserRole.ADMIN,
             userName = "Adel",
-            action = ActionType.CREATE,
-            entityType = EntityType.PROJECT,
+            action = Audit.ActionType.CREATE,
+            entityType = Audit.EntityType.PROJECT,
         ),
         createAudit(
             userRole = UserRole.ADMIN,
             userName = "Adel",
-            action = ActionType.UPDATE,
-            entityType = EntityType.PROJECT,
+            action = Audit.ActionType.UPDATE,
+            entityType = Audit.EntityType.PROJECT,
         ),
         createAudit(
             userRole = UserRole.ADMIN,
             userName = "Adel",
-            action = ActionType.UPDATE,
-            entityType = EntityType.PROJECT,
+            action = Audit.ActionType.UPDATE,
+            entityType = Audit.EntityType.PROJECT,
         )
     )
 
@@ -56,15 +55,15 @@ class GetAuditLogsByProjectIdUseCaseTest {
             createAudit(
                 userRole = UserRole.ADMIN,
                 userName = "Adel",
-                action = ActionType.CREATE,
-                entityType = EntityType.PROJECT,
+                action = Audit.ActionType.CREATE,
+                entityType = Audit.EntityType.PROJECT,
                 entityId = givenId,
             ),
             createAudit(
                 userRole = UserRole.ADMIN,
                 userName = "Adel",
-                action = ActionType.UPDATE,
-                entityType = EntityType.PROJECT,
+                action = Audit.ActionType.UPDATE,
+                entityType = Audit.EntityType.PROJECT,
                 entityId = givenId,
             )
         )

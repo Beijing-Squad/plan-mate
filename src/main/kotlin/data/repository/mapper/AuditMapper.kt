@@ -2,9 +2,7 @@ package data.repository.mapper
 
 import data.remote.mongoDataSource.dto.AuditDto
 import kotlinx.datetime.LocalDateTime
-import logic.entities.ActionType
 import logic.entities.Audit
-import logic.entities.EntityType
 import logic.entities.type.UserRole
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
@@ -16,10 +14,10 @@ fun toAuditEntity(audit: AuditDto): Audit {
         userRole = UserRole.valueOf(audit.userRole),
         userName = audit.userName,
         entityId = audit.entityId,
-        entityType = EntityType.valueOf(audit.entityType),
+        entityType = Audit.EntityType.valueOf(audit.entityType),
         actionDetails = audit.actionDetails,
         timeStamp = LocalDateTime.parse(audit.timeStamp),
-        action = ActionType.valueOf(audit.action)
+        action = Audit.ActionType.valueOf(audit.action)
     )
 }
 

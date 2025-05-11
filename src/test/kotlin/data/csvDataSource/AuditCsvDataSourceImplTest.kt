@@ -7,9 +7,7 @@ import fake.createAudit
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import logic.entities.ActionType
 import logic.entities.Audit
-import logic.entities.EntityType
 import logic.entities.type.UserRole
 import logic.exceptions.DataAccessException
 import org.junit.jupiter.api.BeforeEach
@@ -34,16 +32,16 @@ class AuditCsvDataSourceImplTest {
             createAudit(
                 userRole = UserRole.ADMIN,
                 userName = "Admin",
-                entityType = EntityType.PROJECT,
+                entityType = Audit.EntityType.PROJECT,
                 entityId = "PROJECT-001",
-                action = ActionType.CREATE,
+                action = Audit.ActionType.CREATE,
             ),
             createAudit(
                 userRole = UserRole.MATE,
                 userName = "User1",
-                entityType = EntityType.TASK,
+                entityType = Audit.EntityType.TASK,
                 entityId = "TASK-123",
-                action = ActionType.UPDATE,
+                action = Audit.ActionType.UPDATE,
             )
         )
         every { csvDataSource.loadAllDataFromFile() } returns auditLogs
@@ -88,9 +86,9 @@ class AuditCsvDataSourceImplTest {
         val auditLog = createAudit(
             userRole = UserRole.ADMIN,
             userName = "Adel",
-            entityType = EntityType.PROJECT,
+            entityType = Audit.EntityType.PROJECT,
             entityId = "PROJECT-001",
-            action = ActionType.CREATE,
+            action = Audit.ActionType.CREATE,
         )
 
         // When
@@ -106,9 +104,9 @@ class AuditCsvDataSourceImplTest {
         val auditLog = createAudit(
             userRole = UserRole.MATE,
             userName = "User1",
-            entityType = EntityType.TASK,
+            entityType = Audit.EntityType.TASK,
             entityId = "TASK-123",
-            action = ActionType.UPDATE,
+            action = Audit.ActionType.UPDATE,
         )
 
         // When
@@ -124,9 +122,9 @@ class AuditCsvDataSourceImplTest {
         val auditLog = createAudit(
             userRole = UserRole.ADMIN,
             userName = "Admin",
-            entityType = EntityType.PROJECT,
+            entityType = Audit.EntityType.PROJECT,
             entityId = "PROJECT-002",
-            action = ActionType.DELETE,
+            action = Audit.ActionType.DELETE,
         )
         every { csvDataSource.appendToFile(auditLog) } throws DataAccessException("Failed to write to audit.csv")
 
@@ -146,23 +144,23 @@ class AuditCsvDataSourceImplTest {
             createAudit(
                 userRole = UserRole.ADMIN,
                 userName = "Admin",
-                entityType = EntityType.PROJECT,
+                entityType = Audit.EntityType.PROJECT,
                 entityId = projectId,
-                action = ActionType.CREATE,
+                action = Audit.ActionType.CREATE,
             ),
             createAudit(
                 userRole = UserRole.MATE,
                 userName = "User1",
-                entityType = EntityType.TASK,
+                entityType = Audit.EntityType.TASK,
                 entityId = "TASK-123",
-                action = ActionType.UPDATE,
+                action = Audit.ActionType.UPDATE,
             ),
             createAudit(
                 userRole = UserRole.ADMIN,
                 userName = "Admin",
-                entityType = EntityType.PROJECT,
+                entityType = Audit.EntityType.PROJECT,
                 entityId = projectId,
-                action = ActionType.UPDATE,
+                action = Audit.ActionType.UPDATE,
             )
         )
         every { csvDataSource.loadAllDataFromFile() } returns auditLogs
@@ -172,8 +170,8 @@ class AuditCsvDataSourceImplTest {
 
         // Then
         assertThat(result.size).isEqualTo(2)
-        assertThat(result.all { it.entityId == projectId && it.entityType == EntityType.PROJECT }).isTrue()
-        assertThat(result.map { it.action }).containsExactly(ActionType.CREATE, ActionType.UPDATE)
+        assertThat(result.all { it.entityId == projectId && it.entityType == Audit.EntityType.PROJECT }).isTrue()
+        assertThat(result.map { it.action }).containsExactly(Audit.ActionType.CREATE, Audit.ActionType.UPDATE)
         verify { csvDataSource.loadAllDataFromFile() }
     }
 
@@ -185,9 +183,9 @@ class AuditCsvDataSourceImplTest {
             createAudit(
                 userRole = UserRole.MATE,
                 userName = "User1",
-                entityType = EntityType.TASK,
+                entityType = Audit.EntityType.TASK,
                 entityId = "TASK-123",
-                action = ActionType.UPDATE,
+                action = Audit.ActionType.UPDATE,
             )
         )
         every { csvDataSource.loadAllDataFromFile() } returns auditLogs
@@ -208,23 +206,23 @@ class AuditCsvDataSourceImplTest {
             createAudit(
                 userRole = UserRole.MATE,
                 userName = "User1",
-                entityType = EntityType.TASK,
+                entityType = Audit.EntityType.TASK,
                 entityId = taskId,
-                action = ActionType.UPDATE,
+                action = Audit.ActionType.UPDATE,
             ),
             createAudit(
                 userRole = UserRole.ADMIN,
                 userName = "Admin",
-                entityType = EntityType.PROJECT,
+                entityType = Audit.EntityType.PROJECT,
                 entityId = "PROJECT-001",
-                action = ActionType.CREATE,
+                action = Audit.ActionType.CREATE,
             ),
             createAudit(
                 userRole = UserRole.MATE,
                 userName = "User2",
-                entityType = EntityType.TASK,
+                entityType = Audit.EntityType.TASK,
                 entityId = taskId,
-                action = ActionType.DELETE,
+                action = Audit.ActionType.DELETE,
             )
         )
         every { csvDataSource.loadAllDataFromFile() } returns auditLogs
@@ -234,8 +232,8 @@ class AuditCsvDataSourceImplTest {
 
         // Then
         assertThat(result.size).isEqualTo(2)
-        assertThat(result.all { it.entityId == taskId && it.entityType == EntityType.TASK }).isTrue()
-        assertThat(result.map { it.action }).containsExactly(ActionType.UPDATE, ActionType.DELETE)
+        assertThat(result.all { it.entityId == taskId && it.entityType == Audit.EntityType.TASK }).isTrue()
+        assertThat(result.map { it.action }).containsExactly(Audit.ActionType.UPDATE, Audit.ActionType.DELETE)
         verify { csvDataSource.loadAllDataFromFile() }
     }
 
@@ -247,9 +245,9 @@ class AuditCsvDataSourceImplTest {
             createAudit(
                 userRole = UserRole.ADMIN,
                 userName = "Admin",
-                entityType = EntityType.PROJECT,
+                entityType = Audit.EntityType.PROJECT,
                 entityId = "PROJECT-001",
-                action = ActionType.CREATE,
+                action = Audit.ActionType.CREATE,
             )
         )
         every { csvDataSource.loadAllDataFromFile() } returns auditLogs

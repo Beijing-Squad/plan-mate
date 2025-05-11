@@ -5,9 +5,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import logic.entities.ActionType
 import logic.entities.Audit
-import logic.entities.EntityType
 import logic.entities.Project
 import logic.entities.type.UserRole
 import logic.useCases.audit.AddAuditLogUseCase
@@ -124,8 +122,8 @@ class ProjectManagementScreen(
                         id = Uuid.random(),
                         userRole = userRole,
                         userName = userName,
-                        action = ActionType.UPDATE,
-                        entityType = EntityType.PROJECT,
+                        action = Audit.ActionType.UPDATE,
+                        entityType = Audit.EntityType.PROJECT,
                         entityId = updated.id.toString(),
                         actionDetails = actionDetails,
                         timeStamp = now
@@ -164,8 +162,8 @@ class ProjectManagementScreen(
                         id = Uuid.random(),
                         userRole = userRole,
                         userName = createdBy,
-                        action = ActionType.CREATE,
-                        entityType = EntityType.PROJECT,
+                        action = Audit.ActionType.CREATE,
+                        entityType = Audit.EntityType.PROJECT,
                         entityId = newProject.id.toString(),
                         actionDetails = actionDetails,
                         timeStamp = now
@@ -191,8 +189,8 @@ class ProjectManagementScreen(
                         id = Uuid.random(),
                         userRole = UserRole.ADMIN,
                         userName = userName,
-                        action = ActionType.DELETE,
-                        entityType = EntityType.PROJECT,
+                        action = Audit.ActionType.DELETE,
+                        entityType = Audit.EntityType.PROJECT,
                         entityId = id,
                         actionDetails = actionDetails,
                         timeStamp = now

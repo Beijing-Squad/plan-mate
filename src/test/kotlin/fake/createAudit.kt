@@ -4,9 +4,7 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import logic.entities.ActionType
 import logic.entities.Audit
-import logic.entities.EntityType
 import logic.entities.type.UserRole
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
@@ -16,8 +14,8 @@ fun createAudit(
     userRole: UserRole = UserRole.MATE,
     userName: String = "defaultUser",
     entityId: String = "defaultEntityId",
-    entityType: EntityType = EntityType.PROJECT,
-    action: ActionType = ActionType.CREATE,
+    entityType: Audit.EntityType = Audit.EntityType.PROJECT,
+    action: Audit.ActionType = Audit.ActionType.CREATE,
     actionDetails : String = "",
     timeStamp: LocalDateTime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
 ): Audit {
