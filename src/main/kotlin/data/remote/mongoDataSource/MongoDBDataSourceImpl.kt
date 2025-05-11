@@ -10,7 +10,6 @@ import com.mongodb.kotlin.client.coroutine.MongoDatabase
 import data.common.hashPassword
 import data.dto.*
 import data.remote.mongoDataSource.mongoConnection.MongoConnection
-import data.common.PasswordHashingDataSource
 import data.repository.mapper.toTaskDTO
 import data.repository.remoteDataSource.RemoteDataSource
 import kotlinx.coroutines.Dispatchers
@@ -19,6 +18,7 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.withContext
 import logic.entities.Task
+import logic.exceptions.DataSourceException
 import logic.exceptions.InvalidLoginException
 import logic.exceptions.StateNotFoundException
 import logic.exceptions.TaskNotFoundException
@@ -194,14 +194,8 @@ class MongoDBDataSourceImpl(
     //region user operations
     override suspend fun getAllUsers(): List<UserDTO> {
         return withContext(Dispatchers.IO) {
-            try {
-                userCollection.find().toList()
-            } catch (e: MongoTimeoutException) {
-                println("Database connection failed: ${e.message}")
-                emptyList()
-            }
-        }
-
+            userCollection.find().toList()
+        }.ifEmpty { throw DataSourceException("Unable to fetch users due to a data source issue. Please try again later.") }
     }
 
     override suspend fun getUserByUserId(userId: String): UserDTO {
@@ -232,10 +226,10 @@ class MongoDBDataSourceImpl(
     }
 
     private fun buildPasswordUpdates(newPassword: String, existingPassword: String): List<Bson> {
-        return if (passwordHashingDataSource.hashPassword(newPassword)
-            != passwordHashingDataSource.hashPassword(existingPassword)
+        return if (hashPassword(newPassword)
+            != hashPassword(existingPassword)
         ) {
-            listOf(set(UserDTO::password.name, passwordHashingDataSource.hashPassword(newPassword)))
+            listOf(set(UserDTO::password.name, hashPassword(newPassword)))
         } else {
             emptyList()
         }
