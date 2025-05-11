@@ -6,10 +6,8 @@ import fake.createState
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
-import logic.exceptions.StateNotFoundException
 import logic.repository.StatesRepository
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.assertThrows
 import kotlin.test.Test
 import kotlin.uuid.ExperimentalUuidApi
 
@@ -35,14 +33,14 @@ class GetAllTaskStatesUseCaseTest {
                 createProject(name = "PlanMate Extended", createdBy = createdBy)
             )
             val states = listOf(
-                createState(name = "In Progress", projectId = projects[0].id.toString()),
-                createState(name = "Done", projectId = projects[1].id.toString())
+                createState(name = "In Progress", projectId = projects[0].id),
+                createState(name = "Done", projectId = projects[1].id)
             )
 
-            coEvery { statesRepository.getAllStates() } returns states
+            coEvery { statesRepository.getAllTaskStates() } returns states
 
             // When
-            val actualStates = getAllTaskStatesUseCase.getAllStates()
+            val actualStates = getAllTaskStatesUseCase.getAllTaskStates()
 
             // Then
             assertThat(actualStates).isEqualTo(states)
@@ -50,15 +48,16 @@ class GetAllTaskStatesUseCaseTest {
     }
 
     @Test
-    fun `should throw exception when not found states`() {
+    fun `should return empty list when no states are found`() {
         runTest {
             // Given
-            coEvery { statesRepository.getAllStates() } returns emptyList()
+            coEvery { statesRepository.getAllTaskStates() } returns emptyList()
 
-            // When && Then
-            assertThrows<StateNotFoundException> {
-                getAllTaskStatesUseCase.getAllStates()
-            }
+            // When
+            val actualStates = getAllTaskStatesUseCase.getAllTaskStates()
+
+            // Then
+            assertThat(actualStates).isEmpty()
         }
     }
 
@@ -67,16 +66,19 @@ class GetAllTaskStatesUseCaseTest {
     fun `should return the correct states`() {
         runTest {
             // Given
+            val project = listOf(
+                createProject(name = "PlanMate Core Features", createdBy = "adminUser01")
+            )
             val states = listOf(
-                createState(name = "In Progress", projectId = "550e8400-e29b-41d4-a716-446655440000"),
-                createState(name = "Done", projectId = "550e8400-e29b-41d4-a716-446655440000"),
-                createState(name = "Blocked", projectId = "550e8400-e29b-41d4-a716-446655440000")
+                createState(name = "In Progress", projectId = project[0].id),
+                createState(name = "Done", projectId = project[0].id),
+                createState(name = "Blocked", projectId = project[0].id)
             )
 
-            coEvery { statesRepository.getAllStates() } returns states
+            coEvery { statesRepository.getAllTaskStates() } returns states
 
             // When
-            val actualStates = getAllTaskStatesUseCase.getAllStates()
+            val actualStates = getAllTaskStatesUseCase.getAllTaskStates()
 
             // Then
             assertThat(actualStates).isEqualTo(states)

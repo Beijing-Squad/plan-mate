@@ -222,7 +222,7 @@ class TaskManagementScreenTest {
         val tasks = listOf(createTask(title = "T1"))
         val states = listOf(createState(name = "To Do"))
         coEvery { getAllTasksUseCase.getAllTasks() } returns tasks
-        coEvery { getAllTaskStatesUseCase.getAllStates() } returns states
+        coEvery { getAllTaskStatesUseCase.getAllTaskStates() } returns states
 
         // When
         screen.showTasksInSwimlanes()

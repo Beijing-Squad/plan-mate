@@ -24,6 +24,7 @@ import org.bson.conversions.Bson
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
+@OptIn(ExperimentalUuidApi::class)
 class MongoDBDataSourceImpl(
     database: MongoDatabase = MongoConnection.database
 ) : RemoteDataSource {
@@ -35,7 +36,6 @@ class MongoDBDataSourceImpl(
     private val taskCollection = database.getCollection<TaskDto>("tasks")
 
     //region authentication operations
-    @OptIn(ExperimentalUuidApi::class)
     override suspend fun saveUser(
         username: String,
         password: String,
@@ -108,6 +108,12 @@ class MongoDBDataSourceImpl(
     override suspend fun getProjectById(projectId: String): ProjectDto {
         return projectCollection.find(eq("_id", projectId)).first()
     }
+
+    private suspend fun isProjectExists(projectId: String): Boolean {
+        return projectCollection
+            .find(eq("_id", projectId))
+            .firstOrNull() != null
+    }
     //endregion
 
     //region task operations
@@ -115,7 +121,6 @@ class MongoDBDataSourceImpl(
         return taskCollection.find<TaskDto>().toList()
     }
 
-    @OptIn(ExperimentalUuidApi::class)
     override suspend fun getTaskById(taskId: String): TaskDto {
 
         val taskIdFilter = Filters.eq("_id", taskId)
@@ -132,14 +137,12 @@ class MongoDBDataSourceImpl(
         }
     }
 
-    @OptIn(ExperimentalUuidApi::class)
     override suspend fun deleteTask(taskId: String) {
         val taskIdFilter = Filters.eq("_id", taskId)
         taskCollection.findOneAndDelete(taskIdFilter)
             ?: throw TaskNotFoundException("Task with id $taskId not found")
     }
 
-    @OptIn(ExperimentalUuidApi::class)
     override suspend fun updateTask(updatedTask: TaskDto): TaskDto {
         val taskIdFilter = Filters.eq("_id", updatedTask.id)
         val updateTask = Updates.combine(
@@ -159,41 +162,46 @@ class MongoDBDataSourceImpl(
     }
     //endregion
 
-    //region task state operations
-    override suspend fun getAllStates(): List<TaskStateDto> {
-        return statesCollection.find<TaskStateDto>().toList()
+    //region taskState operations
+    override suspend fun addTaskState(taskState: TaskStateDto): Boolean {
+        if (isTaskStateExists(taskState.id)) throw StateAlreadyExistException()
+
+        return statesCollection.insertOne(taskState).wasAcknowledged()
+    }
+
+    override suspend fun deleteTaskState(taskStateId: String): Boolean {
+        if (!isTaskStateExists(taskStateId)) throw StateNotFoundException()
+
+        return statesCollection.deleteOne(eq("_id", taskStateId)).deletedCount > 0
+    }
+
+    override suspend fun getAllTaskStates(): List<TaskStateDto> {
+        return statesCollection.find().toList()
     }
 
     override suspend fun getTaskStatesByProjectId(projectId: String): List<TaskStateDto> {
+        if (!isProjectExists(projectId)) throw ProjectNotFoundException()
         val projectIdFilter = eq("projectId", projectId)
         return statesCollection.find(projectIdFilter).toList()
     }
 
-    override suspend fun getTaskStateById(stateId: String): TaskStateDto {
-        val stateIdFilter = eq("_id", stateId)
+    override suspend fun getTaskStateById(taskStateId: String): TaskStateDto {
+        val stateIdFilter = eq("_id", taskStateId)
         return statesCollection.find(stateIdFilter).firstOrNull() ?: throw StateNotFoundException()
     }
 
-    override suspend fun addTaskState(taskState: TaskStateDto): Boolean {
-        return statesCollection.insertOne(taskState).wasAcknowledged()
-    }
-
-    override suspend fun updateTaskState(taskState: TaskStateDto): TaskStateDto {
-        val stateIdFilter = eq("_id", taskState.id)
-        val updatedState = combine(
-            set("name", taskState.name),
-            set("projectId", taskState.projectId)
-        )
-        return statesCollection.updateOne(filter = stateIdFilter, update = updatedState)
-            .takeIf { it.matchedCount > 0 }
-            ?.let { taskState }
-            ?: throw StateNotFoundException()
-    }
-
-    override suspend fun deleteTaskState(taskState: TaskStateDto): Boolean {
+    override suspend fun updateTaskState(taskState: TaskStateDto): Boolean {
+        if (!isTaskStateExists(taskState.id)) throw StateNotFoundException()
+        if (!isProjectExists(taskState.projectId)) throw ProjectNotFoundException()
         val stateIdFilter = eq("_id", taskState.id)
 
-        return statesCollection.deleteOne(stateIdFilter).deletedCount > 0
+        return statesCollection.replaceOne(stateIdFilter, taskState).wasAcknowledged()
+    }
+
+    private suspend fun isTaskStateExists(stateId: String): Boolean {
+        val stateIdFilter = eq("_id", stateId)
+        val existingState = statesCollection.find<TaskStateDto>(stateIdFilter).firstOrNull()
+        return existingState != null
     }
     //endregion
 

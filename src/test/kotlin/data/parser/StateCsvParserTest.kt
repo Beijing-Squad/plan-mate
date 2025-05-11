@@ -63,14 +63,16 @@ class StateCsvParserTest {
         val state = createState(
             id = Uuid.parse("11111111-1111-1111-1111-111111111111"),
             name = "InProgress",
-            projectId = "project-123"
+            projectId = Uuid.parse("21111111-1111-1111-1111-111111111111")
         )
 
         // When
         val csv = parser.serializer(state)
 
         // Then
-        assertThat(csv).isEqualTo("11111111-1111-1111-1111-111111111111,InProgress,project-123")
+        assertThat(csv).isEqualTo(
+            "11111111-1111-1111-1111-111111111111,InProgress,21111111-1111-1111-1111-111111111111"
+        )
     }
 
     @Test
@@ -79,7 +81,7 @@ class StateCsvParserTest {
         val original = createState(
             id = Uuid.parse("22222222-2222-2222-2222-222222222222"),
             name = "Review",
-            projectId = "project-456"
+            projectId = Uuid.parse("21111111-1111-1111-1111-111111111111")
         )
 
         // When
