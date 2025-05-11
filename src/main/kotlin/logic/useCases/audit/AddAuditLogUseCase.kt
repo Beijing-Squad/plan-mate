@@ -2,12 +2,17 @@ package logic.useCases.audit
 
 import logic.entities.Audit
 import logic.repository.AuditRepository
+import logic.useCases.authentication.SessionManagerUseCase
+import kotlin.uuid.ExperimentalUuidApi
 
 class AddAuditLogUseCase(
-    private val auditRepository: AuditRepository
+    private val auditRepository: AuditRepository,
+    private val sessionManagerUseCase: SessionManagerUseCase
 ) {
 
+    @OptIn(ExperimentalUuidApi::class)
     suspend fun addAuditLog(audit: Audit) {
-        auditRepository.addAuditLog(audit)
+        sessionManagerUseCase.getCurrentUser()?.let { audit.copy(userRole = it.role) }
+            ?.let { auditRepository.addAuditLog(it) }
     }
 }

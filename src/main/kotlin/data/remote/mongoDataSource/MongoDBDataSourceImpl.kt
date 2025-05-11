@@ -98,7 +98,7 @@ class MongoDBDataSourceImpl(
     }
 
     override suspend fun deleteProject(projectId: String) {
-        projectCollection.findOneAndDelete(eq("id", projectId))
+        projectCollection.findOneAndDelete(eq("_id", projectId))
     }
 
     override suspend fun updateProject(newProjects: ProjectDto) {

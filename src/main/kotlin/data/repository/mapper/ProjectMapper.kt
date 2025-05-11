@@ -7,7 +7,7 @@ import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
 @OptIn(ExperimentalUuidApi::class)
-fun ProjectDto.toEntity(): Project {
+fun ProjectDto.toProjectEntity(): Project {
     return Project(
         id = Uuid.parse(this.id),
         name = this.name,
@@ -19,7 +19,7 @@ fun ProjectDto.toEntity(): Project {
 }
 
 @OptIn(ExperimentalUuidApi::class)
-fun Project.toDto(): ProjectDto {
+fun Project.toProjectDto(): ProjectDto {
     return ProjectDto(
         id = this.id.toString(),
         name = this.name,

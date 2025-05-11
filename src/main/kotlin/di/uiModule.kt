@@ -23,6 +23,7 @@ val uiModule = module {
         ProjectManagementScreen(
             get(), get(), get(), get(), get(),
             get(),
+            get(),
             get()
         )
     }
