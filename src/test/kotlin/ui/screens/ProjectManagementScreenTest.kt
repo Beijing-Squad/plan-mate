@@ -3,8 +3,8 @@ package ui.screens
 import fake.createProject
 import io.mockk.*
 import kotlinx.coroutines.test.runTest
-import logic.entities.type.UserRole
 import logic.useCases.audit.AddAuditLogUseCase
+import logic.useCases.authentication.SessionManagerUseCase
 import logic.useCases.project.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -22,8 +22,7 @@ class ProjectManagementScreenTest {
     private lateinit var consoleIO: ConsoleIO
     private lateinit var projectScreen: ProjectManagementScreen
     private lateinit var addAuditLogUseCase: AddAuditLogUseCase
-    private val userRole: UserRole = UserRole.ADMIN
-
+    private lateinit var sessionManager: SessionManagerUseCase
     @BeforeEach
     fun setup() {
         addProjectUseCase = mockk(relaxed = true)
@@ -41,8 +40,8 @@ class ProjectManagementScreenTest {
             getProjectByIdUseCase,
             updateProjectUseCase,
             addAuditLogUseCase,
-            userRole,
             consoleIO,
+            sessionManager
         )
     }
 
