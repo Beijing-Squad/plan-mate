@@ -1,6 +1,5 @@
 package data.remote.mongoDataSource
 
-import com.mongodb.MongoTimeoutException
 import com.mongodb.client.model.Filters
 import com.mongodb.client.model.Filters.eq
 import com.mongodb.client.model.Updates
@@ -31,7 +30,7 @@ class MongoDBDataSourceImpl(
     database: MongoDatabase = MongoConnection.database
 ) : RemoteDataSource {
 
-    private val userCollection = database.getCollection<UserDTO>("users")
+    private val userCollection = database.getCollection<UserDto>("users")
     private val auditsCollection = database.getCollection<AuditDTO>("audits")
     private val projectCollection = database.getCollection<ProjectDTO>("projects")
     private val statesCollection = database.getCollection<TaskStateDTO>("states")
@@ -44,7 +43,7 @@ class MongoDBDataSourceImpl(
         password: String,
         role: String
     ): Boolean {
-        val newUser = UserDTO(
+        val newUser = UserDto(
             id = Uuid.random().toString(),
             userName = username,
             password = hashPassword(password),
@@ -54,7 +53,7 @@ class MongoDBDataSourceImpl(
         return result.wasAcknowledged()
     }
 
-    override suspend fun getAuthenticatedUser(username: String, password: String): UserDTO {
+    override suspend fun getAuthenticatedUser(username: String, password: String): UserDto {
         val query = Filters.and(
             eq("userName", username), eq(
                 "password",
@@ -192,20 +191,20 @@ class MongoDBDataSourceImpl(
     //endregion
 
     //region user operations
-    override suspend fun getAllUsers(): List<UserDTO> {
+    override suspend fun getAllUsers(): List<UserDto> {
         return withContext(Dispatchers.IO) {
             userCollection.find().toList()
         }.ifEmpty { throw DataSourceException("Unable to fetch users due to a data source issue. Please try again later.") }
     }
 
-    override suspend fun getUserByUserId(userId: String): UserDTO {
+    override suspend fun getUserByUserId(userId: String): UserDto {
         return getAllUsers()
             .find { it.id == userId }
             ?: throw UserNotFoundException()
     }
 
-    override suspend fun updateUser(user: UserDTO): UserDTO {
-        val filters = eq(UserDTO::id.name, user.id)
+    override suspend fun updateUser(user: UserDto): UserDto {
+        val filters = eq(UserDto::id.name, user.id)
         val existingUser = userCollection.find(filters).firstOrNull() ?: throw UserNotFoundException()
         val updates = buildList {
             addAll(buildUsernameUpdates(user.userName, existingUser.userName))
@@ -219,7 +218,7 @@ class MongoDBDataSourceImpl(
 
     private fun buildUsernameUpdates(newUserName: String, existingUserName: String): List<Bson> {
         return if (newUserName != existingUserName) {
-            listOf(set(UserDTO::userName.name, newUserName))
+            listOf(set(UserDto::userName.name, newUserName))
         } else {
             emptyList()
         }
@@ -229,7 +228,7 @@ class MongoDBDataSourceImpl(
         return if (hashPassword(newPassword)
             != hashPassword(existingPassword)
         ) {
-            listOf(set(UserDTO::password.name, hashPassword(newPassword)))
+            listOf(set(UserDto::password.name, hashPassword(newPassword)))
         } else {
             emptyList()
         }
