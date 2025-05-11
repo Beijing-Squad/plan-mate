@@ -10,16 +10,16 @@ class UserRepositoryImpl(
     private val userMongoDataSource: MongoDBDataSourceImpl
 ) : UserRepository {
     override suspend fun getAllUsers(): List<User> {
-        return userMongoDataSource.getAllUsers().map { toUserEntity(it) }
+        return userMongoDataSource.getAllUsers().map { it.toUserEntity() }
     }
 
     override suspend fun getUserByUserId(userId: String): User {
-        return toUserEntity(userMongoDataSource.getUserByUserId(userId))
+        return userMongoDataSource.getUserByUserId(userId).toUserEntity()
     }
 
     override suspend fun updateUser(user: User): User {
-        val userDto = toUserDto(user)
-        return toUserEntity(userMongoDataSource.updateUser(userDto))
+        val userDto = user.toUserDto()
+        return userMongoDataSource.updateUser(userDto).toUserEntity()
     }
 
 }

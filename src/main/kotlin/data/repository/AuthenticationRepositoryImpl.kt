@@ -14,5 +14,5 @@ class AuthenticationRepositoryImpl(
         dataSource.saveUser(username, password, role.name)
 
     override suspend fun loginUser(username: String, password: String): User =
-        toUserEntity(dataSource.getAuthenticatedUser(username, password))
+        dataSource.getAuthenticatedUser(username, password).toUserEntity()
 }

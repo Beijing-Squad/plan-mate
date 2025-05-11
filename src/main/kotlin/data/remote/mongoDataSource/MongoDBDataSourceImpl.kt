@@ -202,7 +202,7 @@ class MongoDBDataSourceImpl(
     override suspend fun getAllUsers(): List<UserDto> {
         return withContext(Dispatchers.IO) {
             userCollection.find().toList()
-        }.ifEmpty { throw DataSourceException("Unable to fetch users due to a data source issue. Please try again later.") }
+        }
     }
 
     override suspend fun getUserByUserId(userId: String): UserDto {
@@ -212,7 +212,7 @@ class MongoDBDataSourceImpl(
     }
 
     override suspend fun updateUser(user: UserDto): UserDto {
-        val filters = eq(UserDto::id.name, user.id)
+        val filters = eq("_id", user.id)
         val existingUser = userCollection.find(filters).firstOrNull() ?: throw UserNotFoundException()
         val updates = buildList {
             addAll(buildUsernameUpdates(user.userName, existingUser.userName))
@@ -244,7 +244,7 @@ class MongoDBDataSourceImpl(
 
     private suspend fun checkUpdateUserIfEmpty(updates: List<Bson>, filters: Bson) {
         if (updates.isNotEmpty()) {
-            val result = userCollection.updateOne(filters, Updates.combine(updates))
+            val result = userCollection.updateOne(filters, combine(updates))
             require(result.matchedCount.toInt() != 0) { throw UserNotFoundException() }
         }
     }
