@@ -1,14 +1,15 @@
 package data.dto
 
+import org.bson.codecs.pojo.annotations.BsonId
 import org.bson.codecs.pojo.annotations.BsonProperty
 
 data class TaskDTO(
-    @BsonProperty("id") val id: String,
-    val projectId: String,
-    val title: String,
-    val description: String,
-    val createdBy: String,
-    val stateId: String,
+    @BsonId val id: String,
+    @BsonProperty("projectId") val projectId: String,
+    @BsonProperty("title") val title: String,
+    @BsonProperty("description") val description: String,
+    @BsonProperty("createdBy") val createdBy: String,
+    @BsonProperty("stateId") val stateId: String,
     @BsonProperty("createdAt") val createdAt: String,
     @BsonProperty("updatedAt") val updatedAt: String
 )
