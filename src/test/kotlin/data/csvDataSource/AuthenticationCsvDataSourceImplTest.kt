@@ -10,7 +10,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import logic.entities.User
-import logic.entities.UserRole
+import logic.entities.type.UserRole
 import logic.exceptions.InvalidPasswordException
 import logic.exceptions.UserExistsException
 import logic.exceptions.UserNotFoundException

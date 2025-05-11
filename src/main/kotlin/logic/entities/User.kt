@@ -1,5 +1,6 @@
 package logic.entities
 
+import logic.entities.type.UserRole
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 

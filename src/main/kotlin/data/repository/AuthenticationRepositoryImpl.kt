@@ -3,7 +3,7 @@ package data.repository
 import data.repository.mapper.toUserEntity
 import data.repository.remoteDataSource.RemoteDataSource
 import logic.entities.User
-import logic.entities.UserRole
+import logic.entities.type.UserRole
 import logic.repository.AuthenticationRepository
 
 class AuthenticationRepositoryImpl(

@@ -3,7 +3,7 @@ package ui.screens
 import fake.createProject
 import io.mockk.*
 import kotlinx.coroutines.test.runTest
-import logic.entities.UserRole
+import logic.entities.type.UserRole
 import logic.useCases.audit.AddAuditLogUseCase
 import logic.useCases.project.*
 import org.junit.jupiter.api.BeforeEach

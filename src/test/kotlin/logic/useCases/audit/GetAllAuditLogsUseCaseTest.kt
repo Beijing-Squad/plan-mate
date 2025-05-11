@@ -5,9 +5,8 @@ import fake.createAudit
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
-import logic.entities.ActionType
-import logic.entities.EntityType
-import logic.entities.UserRole
+import logic.entities.Audit
+import logic.entities.type.UserRole
 import logic.repository.AuditRepository
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -30,12 +29,12 @@ class GetAllAuditLogsUseCaseTest {
             createAudit(
                 userRole = UserRole.ADMIN,
                 userName = "Admin",
-                entityType = EntityType.PROJECT,
+                entityType = Audit.EntityType.PROJECT,
             ),
             createAudit(
                 userRole = UserRole.MATE,
                 userName = "MATE",
-                entityType = EntityType.TASK,
+                entityType = Audit.EntityType.TASK,
             )
         )
 
@@ -65,20 +64,20 @@ class GetAllAuditLogsUseCaseTest {
             createAudit(
                 userRole = UserRole.ADMIN,
                 userName = "Admin",
-                entityType = EntityType.PROJECT,
-                action = ActionType.CREATE,
+                entityType = Audit.EntityType.PROJECT,
+                action = Audit.ActionType.CREATE,
             ),
             createAudit(
                 userRole = UserRole.MATE,
                 userName = "User1",
-                entityType = EntityType.TASK,
-                action = ActionType.UPDATE,
+                entityType = Audit.EntityType.TASK,
+                action = Audit.ActionType.UPDATE,
             ),
             createAudit(
                 userRole = UserRole.MATE,
                 userName = "User2",
-                entityType = EntityType.PROJECT,
-                action = ActionType.DELETE,
+                entityType = Audit.EntityType.PROJECT,
+                action = Audit.ActionType.DELETE,
             )
         )
 
@@ -88,9 +87,9 @@ class GetAllAuditLogsUseCaseTest {
         // Then
         assertThat(result.size).isEqualTo(3)
         assertThat(result.map { it.action }).containsExactly(
-            ActionType.CREATE,
-            ActionType.UPDATE,
-            ActionType.DELETE
+            Audit.ActionType.CREATE,
+            Audit.ActionType.UPDATE,
+            Audit.ActionType.DELETE
         )
     }
 
@@ -101,16 +100,16 @@ class GetAllAuditLogsUseCaseTest {
             createAudit(
                 userRole = UserRole.ADMIN,
                 userName = "Admin",
-                entityType = EntityType.PROJECT,
+                entityType = Audit.EntityType.PROJECT,
                 entityId = "project-123",
-                action = ActionType.CREATE,
+                action = Audit.ActionType.CREATE,
             ),
             createAudit(
                 userRole = UserRole.MATE,
                 userName = "User1",
-                entityType = EntityType.TASK,
+                entityType = Audit.EntityType.TASK,
                 entityId = "task-456",
-                action = ActionType.CREATE,
+                action = Audit.ActionType.CREATE,
             )
         )
 
@@ -120,8 +119,8 @@ class GetAllAuditLogsUseCaseTest {
         // Then
         assertThat(result.size).isEqualTo(2)
         assertThat(result.map { it.entityType }).containsExactly(
-            EntityType.PROJECT,
-            EntityType.TASK
+            Audit.EntityType.PROJECT,
+            Audit.EntityType.TASK
         )
         assertThat(result.map { it.entityId }).containsExactly(
             "project-123",

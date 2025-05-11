@@ -2,10 +2,8 @@ package data.local.csvDataSource.parser
 
 import data.local.csvDataSource.csv.CsvParser
 import kotlinx.datetime.LocalDateTime
-import logic.entities.ActionType
 import logic.entities.Audit
-import logic.entities.EntityType
-import logic.entities.UserRole
+import logic.entities.type.UserRole
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -34,8 +32,8 @@ class AuditCsvParser : CsvParser<Audit> {
             userRole = UserRole.valueOf(parts[1]),
             userName = parts[2],
             entityId = parts[3],
-            entityType = EntityType.valueOf(parts[4]),
-            action = ActionType.valueOf(parts[5]),
+            entityType = Audit.EntityType.valueOf(parts[4]),
+            action = Audit.ActionType.valueOf(parts[5]),
             actionDetails = parts[6],
             timeStamp = LocalDateTime.parse(parts[8])
         )

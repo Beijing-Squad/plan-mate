@@ -2,7 +2,7 @@ package ui.screens
 
 import com.mongodb.client.model.Filters
 import com.mongodb.kotlin.client.coroutine.MongoDatabase
-import data.dto.TaskDTO
+import data.remote.mongoDataSource.dto.TaskDto
 import data.remote.mongoDataSource.mongoConnection.MongoConnection
 import data.repository.mapper.toTaskDTO
 import data.repository.mapper.toTaskEntity
@@ -14,9 +14,7 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import logic.entities.ActionType
 import logic.entities.Audit
-import logic.entities.EntityType
 import logic.entities.Task
 import logic.exceptions.TaskNotFoundException
 import logic.useCases.audit.AddAuditLogUseCase
@@ -251,7 +249,7 @@ class TaskManagementScreen(
 
         val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
 
-        val taskDTO = TaskDTO(
+        val taskDTO = TaskDto(
             id = Uuid.random().toString(),
             projectId = projectId,
             title = title,
@@ -272,8 +270,8 @@ class TaskManagementScreen(
                     id = Uuid.random(),
                     userRole = currentUser.role,
                     userName = currentUser.userName,
-                    action = ActionType.CREATE,
-                    entityType = EntityType.TASK,
+                    action = Audit.ActionType.CREATE,
+                    entityType = Audit.EntityType.TASK,
                     entityId = task.id.toString(),
                     actionDetails = actionDetails,
                     timeStamp = now
@@ -310,7 +308,7 @@ class TaskManagementScreen(
             val newStateIdInput = consoleIO.read()?.trim()
             val newStateId = newStateIdInput.takeIf { !it.isNullOrBlank() } ?: existingTaskDTO.stateId
 
-            val updatedTaskDTO = TaskDTO(
+            val updatedTaskDto = TaskDto(
                 id = existingTaskDTO.id.toString(),
                 projectId = existingTaskDTO.projectId,
                 title = newTitle,
@@ -321,7 +319,7 @@ class TaskManagementScreen(
                 updatedAt = now.toString()
             )
 
-            val updatedTask = toTaskEntity(updatedTaskDTO)
+            val updatedTask = toTaskEntity(updatedTaskDto)
             val resultTaskDTO = updateTaskUseCase.updateTask(updatedTask)
 
             consoleIO.showWithLine("✅ Task updated successfully:\n📌 Title: ${resultTaskDTO.title}, 📝 Description: ${resultTaskDTO.description}, 🔄 State: ${resultTaskDTO.stateId}")
@@ -332,8 +330,8 @@ class TaskManagementScreen(
                         id = Uuid.random(),
                         userRole = user.role,
                         userName = user.userName,
-                        action = ActionType.UPDATE,
-                        entityType = EntityType.TASK,
+                        action = Audit.ActionType.UPDATE,
+                        entityType = Audit.EntityType.TASK,
                         entityId = id,
                         actionDetails = actionDetails,
                         timeStamp = now
@@ -369,8 +367,8 @@ class TaskManagementScreen(
                         id = Uuid.random(),
                         userRole = user.role,
                         userName = user.userName,
-                        action = ActionType.DELETE,
-                        entityType = EntityType.TASK,
+                        action = Audit.ActionType.DELETE,
+                        entityType = Audit.EntityType.TASK,
                         entityId = id,
                         actionDetails = actionDetails,
                         timeStamp = now
