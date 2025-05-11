@@ -6,22 +6,18 @@ import com.mongodb.client.model.Updates
 import com.mongodb.client.model.Updates.combine
 import com.mongodb.client.model.Updates.set
 import com.mongodb.kotlin.client.coroutine.MongoDatabase
-import data.common.hashPassword
-import data.dto.*
+import data.remote.mongoDataSource.dto.*
 import data.remote.mongoDataSource.mongoConnection.MongoConnection
 import data.repository.mapper.toTaskDTO
 import data.repository.remoteDataSource.RemoteDataSource
+import data.utils.hashPassword
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.withContext
 import logic.entities.Task
-import logic.exceptions.DataSourceException
-import logic.exceptions.InvalidLoginException
-import logic.exceptions.StateNotFoundException
-import logic.exceptions.TaskNotFoundException
-import logic.exceptions.UserNotFoundException
+import logic.exceptions.*
 import org.bson.conversions.Bson
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
@@ -31,10 +27,10 @@ class MongoDBDataSourceImpl(
 ) : RemoteDataSource {
 
     private val userCollection = database.getCollection<UserDto>("users")
-    private val auditsCollection = database.getCollection<AuditDTO>("audits")
-    private val projectCollection = database.getCollection<ProjectDTO>("projects")
-    private val statesCollection = database.getCollection<TaskStateDTO>("states")
-    private val taskCollection = database.getCollection<TaskDTO>("tasks")
+    private val auditsCollection = database.getCollection<AuditDto>("audits")
+    private val projectCollection = database.getCollection<ProjectDto>("projects")
+    private val statesCollection = database.getCollection<TaskStateDto>("states")
+    private val taskCollection = database.getCollection<TaskDto>("tasks")
 
     //region authentication operations
     @OptIn(ExperimentalUuidApi::class)
@@ -65,27 +61,27 @@ class MongoDBDataSourceImpl(
     //endregion
 
     //region audit operations
-    override suspend fun getAllAuditLogs(): List<AuditDTO> {
+    override suspend fun getAllAuditLogs(): List<AuditDto> {
         TODO("Not yet implemented")
     }
 
-    override suspend fun addAuditLog(audit: AuditDTO) {
+    override suspend fun addAuditLog(audit: AuditDto) {
         TODO("Not yet implemented")
     }
 
-    override suspend fun getAuditLogsByProjectId(projectId: String): List<AuditDTO> {
+    override suspend fun getAuditLogsByProjectId(projectId: String): List<AuditDto> {
         TODO("Not yet implemented")
     }
 
-    override suspend fun getAuditLogsByTaskId(taskId: String): List<AuditDTO> {
+    override suspend fun getAuditLogsByTaskId(taskId: String): List<AuditDto> {
         TODO("Not yet implemented")
     }
     //endregion
 
     //region project operations
-    override suspend fun getAllProjects(): List<ProjectDTO> = projectCollection.find().toList()
+    override suspend fun getAllProjects(): List<ProjectDto> = projectCollection.find().toList()
 
-    override suspend fun addProject(project: ProjectDTO) {
+    override suspend fun addProject(project: ProjectDto) {
         projectCollection.insertOne(project)
     }
 
@@ -94,22 +90,22 @@ class MongoDBDataSourceImpl(
     }
 
     @OptIn(ExperimentalUuidApi::class)
-    override suspend fun updateProject(newProjects: ProjectDTO) {
+    override suspend fun updateProject(newProjects: ProjectDto) {
         projectCollection.replaceOne(eq("id", newProjects.id.toString()), newProjects)
     }
 
-    override suspend fun getProjectById(projectId: String): ProjectDTO {
+    override suspend fun getProjectById(projectId: String): ProjectDto {
         return projectCollection.find(eq("id", projectId)).first()
     }
     //endregion
 
     //region task operations
-    override suspend fun getAllTasks(): List<TaskDTO> {
-        return taskCollection.find<TaskDTO>().toList()
+    override suspend fun getAllTasks(): List<TaskDto> {
+        return taskCollection.find<TaskDto>().toList()
     }
 
     @OptIn(ExperimentalUuidApi::class)
-    override suspend fun getTaskById(taskId: String): TaskDTO {
+    override suspend fun getTaskById(taskId: String): TaskDto {
 
         val taskIdFilter = Filters.eq("_id", taskId)
         val task = taskCollection.find<Task>(taskIdFilter).limit(1).firstOrNull()
@@ -117,7 +113,7 @@ class MongoDBDataSourceImpl(
         return toTaskDTO(task)
     }
 
-    override suspend fun addTask(task: TaskDTO) {
+    override suspend fun addTask(task: TaskDto) {
         try {
             taskCollection.insertOne(task)
         } catch (e: Exception) {
@@ -133,7 +129,7 @@ class MongoDBDataSourceImpl(
     }
 
     @OptIn(ExperimentalUuidApi::class)
-    override suspend fun updateTask(updatedTask: TaskDTO): TaskDTO {
+    override suspend fun updateTask(updatedTask: TaskDto): TaskDto {
         val taskIdFilter = Filters.eq("_id", updatedTask.id)
         val updateTask = Updates.combine(
             Updates.set("project_id", updatedTask.projectId),
@@ -153,25 +149,25 @@ class MongoDBDataSourceImpl(
     //endregion
 
     //region task state operations
-    override suspend fun getAllStates(): List<TaskStateDTO> {
-        return statesCollection.find<TaskStateDTO>().toList()
+    override suspend fun getAllStates(): List<TaskStateDto> {
+        return statesCollection.find<TaskStateDto>().toList()
     }
 
-    override suspend fun getTaskStatesByProjectId(projectId: String): List<TaskStateDTO> {
+    override suspend fun getTaskStatesByProjectId(projectId: String): List<TaskStateDto> {
         val projectIdFilter = eq("projectId", projectId)
         return statesCollection.find(projectIdFilter).toList()
     }
 
-    override suspend fun getTaskStateById(stateId: String): TaskStateDTO {
+    override suspend fun getTaskStateById(stateId: String): TaskStateDto {
         val stateIdFilter = eq("_id", stateId)
         return statesCollection.find(stateIdFilter).firstOrNull() ?: throw StateNotFoundException()
     }
 
-    override suspend fun addTaskState(taskState: TaskStateDTO): Boolean {
+    override suspend fun addTaskState(taskState: TaskStateDto): Boolean {
         return statesCollection.insertOne(taskState).wasAcknowledged()
     }
 
-    override suspend fun updateTaskState(taskState: TaskStateDTO): TaskStateDTO {
+    override suspend fun updateTaskState(taskState: TaskStateDto): TaskStateDto {
         val stateIdFilter = eq("_id", taskState.id)
         val updatedState = combine(
             set("name", taskState.name),
@@ -183,7 +179,7 @@ class MongoDBDataSourceImpl(
             ?: throw StateNotFoundException()
     }
 
-    override suspend fun deleteTaskState(taskState: TaskStateDTO): Boolean {
+    override suspend fun deleteTaskState(taskState: TaskStateDto): Boolean {
         val stateIdFilter = eq("_id", taskState.id)
 
         return statesCollection.deleteOne(stateIdFilter).deletedCount > 0
