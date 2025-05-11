@@ -4,7 +4,7 @@ import data.dto.*
 
 interface RemoteDataSource {
     suspend fun saveUser(username: String, password: String, role: String): Boolean
-    suspend fun getAuthenticatedUser(username: String, password: String): UserDTO
+    suspend fun getAuthenticatedUser(username: String, password: String): UserDto
 
     suspend fun getAllAuditLogs(): List<AuditDTO>
     suspend fun addAuditLog(audit: AuditDTO)
@@ -30,7 +30,7 @@ interface RemoteDataSource {
     suspend fun updateTaskState(taskState: TaskStateDTO): TaskStateDTO
     suspend fun deleteTaskState(taskState: TaskStateDTO): Boolean
 
-    suspend fun getAllUsers(): List<UserDTO>
-    suspend fun getUserByUserId(userId: String): UserDTO
-    suspend fun updateUser(user: UserDTO): UserDTO
+    suspend fun getAllUsers(): List<UserDto>
+    suspend fun getUserByUserId(userId: String): UserDto
+    suspend fun updateUser(user: UserDto): UserDto
 }

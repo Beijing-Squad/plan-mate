@@ -47,9 +47,7 @@ class UserScreen(
             "1" -> {
                 val currentUser = sessionManagerUseCase.getCurrentUser()
                 if (currentUser?.role == UserRole.ADMIN) {
-                    runBlocking {
-                        onClickGetAllUsers()
-                    }
+                    onClickGetAllUsers()
                 } else {
                     consoleIO.showWithLine("\u001B[31m❌ You don't have permission\u001B[0m")
                 }

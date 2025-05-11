@@ -1,6 +1,5 @@
 package data.remote.mongoDataSource
 
-import com.mongodb.MongoTimeoutException
 import com.mongodb.client.model.Filters
 import com.mongodb.client.model.Filters.eq
 import com.mongodb.client.model.Updates
@@ -18,10 +17,12 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.withContext
 import logic.entities.Task
+import logic.exceptions.DataSourceException
 import logic.exceptions.InvalidLoginException
 import logic.exceptions.StateNotFoundException
 import logic.exceptions.TaskNotFoundException
 import logic.exceptions.UserNotFoundException
+import org.bson.conversions.Bson
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -29,7 +30,7 @@ class MongoDBDataSourceImpl(
     database: MongoDatabase = MongoConnection.database
 ) : RemoteDataSource {
 
-    private val userCollection = database.getCollection<UserDTO>("users")
+    private val userCollection = database.getCollection<UserDto>("users")
     private val auditsCollection = database.getCollection<AuditDTO>("audits")
     private val projectCollection = database.getCollection<ProjectDTO>("projects")
     private val statesCollection = database.getCollection<TaskStateDTO>("states")
@@ -42,7 +43,7 @@ class MongoDBDataSourceImpl(
         password: String,
         role: String
     ): Boolean {
-        val newUser = UserDTO(
+        val newUser = UserDto(
             id = Uuid.random().toString(),
             userName = username,
             password = hashPassword(password),
@@ -52,7 +53,7 @@ class MongoDBDataSourceImpl(
         return result.wasAcknowledged()
     }
 
-    override suspend fun getAuthenticatedUser(username: String, password: String): UserDTO {
+    override suspend fun getAuthenticatedUser(username: String, password: String): UserDto {
         val query = Filters.and(
             eq("userName", username), eq(
                 "password",
@@ -190,45 +191,55 @@ class MongoDBDataSourceImpl(
     //endregion
 
     //region user operations
-    override suspend fun getAllUsers(): List<UserDTO> {
+    override suspend fun getAllUsers(): List<UserDto> {
         return withContext(Dispatchers.IO) {
-            try {
-                userCollection.find().toList()
-            } catch (e: MongoTimeoutException) {
-                println("Database connection failed: ${e.message}")
-                emptyList()
-            }
-        }
-
+            userCollection.find().toList()
+        }.ifEmpty { throw DataSourceException("Unable to fetch users due to a data source issue. Please try again later.") }
     }
 
-    override suspend fun getUserByUserId(userId: String): UserDTO {
+    override suspend fun getUserByUserId(userId: String): UserDto {
         return getAllUsers()
             .find { it.id == userId }
             ?: throw UserNotFoundException()
     }
 
-    override suspend fun updateUser(user: UserDTO): UserDTO {
-        val filters = Filters.eq(UserDTO::id.name, user.id)
+    override suspend fun updateUser(user: UserDto): UserDto {
+        val filters = eq(UserDto::id.name, user.id)
         val existingUser = userCollection.find(filters).firstOrNull() ?: throw UserNotFoundException()
-
         val updates = buildList {
-            if (user.userName != existingUser.userName) {
-                add(Updates.set(UserDTO::userName.name, user.userName))
-            }
-            if (hashPassword(user.password)
-                != hashPassword(existingUser.password)
-            ) {
-                add(Updates.set(UserDTO::password.name, hashPassword(user.password)))
-            }
+            addAll(buildUsernameUpdates(user.userName, existingUser.userName))
+            addAll(buildPasswordUpdates(user.password, existingUser.password))
         }
+        checkUpdateUserIfEmpty(updates, filters)
+        return withContext(Dispatchers.IO) {
+            userCollection.find(filters).firstOrNull() ?: throw UserNotFoundException()
+        }
+    }
 
+    private fun buildUsernameUpdates(newUserName: String, existingUserName: String): List<Bson> {
+        return if (newUserName != existingUserName) {
+            listOf(set(UserDto::userName.name, newUserName))
+        } else {
+            emptyList()
+        }
+    }
+
+    private fun buildPasswordUpdates(newPassword: String, existingPassword: String): List<Bson> {
+        return if (hashPassword(newPassword)
+            != hashPassword(existingPassword)
+        ) {
+            listOf(set(UserDto::password.name, hashPassword(newPassword)))
+        } else {
+            emptyList()
+        }
+    }
+
+    private suspend fun checkUpdateUserIfEmpty(updates: List<Bson>, filters: Bson) {
         if (updates.isNotEmpty()) {
             val result = userCollection.updateOne(filters, Updates.combine(updates))
             require(result.matchedCount.toInt() != 0) { throw UserNotFoundException() }
         }
-
-        return userCollection.find(filters).firstOrNull() ?: throw UserNotFoundException()
     }
+
     //endregion
 }
