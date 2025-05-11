@@ -80,7 +80,7 @@ class TaskManagementScreen(
         consoleIO.showWithLine("\n\u001B[36m📋 All Tasks (Swimlanes View):\u001B[0m")
         try {
             val tasks = getAllTasksUseCase.getAllTasks()
-            val states = getAllTaskStatesUseCase.getAllStates()
+            val states = getAllTaskStatesUseCase.getAllTaskStates()
             swimlanesRenderer.render(tasks, states)
         } catch (e: Exception) {
             consoleIO.showWithLine("\u001B[31m❌ Failed to load tasks: ${e.message}\u001B[0m")
@@ -91,7 +91,7 @@ class TaskManagementScreen(
                     return
                 }
                 val tasks = rawDocs.mapNotNull { doc -> mapRawDocumentToTask(doc) }
-                val states = getAllTaskStatesUseCase.getAllStates()
+                val states = getAllTaskStatesUseCase.getAllTaskStates()
                 swimlanesRenderer.render(tasks, states)
                 consoleIO.showWithLine("\u001B[33m⚠️ Loaded tasks using fallback method due to schema issues.\u001B[0m")
             } catch (e: Exception) {
