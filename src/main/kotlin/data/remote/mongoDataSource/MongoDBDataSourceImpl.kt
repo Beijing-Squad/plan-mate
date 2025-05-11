@@ -2,6 +2,7 @@ package data.remote.mongoDataSource
 
 import com.mongodb.MongoTimeoutException
 import com.mongodb.client.model.Filters
+import com.mongodb.client.model.Filters.and
 import com.mongodb.client.model.Filters.eq
 import com.mongodb.client.model.Updates
 import com.mongodb.client.model.Updates.combine
@@ -17,6 +18,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.withContext
+import logic.entities.EntityType
 import logic.entities.Task
 import logic.exceptions.InvalidLoginException
 import logic.exceptions.StateNotFoundException
@@ -65,19 +67,29 @@ class MongoDBDataSourceImpl(
 
     //region audit operations
     override suspend fun getAllAuditLogs(): List<AuditDTO> {
-        TODO("Not yet implemented")
+        return auditsCollection.find().toList()
     }
 
     override suspend fun addAuditLog(audit: AuditDTO) {
-        TODO("Not yet implemented")
+        auditsCollection.insertOne(audit)
     }
 
     override suspend fun getAuditLogsByProjectId(projectId: String): List<AuditDTO> {
-        TODO("Not yet implemented")
+        return auditsCollection.find(
+            and(
+                eq<String>("entityId", projectId),
+                eq<String>("entityType", EntityType.PROJECT.name)
+            )
+        ).toList()
     }
 
     override suspend fun getAuditLogsByTaskId(taskId: String): List<AuditDTO> {
-        TODO("Not yet implemented")
+        return auditsCollection.find(
+            and(
+                eq("entityId", taskId),
+                eq("entityType", EntityType.TASK.name)
+            )
+        ).toList()
     }
     //endregion
 
