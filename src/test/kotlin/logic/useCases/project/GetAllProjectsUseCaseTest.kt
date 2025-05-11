@@ -5,7 +5,7 @@ import fake.createProject
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
-import logic.entities.exceptions.CsvReadException
+import logic.exceptions.DataReadException
 import logic.repository.ProjectsRepository
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -51,10 +51,10 @@ class GetAllProjectsUseCaseTest {
     fun `should throw exception when there is error in csv file`() {
         runTest {
             // Given
-            coEvery { projectRepository.getAllProjects() } throws CsvReadException("")
+            coEvery { projectRepository.getAllProjects() } throws DataReadException("")
 
             // When && Then
-            assertThrows<CsvReadException> { getAllProjectsUseCase.getAllProjects() }
+            assertThrows<DataReadException> { getAllProjectsUseCase.getAllProjects() }
         }
     }
 }

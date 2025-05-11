@@ -1,8 +1,8 @@
 package data.local.csvDataSource.csv
 
-import logic.entities.exceptions.CsvReadException
-import logic.entities.exceptions.CsvWriteException
-import logic.entities.exceptions.ProjectNotFoundException
+import logic.exceptions.DataReadException
+import logic.exceptions.DataWriteException
+import logic.exceptions.ProjectNotFoundException
 
 class CsvDataSourceImpl<T>(
     private var csvFileReader: CsvReader,
@@ -16,7 +16,7 @@ class CsvDataSourceImpl<T>(
 
             lines.drop(1).map(csvDataParser::deserializer)
         } catch (e: Exception) {
-            throw CsvReadException("Error reading CSV file: ${e.message}")
+            throw DataReadException("Error reading CSV file: ${e.message}")
         }
     }
 
@@ -36,7 +36,7 @@ class CsvDataSourceImpl<T>(
 
             csvFileWriter.appendLine(csvDataParser.serializer(item))
         } catch (e: Exception) {
-            throw CsvWriteException("Error writing to CSV file: ${e.message}")
+            throw DataWriteException("Error writing to CSV file: ${e.message}")
         }
     }
 
@@ -45,7 +45,7 @@ class CsvDataSourceImpl<T>(
             val serializedLines = items.map(csvDataParser::serializer)
             csvFileWriter.updateLines(listOf(csvDataParser.header()) + serializedLines)
         } catch (e: Exception) {
-            throw CsvWriteException("Error saving to CSV file: ${e.message}")
+            throw DataWriteException("Error saving to CSV file: ${e.message}")
         }
     }
 
@@ -62,7 +62,7 @@ class CsvDataSourceImpl<T>(
             val updatedItems = allItems.filter { csvDataParser.getId(it) != id }
             updateFile(updatedItems)
         } catch (e: Exception) {
-            throw CsvWriteException("Error deleting item from CSV: ${e.message}")
+            throw DataWriteException("Error deleting item from CSV: ${e.message}")
         }
     }
 
@@ -72,7 +72,7 @@ class CsvDataSourceImpl<T>(
             allItems.find { csvDataParser.getId(it) == id }
                 ?: throw ProjectNotFoundException("Item with ID: $id was not found.")
         } catch (e: Exception) {
-            throw CsvReadException("Error reading CSV file for item with ID: $id, reason: ${e.message}")
+            throw DataReadException("Error reading CSV file for item with ID: $id, reason: ${e.message}")
         }
     }
     fun updateItem(updatedItem: T) {
@@ -91,7 +91,7 @@ class CsvDataSourceImpl<T>(
 
             updateFile(updatedList)
         } catch (e: Exception) {
-            throw CsvWriteException("Error updating item in CSV file: ${e.message}")
+            throw DataWriteException("Error updating item in CSV file: ${e.message}")
         }
     }
 }

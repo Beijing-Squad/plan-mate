@@ -1,10 +1,10 @@
 package data.local.csvDataSource
 
 import data.local.csvDataSource.csv.CsvDataSourceImpl
-import data.repository.dataSource.StatesDataSource
+import data.repository.localDataSource.StatesDataSource
 import logic.entities.TaskState
-import logic.entities.exceptions.StateException
-import logic.entities.exceptions.StateNotFoundException
+import logic.exceptions.StateException
+import logic.exceptions.StateNotFoundException
 import kotlin.uuid.ExperimentalUuidApi
 
 class TaskStatesCsvDataSourceImpl(

@@ -3,7 +3,7 @@ package logic.useCases.project
 import fake.createProject
 import io.mockk.*
 import kotlinx.coroutines.test.runTest
-import logic.entities.exceptions.CsvWriteException
+import logic.exceptions.DataWriteException
 import logic.repository.ProjectsRepository
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -40,10 +40,10 @@ class AddProjectUseCaseTest {
         runTest {
             // Given
             val project = createProject()
-            coEvery { projectRepository.addProject(project) } throws CsvWriteException("Failed to write CSV")
+            coEvery { projectRepository.addProject(project) } throws DataWriteException("Failed to write CSV")
 
             // When && Then
-            assertThrows<CsvWriteException> {
+            assertThrows<DataWriteException> {
                 addProject.addProject(project)
             }
         }

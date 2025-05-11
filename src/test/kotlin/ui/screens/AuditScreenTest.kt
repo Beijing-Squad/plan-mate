@@ -6,8 +6,8 @@ import kotlinx.coroutines.runBlocking
 import logic.entities.ActionType
 import logic.entities.EntityType
 import logic.entities.UserRole
-import logic.entities.exceptions.InvalidInputException
-import logic.entities.exceptions.ProjectNotFoundException
+import logic.exceptions.InvalidInputException
+import logic.exceptions.ProjectNotFoundException
 import logic.useCases.audit.GetAllAuditLogsUseCase
 import logic.useCases.audit.GetAuditLogsByProjectIdUseCase
 import logic.useCases.audit.GetAuditLogsByTaskIdUseCase

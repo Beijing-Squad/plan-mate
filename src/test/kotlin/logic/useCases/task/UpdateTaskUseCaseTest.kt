@@ -7,11 +7,9 @@ import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.LocalDateTime
-import logic.entities.exceptions.InvalidInputException
 import logic.repository.TasksRepository
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import kotlin.test.assertFailsWith
 import kotlin.uuid.ExperimentalUuidApi
 
 @OptIn(ExperimentalUuidApi::class)

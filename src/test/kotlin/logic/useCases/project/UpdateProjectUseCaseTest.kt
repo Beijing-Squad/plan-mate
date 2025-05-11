@@ -7,7 +7,7 @@ import io.mockk.coEvery
 import io.mockk.just
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
-import logic.entities.exceptions.ProjectNotFoundException
+import logic.exceptions.ProjectNotFoundException
 import logic.repository.ProjectsRepository
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test

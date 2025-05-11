@@ -1,9 +1,9 @@
 package logic.useCases.state
 
 import logic.entities.TaskState
-import logic.entities.exceptions.InvalidStateNameException
-import logic.entities.exceptions.ProjectNotFoundException
-import logic.entities.exceptions.StateAlreadyExistException
+import logic.exceptions.InvalidStateNameException
+import logic.exceptions.ProjectNotFoundException
+import logic.exceptions.StateAlreadyExistException
 import logic.repository.StatesRepository
 import logic.useCases.project.GetAllProjectsUseCase
 import kotlin.uuid.ExperimentalUuidApi

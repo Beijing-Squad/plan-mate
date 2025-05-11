@@ -2,7 +2,7 @@ package data.local.csvDataSource
 
 
 import data.local.csvDataSource.csv.CsvDataSourceImpl
-import data.repository.dataSource.AuditDataSource
+import data.repository.localDataSource.AuditDataSource
 import logic.entities.Audit
 import logic.entities.EntityType
 

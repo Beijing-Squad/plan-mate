@@ -11,7 +11,7 @@ import logic.entities.ActionType
 import logic.entities.Audit
 import logic.entities.EntityType
 import logic.entities.UserRole
-import logic.entities.exceptions.DataAccessException
+import logic.exceptions.DataAccessException
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows

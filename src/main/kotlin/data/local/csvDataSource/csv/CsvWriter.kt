@@ -1,14 +1,14 @@
 package data.local.csvDataSource.csv
 
-import logic.entities.exceptions.CsvFileExceptions
-import logic.entities.exceptions.EmptyHeaderException
+import logic.exceptions.DataSourceException
+import logic.exceptions.EmptyHeaderException
 import java.io.File
 
 class CsvWriter(private val file: File) {
 
     init {
         if (!file.name.endsWith(".csv", ignoreCase = true)) {
-            throw CsvFileExceptions("The file must have a .csv extension")
+            throw DataSourceException("The file must have a .csv extension")
         }
     }
 

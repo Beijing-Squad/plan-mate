@@ -5,8 +5,8 @@ import fake.createUser
 import io.mockk.*
 import kotlinx.coroutines.test.runTest
 import logic.entities.UserRole
-import logic.entities.exceptions.InvalidUserNameException
-import logic.entities.exceptions.UserNotFoundException
+import logic.exceptions.InvalidUserNameException
+import logic.exceptions.UserNotFoundException
 import logic.repository.AuthenticationRepository
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test

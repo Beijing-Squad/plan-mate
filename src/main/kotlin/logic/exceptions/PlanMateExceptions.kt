@@ -1,4 +1,4 @@
-package logic.entities.exceptions
+package logic.exceptions
 
 open class PlanMateException(message: String) : Exception(message)
 
@@ -32,7 +32,7 @@ class MateUnauthorizedException(message: String = "User should be admin") : Vali
 
 class DataAccessException(message: String) : PlanMateException(message)
 
-class CsvFileExceptions(message: String) : IllegalArgumentException(message)
+class DataSourceException(message: String) : IllegalArgumentException(message)
 class EmptyHeaderException(message: String) : IllegalArgumentException(message)
-class CsvReadException(message: String) : RuntimeException(message)
-class CsvWriteException(message: String) : RuntimeException(message)
+class DataReadException(message: String) : RuntimeException(message)
+class DataWriteException(message: String) : RuntimeException(message)
