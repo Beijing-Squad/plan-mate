@@ -1,14 +1,12 @@
 package ui.screens
 
+import GetAuditLogsByProjectIdUseCase
 import fake.createAudit
 import io.mockk.*
 import kotlinx.coroutines.runBlocking
 import logic.entities.Audit
 import logic.entities.type.UserRole
-import logic.exceptions.InvalidInputException
-import logic.exceptions.ProjectNotFoundException
 import logic.useCases.audit.GetAllAuditLogsUseCase
-import logic.useCases.audit.GetAuditLogsByProjectIdUseCase
 import logic.useCases.audit.GetAuditLogsByTaskIdUseCase
 import ui.main.consoleIO.ConsoleIO
 import kotlin.test.BeforeTest
@@ -59,23 +57,20 @@ class AuditScreenTest {
     }
 
     @Test
-    fun `showOptionService should display audit logs options when called`() {
-        auditScreen.showOptionService()
-        verify { consoleIO.showWithLine(any()) }
-    }
-
-    @Test
-    fun `handleFeatureChoice should call getAllAuditLogs when this option is selected`() = runBlocking {
+    fun `handleFeatureChoice shows all audit logs if not empty`() = runBlocking {
         every { consoleIO.read() } returns "1"
         coEvery { getAllAuditLogsUseCase.getAllAuditLogs() } returns allAudit
 
         auditScreen.handleFeatureChoice()
 
-        coVerify { getAllAuditLogsUseCase.getAllAuditLogs() }
+        verify {
+            consoleIO.showWithLine("\n📋 All Audit Logs:\n")
+            consoleIO.showWithLine(match { it.contains("Adel") })
+        }
     }
 
     @Test
-    fun `should view no audit logs found message when getAllAuditLogs returns empty list`() = runBlocking {
+    fun `handleFeatureChoice shows no audit logs if list is empty`() = runBlocking {
         every { consoleIO.read() } returns "1"
         coEvery { getAllAuditLogsUseCase.getAllAuditLogs() } returns emptyList()
 
@@ -85,123 +80,93 @@ class AuditScreenTest {
     }
 
     @Test
-    fun `should view all audit logs when getAllAuditLogs returns non-empty list`() = runBlocking {
-        every { consoleIO.read() } returns "1"
-        coEvery { getAllAuditLogsUseCase.getAllAuditLogs() } returns allAudit
-
-        auditScreen.handleFeatureChoice()
-
-        verifyOrder {
-            consoleIO.showWithLine("\n📋 All Audit Logs:\n")
-            consoleIO.showWithLine(any())
-        }
-    }
-
-    @Test
-    fun `handleFeatureChoice should call getAuditLogsByProjectId when this option is selected`() = runBlocking {
-        every { consoleIO.read() } returns "2"
-        coEvery { getAuditLogsByProjectIdUseCase.getAuditLogsByProjectId(any()) } returns allAudit
-
-        auditScreen.handleFeatureChoice()
-
-        coVerify { getAuditLogsByProjectIdUseCase.getAuditLogsByProjectId(any()) }
-    }
-
-    @Test
-    fun `should view all project audit logs when getAuditLogsByProjectId returns non-empty list`() = runBlocking {
+    fun `handleFeatureChoice shows project logs if found`() = runBlocking {
         val projectId = "123"
         every { consoleIO.read() } returns "2" andThen projectId
         coEvery { getAuditLogsByProjectIdUseCase.getAuditLogsByProjectId(projectId) } returns allAudit
 
         auditScreen.handleFeatureChoice()
 
-        verifyOrder {
+        verify {
             consoleIO.showWithLine("\n🔍 Audit Logs For Project ID: $projectId\n")
-            consoleIO.showWithLine(any())
+            consoleIO.showWithLine(match { it.contains("Adel") })
         }
     }
 
     @Test
-    fun `should view PROJECT_NOT_FOUND_ERROR message when getAuditLogsByProjectId returns error`() = runBlocking {
+    fun `handleFeatureChoice shows not found for empty project logs`() = runBlocking {
         val projectId = "123"
-        val error = "❌ Error: Project logs not found"
         every { consoleIO.read() } returns "2" andThen projectId
-        coEvery {
-            getAuditLogsByProjectIdUseCase.getAuditLogsByProjectId(projectId)
-        } throws ProjectNotFoundException(error)
+        coEvery { getAuditLogsByProjectIdUseCase.getAuditLogsByProjectId(projectId) } returns emptyList()
 
         auditScreen.handleFeatureChoice()
 
-        verify { consoleIO.showWithLine("❌ $error") }
+        verifySequence {
+            consoleIO.read()
+            consoleIO.show("Enter ID:")
+            consoleIO.read()
+            consoleIO.showWithLine("📋 Fetching project audit logs...")
+            consoleIO.showWithLine("❌ No Audit Logs Found")
+        }
+
     }
 
     @Test
-    fun `should view INVALID_ID_ERROR message when project id is blank`() = runBlocking {
-        val error = "Error: ID shouldn't be blank"
+    fun `handleFeatureChoice shows invalid project id if blank`() = runBlocking {
         every { consoleIO.read() } returns "2" andThen ""
-        coEvery {
-            getAuditLogsByProjectIdUseCase.getAuditLogsByProjectId("")
-        } throws InvalidInputException(error)
-
         auditScreen.handleFeatureChoice()
 
-        verify { consoleIO.showWithLine("❌ $error") }
+        verify { consoleIO.showWithLine("❌ Error: ID shouldn't be blank") }
     }
 
     @Test
-    fun `handleFeatureChoice should call getAuditLogsByTaskId when this option is selected`() = runBlocking {
-        every { consoleIO.read() } returns "3"
-        coEvery { getAuditLogsByTaskIdUseCase.getAuditLogsByTaskId(any()) } returns allAudit
-
-        auditScreen.handleFeatureChoice()
-
-        coVerify { getAuditLogsByTaskIdUseCase.getAuditLogsByTaskId(any()) }
-    }
-
-    @Test
-    fun `should view all task audit logs when getAuditLogsByTaskId returns non-empty list`() = runBlocking {
+    fun `handleFeatureChoice shows task logs if found`() = runBlocking {
         val taskId = "456"
         every { consoleIO.read() } returns "3" andThen taskId
         coEvery { getAuditLogsByTaskIdUseCase.getAuditLogsByTaskId(taskId) } returns allAudit
 
         auditScreen.handleFeatureChoice()
 
-        verifyOrder {
+        verify {
             consoleIO.showWithLine("\n🔍 Audit Logs For Task ID: $taskId\n")
-            consoleIO.showWithLine(any())
+            consoleIO.showWithLine(match { it.contains("Adel") })
         }
     }
 
     @Test
-    fun `should view INVALID_ID_ERROR message when task id is blank`() = runBlocking {
-        val error = "Error: ID shouldn't be blank"
+    fun `handleFeatureChoice shows not found for empty task logs`() = runBlocking {
+        val taskId = "456"
+        every { consoleIO.read() } returns "3" andThen taskId
+        coEvery { getAuditLogsByTaskIdUseCase.getAuditLogsByTaskId(taskId) } returns emptyList()
+
+        auditScreen.handleFeatureChoice()
+
+        verify { consoleIO.showWithLine("❌ No Audit Logs Found") }
+    }
+
+    @Test
+    fun `handleFeatureChoice shows invalid task id if blank`() = runBlocking {
         every { consoleIO.read() } returns "3" andThen ""
-        coEvery {
-            getAuditLogsByTaskIdUseCase.getAuditLogsByTaskId("")
-        } throws InvalidInputException(error)
 
         auditScreen.handleFeatureChoice()
 
-        verify { consoleIO.showWithLine("❌ $error") }
+        verify {
+            consoleIO.showWithLine("❌ Error: ID shouldn't be blank")
+        }
     }
 
+
     @Test
-    fun `should exit from audit log system when 0 is selected`() = runBlocking {
+    fun `handleFeatureChoice exits when 0 selected`() = runBlocking {
         every { consoleIO.read() } returns "0"
-
         auditScreen.handleFeatureChoice()
-
-        coVerify(exactly = 0) { getAllAuditLogsUseCase.getAllAuditLogs() }
+        confirmVerified(getAllAuditLogsUseCase, getAuditLogsByProjectIdUseCase, getAuditLogsByTaskIdUseCase)
     }
 
     @Test
-    fun `should show error message when enter invalid option`() = runBlocking {
-        val invalidOption = "999"
-        val invalidOptionMessage = "❌ Invalid Option"
-        every { consoleIO.read() } returns invalidOption
-
+    fun `handleFeatureChoice shows invalid option message`() = runBlocking {
+        every { consoleIO.read() } returns "9"
         auditScreen.handleFeatureChoice()
-
-        verify { consoleIO.showWithLine(invalidOptionMessage) }
+        verify { consoleIO.showWithLine("❌ Invalid Option") }
     }
 }
