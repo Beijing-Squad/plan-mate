@@ -41,6 +41,7 @@ abstract class BaseScreen(
 
         runBlocking {
             try {
+                delay(2000)
                 operation()
             } finally {
                 loadingJob.cancel()

@@ -68,14 +68,13 @@ class ProjectManagementScreen(
     private fun listAllProjects() {
         try {
             showAnimation("list all project...") {
-                consoleIO.showWithLine("")
                 val projects = getAllProjectsUseCase.getAllProjects()
                 if (projects.isEmpty()) {
                     consoleIO.showWithLine("\u001B[33m⚠️ No projects found.\u001B[0m")
                 } else {
                     projects.forEach { project ->
-                        showProjectInfo(project)
                         consoleIO.showWithLine("")
+                        showProjectInfo(project)
                     }
                 }
             }
@@ -212,14 +211,14 @@ class ProjectManagementScreen(
     private fun showProjectInfo(project: Project) {
         consoleIO.showWithLine(
             """
-        ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+        ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
         ┃   ID          : ${project.id}
         ┃  ️  Name        : ${project.name}
         ┃   Description : ${project.description}
         ┃   Created By  : ${project.createdBy}
         ┃   Created At  : ${project.createdAt}
         ┃   Updated At  : ${project.updatedAt}
-        ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+        ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
         """.trimIndent()
         )
     }
