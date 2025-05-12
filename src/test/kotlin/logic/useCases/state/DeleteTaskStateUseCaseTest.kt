@@ -39,7 +39,7 @@ class DeleteTaskStateUseCaseTest {
             coEvery { statesRepository.deleteState(state) } returns true
 
             // When
-            val result = deleteTaskStateUseCase.deleteState(state)
+            val result = deleteTaskStateUseCase.deleteState(state.id)
 
             // Then
             assertEquals(true, result)
@@ -61,7 +61,7 @@ class DeleteTaskStateUseCaseTest {
 
             // When & Then
             assertThrows<StateNotFoundException> {
-                deleteTaskStateUseCase.deleteState(state)
+                deleteTaskStateUseCase.deleteState(state.id)
             }
         }
     }

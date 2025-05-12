@@ -7,7 +7,6 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import logic.entities.Audit
 import logic.entities.Project
-import logic.entities.type.UserRole
 import logic.useCases.audit.AddAuditLogUseCase
 import logic.useCases.authentication.SessionManagerUseCase
 import logic.useCases.project.*
@@ -68,7 +67,7 @@ class ProjectManagementScreen(
         }
     }
 
-    private fun listAllProjects() = runBlocking{
+    private fun listAllProjects() = runBlocking {
         try {
             val projects = getAllProjectsUseCase.getAllProjects()
             if (projects.isEmpty()) {
@@ -83,7 +82,7 @@ class ProjectManagementScreen(
         }
     }
 
-    private fun findProjectById() = runBlocking{
+    private fun findProjectById() = runBlocking {
         try {
             consoleIO.show("\u001B[32mEnter project ID: \u001B[0m")
             val id = getInput() ?: return@runBlocking
@@ -94,7 +93,7 @@ class ProjectManagementScreen(
         }
     }
 
-    private fun updateProject() = runBlocking{
+    private fun updateProject() = runBlocking {
         try {
             consoleIO.show("\u001B[32mEnter project ID to update: \u001B[0m")
             val id = getInput() ?: return@runBlocking
@@ -115,10 +114,11 @@ class ProjectManagementScreen(
             consoleIO.showWithLine("\u001B[32m✅ Project updated successfully.\u001B[0m")
 
             sessionManager.getCurrentUser()?.let { user ->
-                val actionDetails = "Admin ${user.userName} updated project ${updated.id} with name '$name' at ${now.format()}"
+                val actionDetails =
+                    "Admin ${user.userName} updated project ${updated.id} with name '$name' at ${now.format()}"
                 addAudit.addAuditLog(
                     Audit(
-                        id = Uuid.random(),
+                        id = user.id,
                         userRole = user.role,
                         userName = user.userName,
                         action = Audit.ActionType.UPDATE,
@@ -134,7 +134,7 @@ class ProjectManagementScreen(
         }
     }
 
-    private fun addProject()  = runBlocking{
+    private fun addProject() = runBlocking {
         try {
             consoleIO.show("\u001B[32mEnter project name: \u001B[0m")
             val name = getInput() ?: return@runBlocking
@@ -155,7 +155,6 @@ class ProjectManagementScreen(
             sessionManager.getCurrentUser()?.let { user ->
                 val actionDetails =
                     "Admin ${user.userName} created project ${newProject.id} with name '$name' at ${now.format()}"
-
                 addAudit.addAuditLog(
                     Audit(
                         id = Uuid.random(),
@@ -174,20 +173,19 @@ class ProjectManagementScreen(
         }
     }
 
-    private fun deleteProject()= runBlocking {
+    private fun deleteProject() = runBlocking {
         try {
             consoleIO.show("\u001B[32mEnter project ID to delete: \u001B[0m")
-            val id = getInput() ?: return@runBlocking
             val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
             deleteProjectUseCase.deleteProject(id)
             consoleIO.showWithLine("\u001B[32m✅ Project deleted successfully.\u001B[0m")
-            sessionManager.getCurrentUser()?.userName?.let { userName ->
-                val actionDetails = "Admin $userName deleted project $id with name '$name' at ${now.format()}"
+            sessionManager.getCurrentUser()?.let { user ->
+                val actionDetails = "Admin ${user.userName} deleted project with name '$name' at ${now.format()}"
                 addAudit.addAuditLog(
                     Audit(
-                        id = Uuid.random(),
-                        userRole = UserRole.ADMIN,
-                        userName = userName,
+                        id = user.id,
+                        userRole = user.role,
+                        userName = user.userName,
                         action = Audit.ActionType.DELETE,
                         entityType = Audit.EntityType.PROJECT,
                         entityId = id,
