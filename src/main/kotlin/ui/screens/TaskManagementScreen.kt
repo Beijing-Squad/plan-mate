@@ -4,11 +4,13 @@ import data.remote.mongoDataSource.dto.TaskDto
 import data.repository.mapper.toTaskDto
 import data.repository.mapper.toTaskEntity
 import format
+import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import logic.entities.Audit
+import logic.entities.Task
 import logic.exceptions.TaskAlreadyExistsException
 import logic.exceptions.TaskNotFoundException
 import logic.exceptions.TaskException
@@ -61,7 +63,7 @@ class TaskManagementScreen(
                 "3" ->  getTaskById()
                 "4" ->  deleteTaskById()
                 "5" ->  showAllTasksList()
-                "6" ->  updateTaskById()
+                "6" ->  runBlocking {updateTaskById()}
                 "0" -> return
                 else -> consoleIO.showWithLine("\u001B[31m❌ Invalid option\u001B[0m")
             }
@@ -229,7 +231,7 @@ class TaskManagementScreen(
         }
     }
 
-    fun updateTaskById() {
+    suspend fun updateTaskById() {
         consoleIO.showWithLine("\n\u001B[36m🔄 Update Task\u001B[0m")
         consoleIO.show("Enter Task ID to update: ")
         val id = consoleIO.read()?.trim()
@@ -240,34 +242,33 @@ class TaskManagementScreen(
             return
         }
 
-        showAnimation("Updating task...") {
-            try {
-                val existingTaskDTO = getTaskByIdUseCase.getTaskById(id)
+        try {
+            val existingTask = getTaskByIdUseCase.getTaskById(id)
 
-                consoleIO.show("Enter New Title [${existingTaskDTO.title}]: ")
-                val newTitleInput = consoleIO.read()?.trim()
-                val newTitle = newTitleInput.takeIf { !it.isNullOrBlank() } ?: existingTaskDTO.title
+            consoleIO.show("Enter New Title [${existingTask.title}]: ")
+            val newTitleInput = consoleIO.read()?.trim()
+            val newTitle = newTitleInput.takeIf { !it.isNullOrBlank() } ?: existingTask.title
 
-                consoleIO.show("Enter New Description [${existingTaskDTO.description}]: ")
-                val newDescriptionInput = consoleIO.read()?.trim()
-                val newDescription = newDescriptionInput.takeIf { !it.isNullOrBlank() } ?: existingTaskDTO.description
+            consoleIO.show("Enter New Description [${existingTask.description}]: ")
+            val newDescriptionInput = consoleIO.read()?.trim()
+            val newDescription = newDescriptionInput.takeIf { !it.isNullOrBlank() } ?: existingTask.description
 
-                consoleIO.show("Enter New State ID [${existingTaskDTO.stateId}]: ")
-                val newStateIdInput = consoleIO.read()?.trim()
-                val newStateId = newStateIdInput.takeIf { !it.isNullOrBlank() } ?: existingTaskDTO.stateId
+            consoleIO.show("Enter New State ID [${existingTask.stateId}]: ")
+            val newStateIdInput = consoleIO.read()?.trim()
+            val newStateId = newStateIdInput.takeIf { !it.isNullOrBlank() } ?: existingTask.stateId
 
-                val updatedTaskDTO = TaskDto(
-                    id = existingTaskDTO.id.toString(),
-                    projectId = existingTaskDTO.projectId,
+            showAnimation("Updating task...") {
+                val updatedTask = Task(
+                    id = existingTask.id,
+                    projectId = existingTask.projectId,
                     title = newTitle,
                     description = newDescription,
-                    createdBy = existingTaskDTO.createdBy,
+                    createdBy = existingTask.createdBy,
                     stateId = newStateId,
-                    createdAt = existingTaskDTO.createdAt.toString(),
-                    updatedAt = now.toString()
+                    createdAt = existingTask.createdAt,
+                    updatedAt = now
                 )
 
-                val updatedTask = updatedTaskDTO.toTaskEntity()
                 val resultTaskDTO = updateTaskUseCase.updateTask(updatedTask)
 
                 consoleIO.showWithLine("✅ Task updated successfully:\n📌 Title: ${resultTaskDTO.title}, 📝 Description: ${resultTaskDTO.description}, 🔄 State: ${resultTaskDTO.stateId}")
@@ -288,13 +289,14 @@ class TaskManagementScreen(
                     )
                 }
 
-            } catch (e: TaskNotFoundException) {
-                consoleIO.showWithLine("\u001B[31m❌ ${e.message}\u001B[0m")
-            } catch (e: TaskException) {
-                consoleIO.showWithLine("\u001B[31m❌ Failed to update task: ${e.message}\u001B[0m")
-            }
+}
+        } catch (e: TaskNotFoundException) {
+            consoleIO.showWithLine("\u001B[31m❌ ${e.message}\u001B[0m")
+        } catch (e: TaskException) {
+            consoleIO.showWithLine("\u001B[31m❌ Failed to update task: ${e.message}\u001B[0m")
         }
     }
+
 
     fun deleteTaskById() {
         consoleIO.showWithLine("\n\u001B[36m🗑️ Delete Task\u001B[0m")
