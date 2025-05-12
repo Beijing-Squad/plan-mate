@@ -2,7 +2,7 @@ package ui.screens
 
 import kotlinx.coroutines.runBlocking
 import logic.entities.User
-import logic.entities.UserRole
+import logic.entities.type.UserRole
 import logic.exceptions.InvalidPasswordException
 import logic.exceptions.InvalidUserNameException
 import logic.exceptions.UnauthorizedUserException
@@ -28,7 +28,6 @@ class UserScreen(
     override val name: String
         get() = "User Screen"
 
-
     override fun showOptionService() {
         MenuRenderer.renderMenu(
             """
@@ -43,22 +42,15 @@ class UserScreen(
 
     @OptIn(ExperimentalUuidApi::class)
     override fun handleFeatureChoice() {
-        when (getInput()) {
-            "1" -> {
-                val currentUser = sessionManagerUseCase.getCurrentUser()
-                if (currentUser?.role == UserRole.ADMIN) {
-                    runBlocking {
-                        onClickGetAllUsers()
-                    }
-                } else {
-                    consoleIO.showWithLine("\u001B[31m❌ You don't have permission\u001B[0m")
-                }
+        while (true){
+            when (getInput()) {
+                "1" -> onClickGetAllUsers()
+                "2" -> onClickGetUserByID()
+                "3" -> onClickUpdateUser()
+                "0" -> return
+                else -> consoleIO.showWithLine("\u001B[31m❌ Invalid Option\u001B[0m")
             }
-
-            "2" -> onClickGetUserByID()
-            "3" -> onClickUpdateUser()
-            "0" -> return
-            else -> consoleIO.showWithLine("\u001B[31m❌ Invalid Option\u001B[0m")
+            showOptionService()
         }
     }
 
@@ -75,6 +67,7 @@ class UserScreen(
                     consoleIO.showWithLine("\u001B[33m⚠️  No users found.\u001B[0m")
                 } else {
                     users.forEach { user ->
+                        consoleIO.showWithLine("")
                         consoleIO.showWithLine(
                             """
                         ╭─────────────────────────╮
@@ -193,6 +186,7 @@ class UserScreen(
     private suspend fun updateUserInSystem(user: User) {
         try {
             val updatedUser = updateUser.updateUser(user)
+            consoleIO.showWithLine("")
             consoleIO.showWithLine(
                 """
             ✅ User updated successfully:
@@ -223,9 +217,8 @@ class UserScreen(
 
         showAnimation("get user by id...") {
             try {
-
                 val user = userId?.let { getUserByUserId.getUserByUserId(it) }
-
+                consoleIO.showWithLine("")
                 consoleIO.showWithLine(
                     """
             ╭─────────────────────────╮

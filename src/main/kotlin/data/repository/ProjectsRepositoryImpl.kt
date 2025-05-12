@@ -11,17 +11,17 @@ class ProjectsRepositoryImpl(
 ) : ProjectsRepository {
 
     override suspend fun getAllProjects(): List<Project> =
-        remoteDataSource.getAllProjects().map { toProjectEntity(it) }
+        remoteDataSource.getAllProjects().map { it.toProjectEntity() }
 
     override suspend fun addProject(project: Project) =
-        remoteDataSource.addProject(toProjectDto(project))
+        remoteDataSource.addProject(project.toProjectDto())
 
     override suspend fun deleteProject(projectId: String) =
         remoteDataSource.deleteProject(projectId)
 
     override suspend fun updateProject(newProjects: Project) =
-        remoteDataSource.updateProject(toProjectDto(newProjects))
+        remoteDataSource.updateProject(newProjects.toProjectDto())
 
     override suspend fun getProjectById(projectId: String): Project =
-        toProjectEntity(remoteDataSource.getProjectById(projectId))
+        remoteDataSource.getProjectById(projectId).toProjectEntity()
 }

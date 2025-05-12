@@ -3,15 +3,16 @@ package data.remote.mongoDataSource
 import com.mongodb.MongoTimeoutException
 import com.mongodb.MongoWriteException
 import com.mongodb.client.model.Filters
+import com.mongodb.client.model.Filters.and
 import com.mongodb.client.model.Filters.eq
 import com.mongodb.client.model.Updates
 import com.mongodb.client.model.Updates.combine
 import com.mongodb.client.model.Updates.set
 import com.mongodb.kotlin.client.coroutine.MongoDatabase
-import data.common.hashPassword
-import data.dto.*
+import data.remote.mongoDataSource.dto.*
 import data.remote.mongoDataSource.mongoConnection.MongoConnection
 import data.repository.remoteDataSource.RemoteDataSource
+import data.utils.hashPassword
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
@@ -23,27 +24,31 @@ import logic.exceptions.TaskAlreadyExistsException
 import logic.exceptions.TaskException
 import logic.exceptions.TaskNotFoundException
 import logic.exceptions.UserNotFoundException
+import logic.entities.Audit
+import logic.entities.Task
+import logic.exceptions.*
+import org.bson.conversions.Bson
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
+@OptIn(ExperimentalUuidApi::class)
 class MongoDBDataSourceImpl(
     database: MongoDatabase = MongoConnection.database
 ) : RemoteDataSource {
 
-    private val userCollection = database.getCollection<UserDTO>("users")
-    private val auditsCollection = database.getCollection<AuditDTO>("audits")
-    private val projectCollection = database.getCollection<ProjectDTO>("projects")
-    private val statesCollection = database.getCollection<TaskStateDTO>("states")
+    private val userCollection = database.getCollection<UserDto>("users")
+    private val auditsCollection = database.getCollection<AuditDto>("audits")
+    private val projectCollection = database.getCollection<ProjectDto>("projects")
+    private val statesCollection = database.getCollection<TaskStateDto>("states")
     private val taskCollection = database.getCollection<TaskDto>("tasks")
 
     //region authentication operations
-    @OptIn(ExperimentalUuidApi::class)
     override suspend fun saveUser(
         username: String,
         password: String,
         role: String
     ): Boolean {
-        val newUser = UserDTO(
+        val newUser = UserDto(
             id = Uuid.random().toString(),
             userName = username,
             password = hashPassword(password),
@@ -53,7 +58,7 @@ class MongoDBDataSourceImpl(
         return result.wasAcknowledged()
     }
 
-    override suspend fun getAuthenticatedUser(username: String, password: String): UserDTO {
+    override suspend fun getAuthenticatedUser(username: String, password: String): UserDto {
         val query = Filters.and(
             eq("userName", username), eq(
                 "password",
@@ -65,41 +70,56 @@ class MongoDBDataSourceImpl(
     //endregion
 
     //region audit operations
-    override suspend fun getAllAuditLogs(): List<AuditDTO> {
-        TODO("Not yet implemented")
+    override suspend fun getAllAuditLogs(): List<AuditDto> {
+        return auditsCollection.find().toList()
     }
 
-    override suspend fun addAuditLog(audit: AuditDTO) {
-        TODO("Not yet implemented")
+    override suspend fun addAuditLog(audit: AuditDto) {
+        auditsCollection.insertOne(audit)
     }
 
-    override suspend fun getAuditLogsByProjectId(projectId: String): List<AuditDTO> {
-        TODO("Not yet implemented")
+    override suspend fun getAuditLogsByProjectId(projectId: String): List<AuditDto> {
+        return auditsCollection.find(
+            and(
+                eq<String>("entityId", projectId),
+                eq<String>("entityType", Audit.EntityType.PROJECT.name)
+            )
+        ).toList()
     }
 
-    override suspend fun getAuditLogsByTaskId(taskId: String): List<AuditDTO> {
-        TODO("Not yet implemented")
+    override suspend fun getAuditLogsByTaskId(taskId: String): List<AuditDto> {
+        return auditsCollection.find(
+            and(
+                eq("entityId", taskId),
+                eq("entityType", Audit.EntityType.TASK.name)
+            )
+        ).toList()
     }
     //endregion
 
     //region project operations
-    override suspend fun getAllProjects(): List<ProjectDTO> = projectCollection.find().toList()
+    override suspend fun getAllProjects(): List<ProjectDto> = projectCollection.find().toList()
 
-    override suspend fun addProject(project: ProjectDTO) {
+    override suspend fun addProject(project: ProjectDto) {
         projectCollection.insertOne(project)
     }
 
     override suspend fun deleteProject(projectId: String) {
-        projectCollection.findOneAndDelete(eq("id", projectId))
+        projectCollection.findOneAndDelete(eq("_id", projectId))
     }
 
-    @OptIn(ExperimentalUuidApi::class)
-    override suspend fun updateProject(newProjects: ProjectDTO) {
-        projectCollection.replaceOne(eq("id", newProjects.id.toString()), newProjects)
+    override suspend fun updateProject(newProjects: ProjectDto) {
+        projectCollection.replaceOne(eq("_id", newProjects.id), newProjects)
     }
 
-    override suspend fun getProjectById(projectId: String): ProjectDTO {
-        return projectCollection.find(eq("id", projectId)).first()
+    override suspend fun getProjectById(projectId: String): ProjectDto {
+        return projectCollection.find(eq("_id", projectId)).first()
+    }
+
+    private suspend fun isProjectExists(projectId: String): Boolean {
+        return projectCollection
+            .find(eq("_id", projectId))
+            .firstOrNull() != null
     }
     //endregion
 
@@ -128,84 +148,99 @@ class MongoDBDataSourceImpl(
     }
     //endregion
 
-    //region task state operations
-    override suspend fun getAllStates(): List<TaskStateDTO> {
-        return statesCollection.find<TaskStateDTO>().toList()
+    //region taskState operations
+    override suspend fun addTaskState(taskState: TaskStateDto): Boolean {
+        if (isTaskStateExists(taskState.id)) throw StateAlreadyExistException()
+
+        return statesCollection.insertOne(taskState).wasAcknowledged()
     }
 
-    override suspend fun getTaskStatesByProjectId(projectId: String): List<TaskStateDTO> {
+    override suspend fun deleteTaskState(taskStateId: String): Boolean {
+        if (!isTaskStateExists(taskStateId)) throw StateNotFoundException()
+
+        return statesCollection.deleteOne(eq("_id", taskStateId)).deletedCount > 0
+    }
+
+    override suspend fun getAllTaskStates(): List<TaskStateDto> {
+        return statesCollection.find().toList()
+    }
+
+    override suspend fun getTaskStatesByProjectId(projectId: String): List<TaskStateDto> {
+        if (!isProjectExists(projectId)) throw ProjectNotFoundException()
         val projectIdFilter = eq("projectId", projectId)
         return statesCollection.find(projectIdFilter).toList()
     }
 
-    override suspend fun getTaskStateById(stateId: String): TaskStateDTO {
-        val stateIdFilter = eq("_id", stateId)
+    override suspend fun getTaskStateById(taskStateId: String): TaskStateDto {
+        val stateIdFilter = eq("_id", taskStateId)
         return statesCollection.find(stateIdFilter).firstOrNull() ?: throw StateNotFoundException()
     }
 
-    override suspend fun addTaskState(taskState: TaskStateDTO): Boolean {
-        return statesCollection.insertOne(taskState).wasAcknowledged()
-    }
-
-    override suspend fun updateTaskState(taskState: TaskStateDTO): TaskStateDTO {
-        val stateIdFilter = eq("_id", taskState.id)
-        val updatedState = combine(
-            set("name", taskState.name),
-            set("projectId", taskState.projectId)
-        )
-        return statesCollection.updateOne(filter = stateIdFilter, update = updatedState)
-            .takeIf { it.matchedCount > 0 }
-            ?.let { taskState }
-            ?: throw StateNotFoundException()
-    }
-
-    override suspend fun deleteTaskState(taskState: TaskStateDTO): Boolean {
+    override suspend fun updateTaskState(taskState: TaskStateDto): Boolean {
+        if (!isTaskStateExists(taskState.id)) throw StateNotFoundException()
+        if (!isProjectExists(taskState.projectId)) throw ProjectNotFoundException()
         val stateIdFilter = eq("_id", taskState.id)
 
-        return statesCollection.deleteOne(stateIdFilter).deletedCount > 0
+        return statesCollection.replaceOne(stateIdFilter, taskState).wasAcknowledged()
+    }
+
+    private suspend fun isTaskStateExists(stateId: String): Boolean {
+        val stateIdFilter = eq("_id", stateId)
+        val existingState = statesCollection.find<TaskStateDto>(stateIdFilter).firstOrNull()
+        return existingState != null
     }
     //endregion
 
     //region user operations
-    override suspend fun getAllUsers(): List<UserDTO> {
+    override suspend fun getAllUsers(): List<UserDto> {
         return withContext(Dispatchers.IO) {
-            try {
-                userCollection.find().toList()
-            } catch (e: MongoTimeoutException) {
-                println("Database connection failed: ${e.message}")
-                emptyList()
-            }
+            userCollection.find().toList()
         }
-
     }
 
-    override suspend fun getUserByUserId(userId: String): UserDTO {
+    override suspend fun getUserByUserId(userId: String): UserDto {
         return getAllUsers()
             .find { it.id == userId }
             ?: throw UserNotFoundException()
     }
 
-    override suspend fun updateUser(user: UserDTO): UserDTO {
-        val filters = Filters.eq(UserDTO::id.name, user.id)
+    override suspend fun updateUser(user: UserDto): UserDto {
+        val filters = eq("_id", user.id)
         val existingUser = userCollection.find(filters).firstOrNull() ?: throw UserNotFoundException()
-
         val updates = buildList {
-            if (user.userName != existingUser.userName) {
-                add(Updates.set(UserDTO::userName.name, user.userName))
-            }
-            if (hashPassword(user.password)
-                != hashPassword(existingUser.password)
-            ) {
-                add(Updates.set(UserDTO::password.name, hashPassword(user.password)))
-            }
+            addAll(buildUsernameUpdates(user.userName, existingUser.userName))
+            addAll(buildPasswordUpdates(user.password, existingUser.password))
         }
+        checkUpdateUserIfEmpty(updates, filters)
+        return withContext(Dispatchers.IO) {
+            userCollection.find(filters).firstOrNull() ?: throw UserNotFoundException()
+        }
+    }
 
+    private fun buildUsernameUpdates(newUserName: String, existingUserName: String): List<Bson> {
+        return if (newUserName != existingUserName) {
+            listOf(set(UserDto::userName.name, newUserName))
+        } else {
+            emptyList()
+        }
+    }
+
+    private fun buildPasswordUpdates(newPassword: String, existingPassword: String): List<Bson> {
+        return if (hashPassword(newPassword)
+            != hashPassword(existingPassword)
+        ) {
+            listOf(set(UserDto::password.name, hashPassword(newPassword)))
+        } else {
+            emptyList()
+        }
+    }
+
+    private suspend fun checkUpdateUserIfEmpty(updates: List<Bson>, filters: Bson) {
         if (updates.isNotEmpty()) {
-            val result = userCollection.updateOne(filters, Updates.combine(updates))
+            val result = userCollection.updateOne(filters, combine(updates))
             require(result.matchedCount.toInt() != 0) { throw UserNotFoundException() }
         }
-
-        return userCollection.find(filters).firstOrNull() ?: throw UserNotFoundException()
     }
+
     //endregion
 }

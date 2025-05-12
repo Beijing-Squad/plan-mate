@@ -1,7 +1,7 @@
 package logic.repository
 
 import logic.entities.User
-import logic.entities.UserRole
+import logic.entities.type.UserRole
 
 interface AuthenticationRepository {
     suspend fun registerUser(username: String, password: String, role: UserRole): Boolean

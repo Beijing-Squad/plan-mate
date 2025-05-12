@@ -1,12 +1,12 @@
 package data.repository.mapper
 
-import data.dto.TaskStateDTO
+import data.remote.mongoDataSource.dto.TaskStateDto
 import logic.entities.TaskState
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
 @OptIn(ExperimentalUuidApi::class)
-fun toTaskStateEntity(taskState: TaskStateDTO): TaskState {
+fun toTaskStateEntity(taskState: TaskStateDto): TaskState {
     return TaskState(
         id = Uuid.parse(taskState.id),
         name = taskState.name,
@@ -15,8 +15,8 @@ fun toTaskStateEntity(taskState: TaskStateDTO): TaskState {
 }
 
 @OptIn(ExperimentalUuidApi::class)
-fun toTaskStateDto(taskState: TaskState): TaskStateDTO {
-    return TaskStateDTO(
+fun toTaskStateDto(taskState: TaskState): TaskStateDto {
+    return TaskStateDto(
         id = taskState.id.toString(),
         name = taskState.name,
         projectId = taskState.projectId.toString()

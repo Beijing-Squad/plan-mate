@@ -5,7 +5,9 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import logic.entities.*
+import logic.entities.Audit
+import logic.entities.Project
+import logic.entities.type.UserRole
 import logic.useCases.audit.AddAuditLogUseCase
 import logic.useCases.authentication.SessionManagerUseCase
 import logic.useCases.project.*
@@ -24,11 +26,10 @@ class ProjectManagementScreen(
     private val getProjectByIdUseCase: GetProjectByIdUseCase,
     private val updateProjectUseCase: UpdateProjectUseCase,
     private val addAudit: AddAuditLogUseCase,
-    private val userRole: UserRole = UserRole.ADMIN,
-    private val consoleIO: ConsoleIO
+    private val consoleIO: ConsoleIO,
+    private val sessionManager: SessionManagerUseCase
 ) : BaseScreen(consoleIO) {
 
-    private val sessionManager = SessionManagerUseCase()
     override val id: String
         get() = "1"
     override val name: String
@@ -113,15 +114,15 @@ class ProjectManagementScreen(
             updateProjectUseCase.updateProject(updated)
             consoleIO.showWithLine("\u001B[32m✅ Project updated successfully.\u001B[0m")
 
-            sessionManager.getCurrentUser()?.userName?.let { userName ->
-                val actionDetails = "Admin $userName updated project ${updated.id} with name '$name' at ${now.format()}"
+            sessionManager.getCurrentUser()?.let { user ->
+                val actionDetails = "Admin ${user.userName} updated project ${updated.id} with name '$name' at ${now.format()}"
                 addAudit.addAuditLog(
                     Audit(
                         id = Uuid.random(),
-                        userRole = userRole,
-                        userName = userName,
-                        action = ActionType.UPDATE,
-                        entityType = EntityType.PROJECT,
+                        userRole = user.role,
+                        userName = user.userName,
+                        action = Audit.ActionType.UPDATE,
+                        entityType = Audit.EntityType.PROJECT,
                         entityId = updated.id.toString(),
                         actionDetails = actionDetails,
                         timeStamp = now
@@ -151,17 +152,17 @@ class ProjectManagementScreen(
 
             addProjectUseCase.addProject(newProject)
             consoleIO.showWithLine("\u001B[32m✅ Project added successfully.\u001B[0m")
-            sessionManager.getCurrentUser()?.userName?.let { userName ->
+            sessionManager.getCurrentUser()?.let { user ->
                 val actionDetails =
-                    "Admin $userName created project ${newProject.id} with name '$name' at ${now.format()}"
+                    "Admin ${user.userName} created project ${newProject.id} with name '$name' at ${now.format()}"
 
                 addAudit.addAuditLog(
                     Audit(
                         id = Uuid.random(),
-                        userRole = userRole,
-                        userName = createdBy,
-                        action = ActionType.CREATE,
-                        entityType = EntityType.PROJECT,
+                        userRole = user.role,
+                        userName = user.userName,
+                        action = Audit.ActionType.CREATE,
+                        entityType = Audit.EntityType.PROJECT,
                         entityId = newProject.id.toString(),
                         actionDetails = actionDetails,
                         timeStamp = now
@@ -187,8 +188,8 @@ class ProjectManagementScreen(
                         id = Uuid.random(),
                         userRole = UserRole.ADMIN,
                         userName = userName,
-                        action = ActionType.DELETE,
-                        entityType = EntityType.PROJECT,
+                        action = Audit.ActionType.DELETE,
+                        entityType = Audit.EntityType.PROJECT,
                         entityId = id,
                         actionDetails = actionDetails,
                         timeStamp = now

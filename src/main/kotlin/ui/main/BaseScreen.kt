@@ -44,7 +44,7 @@ abstract class BaseScreen(
                 operation()
             } finally {
                 loadingJob.cancel()
-                consoleIO.show("\r" + " ".repeat(message.length + 10) + "\r") // Clear the loading line
+                consoleIO.show("\r" + " ".repeat(message.length + 10) + "\r")
             }
         }
     }
