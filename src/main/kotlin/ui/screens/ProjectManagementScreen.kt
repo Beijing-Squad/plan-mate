@@ -139,19 +139,16 @@ class ProjectManagementScreen(
             val name = getInput() ?: return@runBlocking
             consoleIO.show("\u001B[32mEnter description: \u001B[0m")
             val desc = getInput() ?: return@runBlocking
-            consoleIO.show("\u001B[32mEnter created by (user ID): \u001B[0m")
-            val createdBy = getInput() ?: return@runBlocking
-            val newProject = Project(
-                name = name,
-                description = desc,
-                createdBy = createdBy,
-                createdAt = now,
-                updatedAt = now
-            )
-
-            addProjectUseCase.addProject(newProject)
-            consoleIO.showWithLine("\u001B[32m✅ Project added successfully.\u001B[0m")
             sessionManager.getCurrentUser()?.let { user ->
+                val newProject = Project(
+                    name = name,
+                    description = desc,
+                    createdBy = user.id.toString(),
+                    createdAt = now,
+                    updatedAt = now
+                )
+                addProjectUseCase.addProject(newProject)
+                consoleIO.showWithLine("\u001B[32m✅ Project added successfully.\u001B[0m")
                 val actionDetails =
                     "Admin ${user.userName} created project ${newProject.id} with name '$name' at ${now.format()}"
                 addAudit.addAuditLog(
@@ -171,7 +168,6 @@ class ProjectManagementScreen(
             consoleIO.showWithLine("\u001B[31m❌ ${e.message}\u001B[0m")
         }
     }
-
     private fun deleteProject() = runBlocking {
         try {
             consoleIO.show("\u001B[32mEnter project ID to delete: \u001B[0m")
