@@ -8,6 +8,7 @@ import logic.repository.ProjectsRepository
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import kotlin.uuid.ExperimentalUuidApi
 
 class AddProjectUseCaseTest {
 
@@ -20,6 +21,7 @@ class AddProjectUseCaseTest {
         addProject = AddProjectUseCase(projectRepository)
     }
 
+    @OptIn(ExperimentalUuidApi::class)
     @Test
     fun `should add project successfully`() {
         runTest {
@@ -35,6 +37,7 @@ class AddProjectUseCaseTest {
         }
     }
 
+    @OptIn(ExperimentalUuidApi::class)
     @Test
     fun `should throw CsvWriteException when repository throws`() {
         runTest {
