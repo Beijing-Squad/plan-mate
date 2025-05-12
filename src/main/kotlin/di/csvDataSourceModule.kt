@@ -1,9 +1,9 @@
 package di
 
-import data.local.csvDataSource.*
+import data.local.csvDataSource.LocalDataSourceImpl
 import data.local.csvDataSource.csv.CsvDataSourceImpl
 import data.local.csvDataSource.parser.*
-import data.repository.localDataSource.*
+import data.repository.localDataSource.LocalDataSource
 import logic.entities.*
 import org.koin.core.qualifier.named
 import org.koin.dsl.bind
@@ -55,12 +55,13 @@ val dataSourceModule = module {
     }
 
     // Implementations
-    single { ProjectCsvDataSourceImpl(get(named("projectDataSource"))) } bind ProjectDataSource::class
-    single { UserCsvDataSourceImpl(get(named("userDataSource"))) } bind UserDataSource::class
-    single { TasksCsvDataSourceImpl(get(named("taskDataSource"))) } bind TasksDataSource::class
-    single { TaskStatesCsvDataSourceImpl(get(named("stateDataSource"))) } bind StatesDataSource::class
-    single { AuditCsvDataSourceImpl(get(named("auditDataSource"))) } bind AuditDataSource::class
-    single {
-        AuthenticationCsvDataSourceImpl(get(named("authenticationDataSource")), get())
-    }bind AuthenticationDataSource::class
+    single<LocalDataSource> {
+        LocalDataSourceImpl(
+            get(named("projectDataSource")),
+            get(named("auditDataSource")),
+            get(named("taskDataSource")),
+            get(named("stateDataSource")),
+            get(named("userDataSource"))
+        )
+    } bind LocalDataSource::class
 }

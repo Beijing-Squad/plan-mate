@@ -12,7 +12,9 @@ import logic.repository.ProjectsRepository
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import kotlin.uuid.ExperimentalUuidApi
 
+@OptIn(ExperimentalUuidApi::class)
 class UpdateProjectUseCaseTest {
 
     private lateinit var updateProjectUseCase: UpdateProjectUseCase
@@ -24,6 +26,7 @@ class UpdateProjectUseCaseTest {
         updateProjectUseCase = UpdateProjectUseCase(projectRepository)
     }
 
+    @OptIn(ExperimentalUuidApi::class)
     @Test
     fun `should update project successfully`() {
         runTest {
@@ -41,6 +44,7 @@ class UpdateProjectUseCaseTest {
     }
 
 
+    @OptIn(ExperimentalUuidApi::class)
     @Test
     fun `should throw ProjectNotFoundException when project does not exist`() {
         runTest {
@@ -58,6 +62,7 @@ class UpdateProjectUseCaseTest {
         }
     }
 
+    @OptIn(ExperimentalUuidApi::class)
     @Test
     fun `should handle exceptions thrown by repository`() {
         runTest {

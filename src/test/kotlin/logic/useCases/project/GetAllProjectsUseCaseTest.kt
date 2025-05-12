@@ -10,7 +10,9 @@ import logic.repository.ProjectsRepository
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import kotlin.uuid.ExperimentalUuidApi
 
+@OptIn(ExperimentalUuidApi::class)
 class GetAllProjectsUseCaseTest {
     private lateinit var getAllProjectsUseCase: GetAllProjectsUseCase
     private lateinit var projectRepository: ProjectsRepository
@@ -22,6 +24,7 @@ class GetAllProjectsUseCaseTest {
         getAllProjectsUseCase = GetAllProjectsUseCase(projectRepository)
     }
 
+    @OptIn(ExperimentalUuidApi::class)
     @Test
     fun `should return projects when there is projects in repository`() {
         runTest {

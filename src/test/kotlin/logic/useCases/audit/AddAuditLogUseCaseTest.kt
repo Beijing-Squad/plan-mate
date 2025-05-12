@@ -1,7 +1,9 @@
 package logic.useCases.audit
 
 import fake.createAudit
+import io.mockk.coEvery
 import io.mockk.coVerify
+import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import logic.entities.Audit
@@ -20,12 +22,12 @@ class AddAuditLogUseCaseTest {
     @BeforeEach
     fun setUp() {
         auditRepository = mockk(relaxed = true)
-        addAuditLogUseCase = AddAuditLogUseCase(auditRepository,sessionManagerUseCase)
+        sessionManagerUseCase = mockk()
+        addAuditLogUseCase = AddAuditLogUseCase(auditRepository, sessionManagerUseCase)
     }
 
     @Test
     fun `should add audit log when called`() = runTest {
-        // Given
         val auditLog = createAudit(
             userRole = UserRole.ADMIN,
             userName = "Adel",
@@ -34,16 +36,24 @@ class AddAuditLogUseCaseTest {
             entityId = "PROJECT-001"
         )
 
-        // When
+        coEvery { sessionManagerUseCase.getCurrentUser() } returns mockk {
+            every { role } returns auditLog.userRole
+        }
+
         addAuditLogUseCase.addAuditLog(auditLog)
 
-        // Then
-        coVerify { auditRepository.addAuditLog(auditLog) }
+        coVerify {
+            auditRepository.addAuditLog(match {
+                it.userName == "Adel" &&
+                        it.action == Audit.ActionType.CREATE &&
+                        it.entityType == Audit.EntityType.PROJECT &&
+                        it.userRole == UserRole.ADMIN
+            })
+        }
     }
 
     @Test
     fun `should add audit log for task with state change`() = runTest {
-        // Given
         val auditLog = createAudit(
             userRole = UserRole.MATE,
             userName = "User1",
@@ -52,16 +62,24 @@ class AddAuditLogUseCaseTest {
             entityId = "TASK-123"
         )
 
-        // When
+        coEvery { sessionManagerUseCase.getCurrentUser() } returns mockk {
+            every { role } returns auditLog.userRole
+        }
+
         addAuditLogUseCase.addAuditLog(auditLog)
 
-        // Then
-        coVerify { auditRepository.addAuditLog(auditLog) }
+        coVerify {
+            auditRepository.addAuditLog(match {
+                it.userName == "User1" &&
+                        it.action == Audit.ActionType.UPDATE &&
+                        it.entityType == Audit.EntityType.TASK &&
+                        it.userRole == UserRole.MATE
+            })
+        }
     }
 
     @Test
     fun `should add audit log with DELETE action`() = runTest {
-        // Given
         val auditLog = createAudit(
             userRole = UserRole.ADMIN,
             userName = "Admin",
@@ -70,16 +88,24 @@ class AddAuditLogUseCaseTest {
             entityId = "PROJECT-002"
         )
 
-        // When
+        coEvery { sessionManagerUseCase.getCurrentUser() } returns mockk {
+            every { role } returns auditLog.userRole
+        }
+
         addAuditLogUseCase.addAuditLog(auditLog)
 
-        // Then
-        coVerify { auditRepository.addAuditLog(auditLog) }
+        coVerify {
+            auditRepository.addAuditLog(match {
+                it.userName == "Admin" &&
+                        it.action == Audit.ActionType.DELETE &&
+                        it.entityType == Audit.EntityType.PROJECT &&
+                        it.userRole == UserRole.ADMIN
+            })
+        }
     }
 
     @Test
     fun `should add multiple audit logs correctly`() = runTest {
-        // Given
         val auditLog1 = createAudit(
             userRole = UserRole.MATE,
             userName = "User1",
@@ -95,20 +121,28 @@ class AddAuditLogUseCaseTest {
             entityId = "TASK-456"
         )
 
-        // When
+        coEvery { sessionManagerUseCase.getCurrentUser() } returnsMany listOf(
+            mockk { every { role } returns auditLog1.userRole },
+            mockk { every { role } returns auditLog2.userRole }
+        )
+
         addAuditLogUseCase.addAuditLog(auditLog1)
         addAuditLogUseCase.addAuditLog(auditLog2)
 
-        // Then
         coVerify {
-            auditRepository.addAuditLog(auditLog1)
-            auditRepository.addAuditLog(auditLog2)
+            auditRepository.addAuditLog(match {
+                it.userName == "User1" &&
+                        it.userRole == UserRole.MATE
+            })
+            auditRepository.addAuditLog(match {
+                it.userName == "Admin" &&
+                        it.userRole == UserRole.ADMIN
+            })
         }
     }
 
     @Test
     fun `should add audit log with minimal fields`() = runTest {
-        // Given
         val auditLog = createAudit(
             userRole = UserRole.MATE,
             userName = "User3",
@@ -117,10 +151,19 @@ class AddAuditLogUseCaseTest {
             entityId = "TASK-789"
         )
 
-        // When
+        coEvery { sessionManagerUseCase.getCurrentUser() } returns mockk {
+            every { role } returns auditLog.userRole
+        }
+
         addAuditLogUseCase.addAuditLog(auditLog)
 
-        // Then
-        coVerify { auditRepository.addAuditLog(auditLog) }
+        coVerify {
+            auditRepository.addAuditLog(match {
+                it.userName == "User3" &&
+                        it.action == Audit.ActionType.CREATE &&
+                        it.entityType == Audit.EntityType.TASK &&
+                        it.userRole == UserRole.MATE
+            })
+        }
     }
 }
