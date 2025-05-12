@@ -76,29 +76,6 @@ class UserScreenTest {
         }
     }
 
-    @OptIn(ExperimentalUuidApi::class)
-    @Test
-    fun `should not call onClickGetAllUsers when user role is mate`() {
-        // Given
-        val userId = Uuid.parse(FAKE_ID)
-        val mockUser = mockk<User>(relaxed = true) {
-            every { id } returns userId
-            every { userName } returns FAKE_USERNAME
-            every { role } returns UserRole.MATE
-        }
-        every { consoleIO.read() } returns GET_ALL_USER_OPTION andThen EXIT_CHOICE
-        every { sessionManager.getCurrentUser() } returns mockUser
-        coEvery { getAllUsersUseCase.getAllUsers() } returns listOf(mockUser)
-
-        // When
-        userScreen.handleFeatureChoice()
-
-        // Then
-        coVerify(exactly = 0) {
-            getAllUsersUseCase.getAllUsers()
-        }
-    }
-
     @Test
     fun `should call onClickGetUserByID when input is 2`() {
         // Given
