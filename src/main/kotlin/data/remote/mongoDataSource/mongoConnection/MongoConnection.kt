@@ -3,14 +3,12 @@ package data.remote.mongoDataSource.mongoConnection
 import com.mongodb.ConnectionString
 import com.mongodb.MongoClientSettings
 import com.mongodb.kotlin.client.coroutine.MongoClient
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers import java.io.File
+import java.io.File
 import java.util.Properties
 
 object MongoConnection {
     private val client by lazy { createClient() }
     val database by lazy { client.getDatabase("planMate") }
-    val dbScope by lazy { CoroutineScope(Dispatchers.IO) }
 
     private fun createClient(): MongoClient {
         val props = Properties().apply {
