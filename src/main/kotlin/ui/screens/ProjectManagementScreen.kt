@@ -46,7 +46,6 @@ class ProjectManagementScreen(
     }
 
     override fun handleFeatureChoice() {
-        showOptionService()
         while (true) {
             when (getInput()) {
                 "1" -> listAllProjects()
@@ -62,12 +61,13 @@ class ProjectManagementScreen(
                 else -> consoleIO.showWithLine("\u001B[31m❌ Invalid Option\u001B[0m")
 
             }
+            showOptionService()
         }
     }
 
     private fun listAllProjects() {
         try {
-            showAnimation("list all project...") {
+            showAnimation("list all project...\n") {
 
                 val projects = getAllProjectsUseCase.getAllProjects()
                 if (projects.isEmpty()) {
@@ -85,7 +85,7 @@ class ProjectManagementScreen(
 
     private fun findProjectById() {
         try {
-            showAnimation("find project by id...") {
+            showAnimation("find project by id...\n") {
 
                 consoleIO.show("\u001B[32mEnter project ID: \u001B[0m")
                 val id = getInput() ?: return@showAnimation
@@ -99,7 +99,7 @@ class ProjectManagementScreen(
 
     private fun updateProject() {
         try {
-            showAnimation("update project...") {
+            showAnimation("update project...\n") {
                 consoleIO.show("\u001B[32mEnter project ID to update: \u001B[0m")
                 val id = getInput() ?: return@showAnimation
                 val project = getProjectByIdUseCase.getProjectById(id)
@@ -142,7 +142,7 @@ class ProjectManagementScreen(
 
     private fun addProject() {
         try {
-            showAnimation("add project...") {
+            showAnimation("add project...\n") {
                 consoleIO.show("\u001B[32mEnter project name: \u001B[0m")
                 val name = getInput() ?: return@showAnimation
                 consoleIO.show("\u001B[32mEnter description: \u001B[0m")
@@ -180,8 +180,9 @@ class ProjectManagementScreen(
 
     private fun deleteProject() {
         try {
-            showAnimation("delete project...") {
+            showAnimation("delete project...\n") {
                 consoleIO.show("\u001B[32mEnter project ID to delete: \u001B[0m")
+                val id = getInput() ?: return@showAnimation
                 val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
                 deleteProjectUseCase.deleteProject(id)
                 consoleIO.showWithLine("\u001B[32m✅ Project deleted successfully.\u001B[0m")
@@ -209,15 +210,17 @@ class ProjectManagementScreen(
     private fun showProjectInfo(project: Project) {
         consoleIO.showWithLine(
             """
-            \u001B[36m╭────────────────────────────╮
-            │ ID: ${project.id}
-            │ Name: ${project.name}
-            │ Description: ${project.description}
-            │ Created By: ${project.createdBy}
-            │ Created At: ${project.createdAt}
-            │ Updated At: ${project.updatedAt}
-            ╰────────────────────────────╯\u001B[0m
-            """.trimIndent()
+        ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+        ┃   ID          : ${project.id}
+        ┃  ️  Name        : ${project.name}
+        ┃   Description : ${project.description}
+        ┃   Created By  : ${project.createdBy}
+        ┃   Created At  : ${project.createdAt}
+        ┃   Updated At  : ${project.updatedAt}
+        ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+        """.trimIndent()
         )
+        consoleIO.showWithLine("\n")
     }
+
 }
