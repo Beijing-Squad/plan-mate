@@ -1,6 +1,10 @@
 package data.repository.localDataSource
 
-import logic.entities.*
+import data.remote.mongoDataSource.dto.TaskStateDto
+import logic.entities.Audit
+import logic.entities.Project
+import logic.entities.Task
+import logic.entities.User
 import logic.entities.type.UserRole
 
 interface LocalDataSource {
@@ -19,12 +23,12 @@ interface LocalDataSource {
     fun updateProject(newProjects: Project)
     fun getProjectById(projectId: String): Project
 
-    fun getAllStates(): List<TaskState>
-    fun getStatesByProjectId(projectId: String): List<TaskState>
-    fun getStateById(stateId: String): TaskState
-    fun addState(taskState: TaskState): Boolean
-    fun updateState(taskState: TaskState): TaskState
-    fun deleteState(taskState: TaskState): Boolean
+    fun addTaskState(taskState: TaskStateDto): Boolean
+    fun deleteTaskState(taskStateId: String): Boolean
+    fun getAllTaskStates(): List<TaskStateDto>
+    fun getTaskStateById(taskStateId: String): TaskStateDto
+    fun getTaskStatesByProjectId(projectId: String): List<TaskStateDto>
+    fun updateTaskState(taskState: TaskStateDto): Boolean
 
     fun getAllTasks(): List<Task>
     fun getTaskById(taskId: String): Task
