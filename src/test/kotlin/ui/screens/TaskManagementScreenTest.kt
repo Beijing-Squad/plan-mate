@@ -6,6 +6,7 @@ import fake.createTask
 import io.mockk.*
 import kotlinx.coroutines.test.runTest
 import logic.entities.*
+import logic.entities.type.UserRole
 import logic.exceptions.TaskNotFoundException
 import logic.exceptions.TaskAlreadyExistsException
 import logic.exceptions.TaskException
@@ -56,7 +57,7 @@ class TaskManagementScreenTest {
         val tasks = listOf(createTask(title = "Task 1"))
         val states = listOf(createState(name = "To Do"))
         coEvery { getAllTasksUseCase.getAllTasks() } returns tasks
-        coEvery { getAllTaskStatesUseCase.getAllStates() } returns states
+        coEvery { getAllTaskStatesUseCase.getAllTaskStates() } returns states
 
         // When
         screen.showTasksInSwimlanes()
@@ -231,7 +232,7 @@ class TaskManagementScreenTest {
             createState(name = "Done")
         )
         coEvery { getAllTasksUseCase.getAllTasks() } returns tasks
-        coEvery { getAllTaskStatesUseCase.getAllStates() } returns states
+        coEvery { getAllTaskStatesUseCase.getAllTaskStates() } returns states
 
         // When
         screen.showTasksInSwimlanes()
@@ -327,7 +328,7 @@ class TaskManagementScreenTest {
         // Given
         val tasks = listOf(createTask(title = "Task 1"))
         coEvery { getAllTasksUseCase.getAllTasks() } returns tasks
-        coEvery { getAllTaskStatesUseCase.getAllStates() } throws TaskException("Failed to load states")
+        coEvery { getAllTaskStatesUseCase.getAllTaskStates() } throws TaskException("Failed to load states")
 
         // When
         screen.showTasksInSwimlanes()
