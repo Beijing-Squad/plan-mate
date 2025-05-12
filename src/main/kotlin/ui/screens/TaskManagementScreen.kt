@@ -330,7 +330,7 @@ class TaskManagementScreen(
                         )
                     )
                 }
-                
+
             } catch (e: TaskNotFoundException) {
                 consoleIO.showWithLine("\u001B[31m❌ ${e.message}\u001B[0m")
             } catch (e: TaskException) {
