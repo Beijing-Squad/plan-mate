@@ -67,14 +67,15 @@ class ProjectManagementScreen(
 
     private fun listAllProjects() {
         try {
-            showAnimation("list all project...\n") {
-
+            showAnimation("list all project...") {
+                consoleIO.showWithLine("")
                 val projects = getAllProjectsUseCase.getAllProjects()
                 if (projects.isEmpty()) {
                     consoleIO.showWithLine("\u001B[33m⚠️ No projects found.\u001B[0m")
                 } else {
                     projects.forEach { project ->
                         showProjectInfo(project)
+                        consoleIO.showWithLine("")
                     }
                 }
             }
@@ -85,10 +86,10 @@ class ProjectManagementScreen(
 
     private fun findProjectById() {
         try {
-            showAnimation("find project by id...\n") {
-
-                consoleIO.show("\u001B[32mEnter project ID: \u001B[0m")
-                val id = getInput() ?: return@showAnimation
+            consoleIO.show("\u001B[32mEnter project ID: \u001B[0m")
+            val id = getInput() ?: return
+            showAnimation("find project by id...") {
+                consoleIO.showWithLine("")
                 val project = getProjectByIdUseCase.getProjectById(id)
                 showProjectInfo(project)
             }
@@ -99,11 +100,11 @@ class ProjectManagementScreen(
 
     private fun updateProject() {
         try {
-            showAnimation("update project...\n") {
-                consoleIO.show("\u001B[32mEnter project ID to update: \u001B[0m")
-                val id = getInput() ?: return@showAnimation
+            consoleIO.show("\u001B[32mEnter project ID to update: \u001B[0m")
+            val id = getInput() ?: return
+            showAnimation("update project...") {
+                consoleIO.showWithLine("")
                 val project = getProjectByIdUseCase.getProjectById(id)
-
                 consoleIO.show("\u001B[32mEnter new name: \u001B[0m")
                 val name = getInput() ?: return@showAnimation
                 consoleIO.show("\u001B[32mEnter new description: \u001B[0m")
@@ -117,7 +118,6 @@ class ProjectManagementScreen(
 
                 updateProjectUseCase.updateProject(updated)
                 consoleIO.showWithLine("\u001B[32m✅ Project updated successfully.\u001B[0m")
-
                 sessionManager.getCurrentUser()?.let { user ->
                     val actionDetails =
                         "Admin ${user.userName} updated project ${updated.id} with name '$name' at ${now.format()}"
@@ -142,19 +142,20 @@ class ProjectManagementScreen(
 
     private fun addProject() {
         try {
-            showAnimation("add project...\n") {
-                consoleIO.show("\u001B[32mEnter project name: \u001B[0m")
-                val name = getInput() ?: return@showAnimation
-                consoleIO.show("\u001B[32mEnter description: \u001B[0m")
-                val desc = getInput() ?: return@showAnimation
-                sessionManager.getCurrentUser()?.let { user ->
-                    val newProject = Project(
-                        name = name,
-                        description = desc,
-                        createdBy = user.id.toString(),
-                        createdAt = now,
-                        updatedAt = now
-                    )
+            consoleIO.show("\u001B[32mEnter project name: \u001B[0m")
+            val name = getInput() ?: return
+            consoleIO.show("\u001B[32mEnter description: \u001B[0m")
+            val desc = getInput() ?: return
+            sessionManager.getCurrentUser()?.let { user ->
+                val newProject = Project(
+                    name = name,
+                    description = desc,
+                    createdBy = user.id.toString(),
+                    createdAt = now,
+                    updatedAt = now
+                )
+                showAnimation("add project...") {
+                    consoleIO.showWithLine("")
                     addProjectUseCase.addProject(newProject)
                     consoleIO.showWithLine("\u001B[32m✅ Project added successfully.\u001B[0m")
                     val actionDetails =
@@ -180,10 +181,11 @@ class ProjectManagementScreen(
 
     private fun deleteProject() {
         try {
-            showAnimation("delete project...\n") {
-                consoleIO.show("\u001B[32mEnter project ID to delete: \u001B[0m")
-                val id = getInput() ?: return@showAnimation
-                val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+            consoleIO.show("\u001B[32mEnter project ID to delete: \u001B[0m")
+            val id = getInput() ?: return
+            val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+            showAnimation("delete project...") {
+                consoleIO.showWithLine("")
                 deleteProjectUseCase.deleteProject(id)
                 consoleIO.showWithLine("\u001B[32m✅ Project deleted successfully.\u001B[0m")
                 sessionManager.getCurrentUser()?.let { user ->
@@ -220,7 +222,5 @@ class ProjectManagementScreen(
         ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
         """.trimIndent()
         )
-        consoleIO.showWithLine("\n")
     }
-
 }
