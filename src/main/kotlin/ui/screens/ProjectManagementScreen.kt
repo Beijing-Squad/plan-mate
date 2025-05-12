@@ -15,7 +15,6 @@ import ui.main.BaseScreen
 import ui.main.MenuRenderer
 import ui.main.consoleIO.ConsoleIO
 import kotlin.uuid.ExperimentalUuidApi
-import kotlin.uuid.Uuid
 
 @OptIn(ExperimentalUuidApi::class)
 class ProjectManagementScreen(
@@ -157,7 +156,7 @@ class ProjectManagementScreen(
                     "Admin ${user.userName} created project ${newProject.id} with name '$name' at ${now.format()}"
                 addAudit.addAuditLog(
                     Audit(
-                        id = Uuid.random(),
+                        id = user.id,
                         userRole = user.role,
                         userName = user.userName,
                         action = Audit.ActionType.CREATE,
