@@ -17,11 +17,11 @@ interface RemoteDataSource {
     suspend fun updateProject(newProjects: ProjectDTO)
     suspend fun getProjectById(projectId: String): ProjectDTO
 
-    suspend fun getAllTasks(): List<TaskDTO>
-    suspend fun getTaskById(taskId: String): TaskDTO
-    suspend fun addTask(task: TaskDTO)
+    suspend fun getAllTasks(): List<TaskDto>
+    suspend fun getTaskById(taskId: String): TaskDto
+    suspend fun addTask(task: TaskDto)
     suspend fun deleteTask(taskId: String)
-    suspend fun updateTask(updatedTask: TaskDTO): TaskDTO
+    suspend fun updateTask(updatedTask: TaskDto): TaskDto
 
     suspend fun getAllStates(): List<TaskStateDTO>
     suspend fun getTaskStatesByProjectId(projectId: String): List<TaskStateDTO>
