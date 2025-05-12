@@ -6,7 +6,6 @@ class GetAuditLogsByProjectIdUseCase(
     private val auditRepository: AuditRepository
 ) {
     suspend fun getAuditLogsByProjectId(projectId: String): List<Audit>? {
-        if (!projectId.isValidProjectId()) return null
 
         return auditRepository.getAuditLogsByProjectId(projectId)
             .takeIf { it.isNotEmpty() }
