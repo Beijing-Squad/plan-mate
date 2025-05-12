@@ -3,7 +3,7 @@ package data.dto
 import org.bson.codecs.pojo.annotations.BsonId
 import org.bson.codecs.pojo.annotations.BsonProperty
 
-data class TaskDTO(
+data class TaskDto(
     @BsonId val id: String,
     @BsonProperty("projectId") val projectId: String,
     @BsonProperty("title") val title: String,
