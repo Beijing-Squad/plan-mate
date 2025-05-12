@@ -1,6 +1,6 @@
 package ui.screens
 
-import data.dto.TaskDto
+import data.remote.mongoDataSource.dto.TaskDto
 import data.repository.mapper.toTaskDto
 import data.repository.mapper.toTaskEntity
 import format
@@ -9,9 +9,9 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import logic.entities.ActionType
 import logic.entities.Audit
-import logic.entities.EntityType
+import logic.entities.Audit.ActionType
+import logic.entities.Audit.EntityType
 import logic.exceptions.TaskAlreadyExistsException
 import logic.exceptions.TaskNotFoundException
 import logic.exceptions.TaskException
@@ -77,7 +77,7 @@ class TaskManagementScreen(
         showAnimation("Loading tasks...\n") {
             try {
                 val tasks = getAllTasksUseCase.getAllTasks()
-                val states = getAllTaskStatesUseCase.getAllStates()
+                val states = getAllTaskStatesUseCase.getAllTaskStates()
                 if (tasks.isEmpty()) {
                     consoleIO.showWithLine("⚠️ No tasks available.")
                     return@showAnimation
