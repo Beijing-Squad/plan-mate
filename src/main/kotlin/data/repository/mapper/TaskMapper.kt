@@ -1,6 +1,6 @@
 package data.repository.mapper
 
-import data.dto.TaskDto
+import data.remote.mongoDataSource.dto.TaskDto
 import kotlinx.datetime.LocalDateTime
 import logic.entities.Task
 import kotlin.uuid.ExperimentalUuidApi
