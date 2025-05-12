@@ -7,7 +7,6 @@ import kotlin.uuid.Uuid
 
 @OptIn(ExperimentalUuidApi::class)
 data class Task(
-    @BsonId
     val id: Uuid = Uuid.random(),
     val projectId: String,
     val title: String,
