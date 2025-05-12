@@ -16,7 +16,7 @@ class LocalDataSourceImpl(
     private val taskCsvDataSource: CsvDataSourceImpl<Task>,
     private val taskStateCsvDataSource: CsvDataSourceImpl<TaskState>
 ) : LocalDataSource {
-    private val states = getAllStates().toMutableList()
+    private val states = getAllTaskStates().toMutableList()
 
     //region authentication
     override fun saveUser(username: String, password: String, role: UserRole): Boolean {
@@ -92,7 +92,7 @@ class LocalDataSourceImpl(
     //endregion
 
     //region task state
-    override fun addState(taskState: TaskState): Boolean {
+    override fun addTaskState(taskState: TaskState): Boolean {
         return try {
             taskStateCsvDataSource.appendToFile(taskState)
             true
@@ -102,7 +102,7 @@ class LocalDataSourceImpl(
     }
 
     @OptIn(ExperimentalUuidApi::class)
-    override fun deleteState(taskState: TaskState): Boolean {
+    override fun deleteTaskState(taskState: TaskState): Boolean {
         return try {
             taskStateCsvDataSource.deleteById(taskState.id.toString())
             true
@@ -111,26 +111,26 @@ class LocalDataSourceImpl(
         }
     }
 
-    override fun getAllStates(): List<TaskState> {
+    override fun getAllTaskStates(): List<TaskState> {
         return taskStateCsvDataSource.loadAllDataFromFile()
     }
 
     @OptIn(ExperimentalUuidApi::class)
-    override fun getStateById(stateId: String): TaskState {
-        return getAllStates()
+    override fun getTaskStateById(stateId: String): TaskState {
+        return getAllTaskStates()
             .find { it.id.toString() == stateId }
             ?: throw StateNotFoundException()
     }
 
     @OptIn(ExperimentalUuidApi::class)
-    override fun getStatesByProjectId(projectId: String): List<TaskState> {
-        return getAllStates()
+    override fun getTaskStatesByProjectId(projectId: String): List<TaskState> {
+        return getAllTaskStates()
             .filter { it.projectId.toString() == projectId }
     }
 
     @OptIn(ExperimentalUuidApi::class)
-    override fun updateState(taskState: TaskState): TaskState {
-        return getStateById(taskState.id.toString()).let { currentState ->
+    override fun updateTaskState(taskState: TaskState): TaskState {
+        return getTaskStateById(taskState.id.toString()).let { currentState ->
             val updatedState = currentState.copy(
                 name = taskState.name,
                 projectId = taskState.projectId
