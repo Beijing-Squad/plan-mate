@@ -139,7 +139,7 @@ class TaskManagementScreen(
             consoleIO.showWithLine("❌ Task ID is required.")
             return
         }
-r
+
         showAnimation("Finding task...\n") {
             try {
                 val taskDTO = getTaskByIdUseCase.getTaskById(id)
