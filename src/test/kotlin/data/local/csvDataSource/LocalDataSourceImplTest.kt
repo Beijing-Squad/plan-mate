@@ -2,10 +2,7 @@ package data.local.csvDataSource
 
 import com.google.common.truth.Truth.assertThat
 import data.local.csvDataSource.csv.CsvDataSourceImpl
-import fake.createProject
-import fake.createState
-import fake.createTask
-import fake.createUser
+import fake.*
 import io.mockk.*
 import kotlinx.datetime.LocalDateTime
 import logic.entities.*
@@ -72,6 +69,7 @@ class LocalDataSourceImplTest {
         )
     }
 
+    //region Authentication
     @Test
     fun `getAuthenticatedUser should throw UserNotFoundException when user does not exist`() {
         // Given
@@ -124,7 +122,257 @@ class LocalDataSourceImplTest {
         verify(exactly = 1) { userCsvDataSource.loadAllDataFromFile() }
         verify(exactly = 0) { userCsvDataSource.appendToFile(any()) }
     }
+    //endregion
 
+    //region audit
+    @Test
+    fun `should return all audit logs from CSV`() {
+        // Given
+        val auditLogs = listOf(
+            createAudit(
+                userRole = UserRole.ADMIN,
+                userName = "Admin",
+                entityType = Audit.EntityType.PROJECT,
+                entityId = "PROJECT-001",
+                action = Audit.ActionType.CREATE,
+            ),
+            createAudit(
+                userRole = UserRole.MATE,
+                userName = "User1",
+                entityType = Audit.EntityType.TASK,
+                entityId = "TASK-123",
+                action = Audit.ActionType.UPDATE,
+            )
+        )
+        every { auditCsvDataSource.loadAllDataFromFile() } returns auditLogs
+
+        // When
+        val result = localDataSourceImpl.getAllAuditLogs()
+
+        // Then
+        assertThat(result).isEqualTo(auditLogs)
+        verify { auditCsvDataSource.loadAllDataFromFile() }
+    }
+
+    @Test
+    fun `should return empty list when CSV is empty`() {
+        // Given
+        every { auditCsvDataSource.loadAllDataFromFile() } returns emptyList()
+
+        // When
+        val result = localDataSourceImpl.getAllAuditLogs()
+
+        // Then
+        assertThat(result).isEmpty()
+        verify { auditCsvDataSource.loadAllDataFromFile() }
+    }
+
+    @Test
+    fun `should throw DataAccessException when CSV read fails`() {
+        // Given
+        every { auditCsvDataSource.loadAllDataFromFile() } throws DataAccessException("Failed to read audit.csv")
+
+        // When&&Then
+        val exception = assertThrows<DataAccessException> {
+            localDataSourceImpl.getAllAuditLogs()
+        }
+        assertThat(exception.message).isEqualTo("Failed to read audit.csv")
+        verify { auditCsvDataSource.loadAllDataFromFile() }
+    }
+
+    @Test
+    fun `should append audit log to CSV`() {
+        // Given
+        val auditLog = createAudit(
+            userRole = UserRole.ADMIN,
+            userName = "Adel",
+            entityType = Audit.EntityType.PROJECT,
+            entityId = "PROJECT-001",
+            action = Audit.ActionType.CREATE,
+        )
+
+        // When
+        localDataSourceImpl.addAuditLog(auditLog)
+
+        // Then
+        verify { auditCsvDataSource.appendToFile(auditLog) }
+    }
+
+    @Test
+    fun `should append audit log with state change to CSV`() {
+        // Given
+        val auditLog = createAudit(
+            userRole = UserRole.MATE,
+            userName = "User1",
+            entityType = Audit.EntityType.TASK,
+            entityId = "TASK-123",
+            action = Audit.ActionType.UPDATE,
+        )
+
+        // When
+        localDataSourceImpl.addAuditLog(auditLog)
+
+        // Then
+        verify { auditCsvDataSource.appendToFile(auditLog) }
+    }
+
+    @Test
+    fun `should throw DataAccessException when CSV write fails`() {
+        // Given
+        val auditLog = createAudit(
+            userRole = UserRole.ADMIN,
+            userName = "Admin",
+            entityType = Audit.EntityType.PROJECT,
+            entityId = "PROJECT-002",
+            action = Audit.ActionType.DELETE,
+        )
+        every { auditCsvDataSource.appendToFile(auditLog) } throws DataAccessException("Failed to write to audit.csv")
+
+        // When&&Then
+        val exception = assertThrows<DataAccessException> {
+            localDataSourceImpl.addAuditLog(auditLog)
+        }
+        assertThat(exception.message).isEqualTo("Failed to write to audit.csv")
+        verify { auditCsvDataSource.appendToFile(auditLog) }
+    }
+
+    @Test
+    fun `should return audit logs for a specific project ID when provided`() {
+        // Given
+        val projectId = "PROJECT-001"
+        val auditLogs = listOf(
+            createAudit(
+                userRole = UserRole.ADMIN,
+                userName = "Admin",
+                entityType = Audit.EntityType.PROJECT,
+                entityId = projectId,
+                action = Audit.ActionType.CREATE,
+            ),
+            createAudit(
+                userRole = UserRole.MATE,
+                userName = "User1",
+                entityType = Audit.EntityType.TASK,
+                entityId = "TASK-123",
+                action = Audit.ActionType.UPDATE,
+            ),
+            createAudit(
+                userRole = UserRole.ADMIN,
+                userName = "Admin",
+                entityType = Audit.EntityType.PROJECT,
+                entityId = projectId,
+                action = Audit.ActionType.UPDATE,
+            )
+        )
+        every { auditCsvDataSource.loadAllDataFromFile() } returns auditLogs
+
+        // When
+        val result = localDataSourceImpl.getAuditLogsByProjectId(projectId)
+
+        // Then
+        assertThat(result.size).isEqualTo(2)
+        assertThat(result.all { it.entityId == projectId && it.entityType == Audit.EntityType.PROJECT }).isTrue()
+        assertThat(result.map { it.action }).containsExactly(Audit.ActionType.CREATE, Audit.ActionType.UPDATE)
+        verify { auditCsvDataSource.loadAllDataFromFile() }
+    }
+
+    @Test
+    fun `should return empty list when no audit logs match project ID`() {
+        // Given
+        val projectId = "PROJECT-999"
+        val auditLogs = listOf(
+            createAudit(
+                userRole = UserRole.MATE,
+                userName = "User1",
+                entityType = Audit.EntityType.TASK,
+                entityId = "TASK-123",
+                action = Audit.ActionType.UPDATE,
+            )
+        )
+        every { auditCsvDataSource.loadAllDataFromFile() } returns auditLogs
+
+        // When
+        val result = localDataSourceImpl.getAuditLogsByProjectId(projectId)
+
+        // Then
+        assertThat(result).isEmpty()
+        verify { auditCsvDataSource.loadAllDataFromFile() }
+    }
+
+    @Test
+    fun `should return audit logs for a specific task ID when provided`() {
+        // Given
+        val taskId = "TASK-123"
+        val auditLogs = listOf(
+            createAudit(
+                userRole = UserRole.MATE,
+                userName = "User1",
+                entityType = Audit.EntityType.TASK,
+                entityId = taskId,
+                action = Audit.ActionType.UPDATE,
+            ),
+            createAudit(
+                userRole = UserRole.ADMIN,
+                userName = "Admin",
+                entityType = Audit.EntityType.PROJECT,
+                entityId = "PROJECT-001",
+                action = Audit.ActionType.CREATE,
+            ),
+            createAudit(
+                userRole = UserRole.MATE,
+                userName = "User2",
+                entityType = Audit.EntityType.TASK,
+                entityId = taskId,
+                action = Audit.ActionType.DELETE,
+            )
+        )
+        every { auditCsvDataSource.loadAllDataFromFile() } returns auditLogs
+
+        // When
+        val result = localDataSourceImpl.getAuditLogsByTaskId(taskId)
+
+        // Then
+        assertThat(result.size).isEqualTo(2)
+        assertThat(result.all { it.entityId == taskId && it.entityType == Audit.EntityType.TASK }).isTrue()
+        assertThat(result.map { it.action }).containsExactly(Audit.ActionType.UPDATE, Audit.ActionType.DELETE)
+        verify { auditCsvDataSource.loadAllDataFromFile() }
+    }
+
+    @Test
+    fun `should return empty list when no audit logs match task ID`() {
+        // Given
+        val taskId = "TASK-999"
+        val auditLogs = listOf(
+            createAudit(
+                userRole = UserRole.ADMIN,
+                userName = "Admin",
+                entityType = Audit.EntityType.PROJECT,
+                entityId = "PROJECT-001",
+                action = Audit.ActionType.CREATE,
+            )
+        )
+        every { auditCsvDataSource.loadAllDataFromFile() } returns auditLogs
+
+        // When
+        val result = localDataSourceImpl.getAuditLogsByTaskId(taskId)
+
+        // Then
+        assertThat(result).isEmpty()
+        verify { auditCsvDataSource.loadAllDataFromFile() }
+    }
+
+    @Test
+    fun `should throw DataAccessException when CSV read fails for task ID`() {
+        // Given
+        val taskId = "TASK-123"
+        every { auditCsvDataSource.loadAllDataFromFile() } throws DataAccessException("Failed to read audit.csv")
+
+        // When&&Then
+        val exception = assertThrows<DataAccessException> {
+            localDataSourceImpl.getAuditLogsByTaskId(taskId)
+        }
+        assertThat(exception.message).isEqualTo("Failed to read audit.csv")
+        verify { auditCsvDataSource.loadAllDataFromFile() }
+    }
     //endregion
 
     //region project
