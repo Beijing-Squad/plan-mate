@@ -32,6 +32,7 @@ class ProjectManagementScreenTest {
         updateProjectUseCase = mockk(relaxed = true)
         addAuditLogUseCase = mockk(relaxed = true)
         consoleIO = mockk(relaxed = true)
+        sessionManager = mockk(relaxed = true)
 
         projectScreen = ProjectManagementScreen(
             addProjectUseCase,
