@@ -12,7 +12,9 @@ import logic.repository.ProjectsRepository
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import kotlin.uuid.ExperimentalUuidApi
 
+@OptIn(ExperimentalUuidApi::class)
 class UpdateProjectUseCaseTest {
 
     private lateinit var updateProjectUseCase: UpdateProjectUseCase
