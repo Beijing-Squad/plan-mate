@@ -234,6 +234,11 @@ class TaskManagementScreen(
     fun updateTaskById() {
         consoleIO.showWithLine("\n\u001B[36m🔄 Update Task\u001B[0m")
         consoleIO.show("Enter Task ID to update: ")
+        val currentUser = sessionManagerUseCase.getCurrentUser()
+        if (currentUser == null) {
+            consoleIO.showWithLine("❌ No user is currently logged in.")
+            return
+        }
         val idInput = consoleIO.read()?.trim()
         if (idInput.isNullOrBlank()) {
             consoleIO.showWithLine("❌ Task ID is required.")
@@ -281,7 +286,7 @@ class TaskManagementScreen(
                     projectId = "default-project-id",
                     title = newTitle,
                     description = newDescription,
-                    createdBy = "default-user",
+                    createdBy = currentUser.userName,
                     stateId = newStateId,
                     createdAt = now,
                     updatedAt = now
@@ -289,28 +294,29 @@ class TaskManagementScreen(
 
                 val resultTaskDTO = updateTaskUseCase.updateTask(updatedTask)
 
-                consoleIO.showWithLine("✅ Task updated successfully:\n📌 " +
-                        "Title: ${resultTaskDTO.title}," +
-                        " 📝 Description: ${resultTaskDTO.description}," +
-                        " 🔄 State: ${resultTaskDTO.stateId}")
+                consoleIO.showWithLine(
+                    "✅ Task updated successfully:\n📌 " +
+                            "Title: ${resultTaskDTO.title}," +
+                            " 📝 Description: ${resultTaskDTO.description}," +
+                            " 🔄 State: ${resultTaskDTO.stateId}"
+                )
 
-                sessionManagerUseCase.getCurrentUser()?.let { user ->
-                    val actionDetails =
-                        "User ${user.userName} updated task $id with title '${newTitle}' at ${now.format()}"
-                    addAudit.addAuditLog(
-                        Audit(
-                            id = Uuid.random(),
-                            userRole = user.role,
-                            userName = user.userName,
-                            action = Audit.ActionType.UPDATE,
-                            entityType = Audit.EntityType.TASK,
-                            entityId = id,
-                            actionDetails = actionDetails,
-                            timeStamp = now
-                        )
+                val actionDetails =
+                    "User ${currentUser.userName} updated task $id with title '${newTitle}' at ${now.format()}"
+                addAudit.addAuditLog(
+                    Audit(
+                        id = Uuid.random(),
+                        userRole = currentUser.role,
+                        userName = currentUser.userName,
+                        action = Audit.ActionType.UPDATE,
+                        entityType = Audit.EntityType.TASK,
+                        entityId = id,
+                        actionDetails = actionDetails,
+                        timeStamp = now
                     )
-                }
+                )
             }
+
         } catch (e: TaskException) {
             consoleIO.showWithLine("\u001B[31m❌ Failed to update task: ${e.message}\u001B[0m")
         }
