@@ -8,11 +8,11 @@ import kotlin.uuid.Uuid
 fun createState(
     id: Uuid = Uuid.random(),
     name: String = "defaultStateName",
-    projectId: String = Uuid.random().toString()
+    projectId: Uuid = Uuid.random()
 ): TaskState {
     return TaskState(
         id = id,
         name = name,
-        projectId = Uuid.parse(projectId)
+        projectId = projectId
     )
 }

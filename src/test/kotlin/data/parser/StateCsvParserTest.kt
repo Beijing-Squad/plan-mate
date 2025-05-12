@@ -30,7 +30,7 @@ class StateCsvParserTest {
         // Given
         val id = "123e4567-e89b-12d3-a456-426614174000"
         val name = "TODO"
-        val projectId = "22222222-2222-2222-2222-222222222222"
+        val projectId = "project-001"
         val line = "$id,$name,$projectId"
 
         // When
@@ -40,7 +40,7 @@ class StateCsvParserTest {
         with(result) {
             assertThat(this.id).isEqualTo(Uuid.parse(id))
             assertThat(this.name).isEqualTo(name)
-            assertThat(this.projectId).isEqualTo(Uuid.parse(projectId))
+            assertThat(this.projectId).isEqualTo(projectId)
         }
     }
 
@@ -63,14 +63,16 @@ class StateCsvParserTest {
         val state = createState(
             id = Uuid.parse("11111111-1111-1111-1111-111111111111"),
             name = "InProgress",
-            projectId = "22222222-2222-2222-2222-222222222222"
+            projectId = Uuid.parse("21111111-1111-1111-1111-111111111111")
         )
 
         // When
         val csv = parser.serializer(state)
 
         // Then
-        assertThat(csv).isEqualTo("11111111-1111-1111-1111-111111111111,InProgress,22222222-2222-2222-2222-222222222222")
+        assertThat(csv).isEqualTo(
+            "11111111-1111-1111-1111-111111111111,InProgress,21111111-1111-1111-1111-111111111111"
+        )
     }
 
     @Test
@@ -79,7 +81,7 @@ class StateCsvParserTest {
         val original = createState(
             id = Uuid.parse("22222222-2222-2222-2222-222222222222"),
             name = "Review",
-            projectId = "22222222-2222-2222-2222-222222222222"
+            projectId = Uuid.parse("21111111-1111-1111-1111-111111111111")
         )
 
         // When
