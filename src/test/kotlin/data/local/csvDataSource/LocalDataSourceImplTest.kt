@@ -366,7 +366,7 @@ class LocalDataSourceImplTest {
 
         taskStateCsvDataSource.appendToFile(newState)
         // When
-        val result = localDataSourceImpl.addState(newState)
+        val result = localDataSourceImpl.addTaskState(newState)
 
         // Then
         assertThat(result).isTrue()
@@ -395,7 +395,7 @@ class LocalDataSourceImplTest {
         every { taskStateCsvDataSource.loadAllDataFromFile() } returns listOf(state1, state2)
 
         // When
-        val result = localDataSourceImpl.getStatesByProjectId("964801c9-49f6-4e7b-899b-113337a91848")
+        val result = localDataSourceImpl.getTaskStatesByProjectId("964801c9-49f6-4e7b-899b-113337a91848")
 
         // Then
         assertThat(result).containsExactly(state1, state2)
@@ -419,7 +419,7 @@ class LocalDataSourceImplTest {
         every { taskStateCsvDataSource.loadAllDataFromFile() } returns listOf(state)
 
         // When
-        val result = localDataSourceImpl.getStateById("964801c9-49f6-4e7b-899b-113337a91848")
+        val result = localDataSourceImpl.getTaskStateById("964801c9-49f6-4e7b-899b-113337a91848")
 
         // Then
         assertThat(result).isEqualTo(state)
@@ -432,7 +432,7 @@ class LocalDataSourceImplTest {
 
         // When & Then
         assertThrows<StateNotFoundException> {
-            localDataSourceImpl.getStateById("non-existing-id")
+            localDataSourceImpl.getTaskStateById("non-existing-id")
         }
     }
 
@@ -448,7 +448,7 @@ class LocalDataSourceImplTest {
 
         // When & Then
         val exception = kotlin.test.assertFailsWith<StateNotFoundException> {
-            localDataSourceImpl.getStateById("non-existing-id")
+            localDataSourceImpl.getTaskStateById("non-existing-id")
         }
         assertThat(exception).isInstanceOf(StateNotFoundException::class.java)
     }
@@ -464,7 +464,7 @@ class LocalDataSourceImplTest {
         every { taskStateCsvDataSource.loadAllDataFromFile() } returns stateList
 
         // When
-        val result = localDataSourceImpl.deleteState(state)
+        val result = localDataSourceImpl.deleteTaskState(state)
 
         // Then
         assertEquals(true, result)
@@ -488,7 +488,7 @@ class LocalDataSourceImplTest {
         every { taskStateCsvDataSource.updateFile(any()) } returns Unit
 
         // When
-        val result = localDataSourceImpl.updateState(updatedState)
+        val result = localDataSourceImpl.updateTaskState(updatedState)
 
         // Then
         assertThat(result).isEqualTo(updatedState)
@@ -506,7 +506,7 @@ class LocalDataSourceImplTest {
 
         // When & Then
         assertThrows<StateNotFoundException> {
-            localDataSourceImpl.updateState(nonExistentState)
+            localDataSourceImpl.updateTaskState(nonExistentState)
         }
     }
     //endregion
