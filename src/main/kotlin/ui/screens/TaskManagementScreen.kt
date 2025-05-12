@@ -4,7 +4,6 @@ import data.remote.mongoDataSource.dto.TaskDto
 import data.repository.mapper.toTaskDto
 import data.repository.mapper.toTaskEntity
 import format
-import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
@@ -57,12 +56,12 @@ class TaskManagementScreen(
     override fun handleFeatureChoice() {
         while (true) {
             when (getInput()) {
-                "1" -> runBlocking { showTasksInSwimlanes() }
-                "2" -> runBlocking { addTask() }
-                "3" -> runBlocking { getTaskById() }
-                "4" -> runBlocking { deleteTaskById() }
-                "5" -> runBlocking { showAllTasksList() }
-                "6" -> runBlocking { updateTaskById() }
+                "1" ->  showTasksInSwimlanes()
+                "2" ->  addTask()
+                "3" ->  getTaskById()
+                "4" ->  deleteTaskById()
+                "5" ->  showAllTasksList()
+                "6" ->  updateTaskById()
                 "0" -> return
                 else -> consoleIO.showWithLine("\u001B[31m❌ Invalid option\u001B[0m")
             }
@@ -72,14 +71,14 @@ class TaskManagementScreen(
 
     fun showTasksInSwimlanes() {
         consoleIO.showWithLine("\n\u001B[36m📋 All Tasks (Swimlanes View):\u001B[0m")
-        showAnimation("Loading tasks...\n") {
+        showAnimation("Loading tasks...") {
             try {
                 val tasks = getAllTasksUseCase.getAllTasks()
                 val states = getAllTaskStatesUseCase.getAllTaskStates()
                 if (tasks.isEmpty()) {
                     consoleIO.showWithLine("⚠️ No tasks available.")
-                    return@showAnimation
                 }
+                consoleIO.showWithLine("")
                 swimlanesRenderer.render(tasks, states)
             } catch (e: TaskException) {
                 consoleIO.showWithLine("\u001B[31m❌ Failed to load tasks: ${e.message}\u001B[0m")
@@ -89,12 +88,11 @@ class TaskManagementScreen(
 
     fun showAllTasksList() {
         consoleIO.showWithLine("\n\u001B[36m📋 All Tasks (List View):\u001B[0m")
-        showAnimation("Fetching task list...\n") {
+        showAnimation("Fetching task list...") {
             try {
                 val tasks = getAllTasksUseCase.getAllTasks()
                 if (tasks.isEmpty()) {
                     consoleIO.showWithLine("⚠️ No tasks available.")
-                    return@showAnimation
                 }
                 tasks.forEach { task ->
                     val taskDTO = task.toTaskDto()
@@ -108,6 +106,7 @@ class TaskManagementScreen(
                     } catch (_: Exception) {
                         taskDTO.updatedAt
                     }
+                    consoleIO.showWithLine("")
                     consoleIO.showWithLine(
                         """
                         ╭────────────────────────────────────────╮
@@ -138,9 +137,10 @@ class TaskManagementScreen(
             return
         }
 
-        showAnimation("Finding task...\n") {
+        showAnimation("Finding task...") {
             try {
                 val taskDTO = getTaskByIdUseCase.getTaskById(id)
+                consoleIO.showWithLine("")
                 consoleIO.showWithLine(
                     """
                     ╭─────────────────────────────────────────╮
