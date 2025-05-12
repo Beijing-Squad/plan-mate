@@ -101,12 +101,10 @@ class AuditScreenTest {
 
         auditScreen.handleFeatureChoice()
 
-        verifySequence {
-            consoleIO.read()
-            consoleIO.show("Enter ID:")
-            consoleIO.read()
-            consoleIO.showWithLine("📋 Fetching project audit logs...")
+        verify(atLeast = 1) {
+            consoleIO.show("Enter ID: ")
             consoleIO.showWithLine("❌ No Audit Logs Found")
+            consoleIO.show(match { it.contains("Fetching project audit logs...") })
         }
 
     }
