@@ -9,6 +9,7 @@ import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import logic.entities.Audit
+import logic.entities.Task
 import logic.exceptions.TaskAlreadyExistsException
 import logic.exceptions.TaskNotFoundException
 import logic.exceptions.TaskException
@@ -56,12 +57,12 @@ class TaskManagementScreen(
     override fun handleFeatureChoice() {
         while (true) {
             when (getInput()) {
-                "1" ->  showTasksInSwimlanes()
-                "2" ->  addTask()
-                "3" ->  getTaskById()
-                "4" ->  deleteTaskById()
-                "5" ->  showAllTasksList()
-                "6" ->  updateTaskById()
+                "1" -> showTasksInSwimlanes()
+                "2" -> addTask()
+                "3" -> getTaskById()
+                "4" -> deleteTaskById()
+                "5" -> showAllTasksList()
+                "6" -> updateTaskById()
                 "0" -> return
                 else -> consoleIO.showWithLine("\u001B[31m❌ Invalid option\u001B[0m")
             }
@@ -207,7 +208,8 @@ class TaskManagementScreen(
                 addTaskUseCase.addTask(task)
                 consoleIO.showWithLine("✅ Task added successfully.")
 
-                val actionDetails = "User ${currentUser.userName} created task ${task.id} with title '$title' at ${now.format()}"
+                val actionDetails =
+                    "User ${currentUser.userName} created task ${task.id} with title '$title' at ${now.format()}"
                 addAudit.addAuditLog(
                     Audit(
                         id = Uuid.random(),
@@ -232,48 +234,69 @@ class TaskManagementScreen(
     fun updateTaskById() {
         consoleIO.showWithLine("\n\u001B[36m🔄 Update Task\u001B[0m")
         consoleIO.show("Enter Task ID to update: ")
-        val id = consoleIO.read()?.trim()
-        val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
-
-        if (id.isNullOrBlank()) {
+        val idInput = consoleIO.read()?.trim()
+        if (idInput.isNullOrBlank()) {
             consoleIO.showWithLine("❌ Task ID is required.")
             return
         }
 
-        showAnimation("Updating task...") {
-            try {
-                val existingTaskDTO = getTaskByIdUseCase.getTaskById(id)
+        val uuid = try {
+            Uuid.parse(idInput)
+        } catch (_: IllegalArgumentException) {
+            consoleIO.showWithLine("❌ Invalid UUID format.")
+            return
+        }
+        val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
 
-                consoleIO.show("Enter New Title [${existingTaskDTO.title}]: ")
-                val newTitleInput = consoleIO.read()?.trim()
-                val newTitle = newTitleInput.takeIf { !it.isNullOrBlank() } ?: existingTaskDTO.title
+        if (id.isBlank()) {
+            consoleIO.showWithLine("❌ Task ID is required.")
+            return
+        }
 
-                consoleIO.show("Enter New Description [${existingTaskDTO.description}]: ")
-                val newDescriptionInput = consoleIO.read()?.trim()
-                val newDescription = newDescriptionInput.takeIf { !it.isNullOrBlank() } ?: existingTaskDTO.description
+        consoleIO.show("Enter New Title: ")
+        val newTitle = consoleIO.read()?.trim()
+        if (newTitle.isNullOrBlank()) {
+            consoleIO.showWithLine("❌ Title is required.")
+            return
+        }
 
-                consoleIO.show("Enter New State ID [${existingTaskDTO.stateId}]: ")
-                val newStateIdInput = consoleIO.read()?.trim()
-                val newStateId = newStateIdInput.takeIf { !it.isNullOrBlank() } ?: existingTaskDTO.stateId
+        consoleIO.show("Enter New Description: ")
+        val newDescription = consoleIO.read()?.trim()
+        if (newDescription.isNullOrBlank()) {
+            consoleIO.showWithLine("❌ Description is required.")
+            return
+        }
 
-                val updatedTaskDTO = TaskDto(
-                    id = existingTaskDTO.id.toString(),
-                    projectId = existingTaskDTO.projectId,
+        consoleIO.show("Enter New State ID: ")
+        val newStateId = consoleIO.read()?.trim()
+        if (newStateId.isNullOrBlank()) {
+            consoleIO.showWithLine("❌ State ID is required.")
+            return
+        }
+
+        try {
+            showAnimation("Updating task...") {
+                val updatedTask = Task(
+                    id = uuid,
+                    projectId = "default-project-id",
                     title = newTitle,
                     description = newDescription,
-                    createdBy = existingTaskDTO.createdBy,
+                    createdBy = "default-user",
                     stateId = newStateId,
-                    createdAt = existingTaskDTO.createdAt.toString(),
-                    updatedAt = now.toString()
+                    createdAt = now,
+                    updatedAt = now
                 )
 
-                val updatedTask = updatedTaskDTO.toTaskEntity()
                 val resultTaskDTO = updateTaskUseCase.updateTask(updatedTask)
 
-                consoleIO.showWithLine("✅ Task updated successfully:\n📌 Title: ${resultTaskDTO.title}, 📝 Description: ${resultTaskDTO.description}, 🔄 State: ${resultTaskDTO.stateId}")
+                consoleIO.showWithLine("✅ Task updated successfully:\n📌 " +
+                        "Title: ${resultTaskDTO.title}," +
+                        " 📝 Description: ${resultTaskDTO.description}," +
+                        " 🔄 State: ${resultTaskDTO.stateId}")
 
                 sessionManagerUseCase.getCurrentUser()?.let { user ->
-                    val actionDetails = "User ${user.userName} updated task $id with title '$newTitle' at ${now.format()}"
+                    val actionDetails =
+                        "User ${user.userName} updated task $id with title '${newTitle}' at ${now.format()}"
                     addAudit.addAuditLog(
                         Audit(
                             id = Uuid.random(),
@@ -287,14 +310,12 @@ class TaskManagementScreen(
                         )
                     )
                 }
-
-            } catch (e: TaskNotFoundException) {
-                consoleIO.showWithLine("\u001B[31m❌ ${e.message}\u001B[0m")
-            } catch (e: TaskException) {
-                consoleIO.showWithLine("\u001B[31m❌ Failed to update task: ${e.message}\u001B[0m")
             }
+        } catch (e: TaskException) {
+            consoleIO.showWithLine("\u001B[31m❌ Failed to update task: ${e.message}\u001B[0m")
         }
     }
+
 
     fun deleteTaskById() {
         consoleIO.showWithLine("\n\u001B[36m🗑️ Delete Task\u001B[0m")
@@ -314,7 +335,8 @@ class TaskManagementScreen(
                 consoleIO.showWithLine("✅ Task deleted successfully.")
 
                 sessionManagerUseCase.getCurrentUser()?.let { user ->
-                    val actionDetails = "User ${user.userName} deleted task $id with title '$taskTitle' at ${now.format()}"
+                    val actionDetails =
+                        "User ${user.userName} deleted task $id with title '$taskTitle' at ${now.format()}"
                     addAudit.addAuditLog(
                         Audit(
                             id = Uuid.random(),
