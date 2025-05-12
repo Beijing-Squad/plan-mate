@@ -46,8 +46,8 @@ class ProjectManagementScreen(
     }
 
     override fun handleFeatureChoice() {
+        showOptionService()
         while (true) {
-            showOptionService()
             when (getInput()) {
                 "1" -> listAllProjects()
                 "2" -> findProjectById()
