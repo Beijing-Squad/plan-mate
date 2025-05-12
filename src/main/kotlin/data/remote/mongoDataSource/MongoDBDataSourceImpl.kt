@@ -109,7 +109,7 @@ class MongoDBDataSourceImpl(
     }
 
     override suspend fun getTaskById(taskId: String): TaskDto {
-        val taskIdFilter = Filters.eq("_id", taskId)
+        val taskIdFilter = eq("_id", taskId)
         return taskCollection.find<TaskDto>(taskIdFilter).first()
     }
 
@@ -117,12 +117,12 @@ class MongoDBDataSourceImpl(
         taskCollection.insertOne(task)
     }
     override suspend fun deleteTask(taskId: String) {
-        val taskIdFilter = Filters.eq("_id", taskId)
+        val taskIdFilter = eq("_id", taskId)
         taskCollection.findOneAndDelete(taskIdFilter)
     }
 
     override suspend fun updateTask(updatedTask: TaskDto): TaskDto {
-        val taskIdFilter = Filters.eq("_id", updatedTask.id)
+        val taskIdFilter = eq("_id", updatedTask.id)
         taskCollection.replaceOne(taskIdFilter, updatedTask)
         return updatedTask
     }
