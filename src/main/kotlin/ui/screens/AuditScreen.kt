@@ -43,7 +43,6 @@ class AuditScreen(
     }
     private fun onClickGetAllAuditLogs() {
         showAnimation("Fetching all audit logs...") {
-            consoleIO.showWithLine("")
             val allAudits = getAllAudits.getAllAuditLogs()
             if (allAudits.isEmpty()) {
                 consoleIO.showWithLine("❌ No Audit Logs Found")
@@ -62,7 +61,6 @@ class AuditScreen(
             return
         }
         showAnimation("Fetching project audit logs...") {
-            consoleIO.showWithLine("")
             val auditLogs = getAuditLogsByProjectId.getAuditLogsByProjectId(projectId)
             if (auditLogs.isNullOrEmpty()) {
                 consoleIO.showWithLine("❌ No Audit Logs Found")
@@ -82,7 +80,6 @@ class AuditScreen(
             return
         }
         showAnimation("Fetching task audit logs...") {
-            consoleIO.showWithLine("")
             val auditLogs = getAuditLogsByTaskId.getAuditLogsByTaskId(taskId)
             if (auditLogs.isEmpty()) {
                 consoleIO.showWithLine("❌ No Audit Logs Found")
