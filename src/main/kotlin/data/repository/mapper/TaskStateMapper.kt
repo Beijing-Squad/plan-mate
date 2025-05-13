@@ -6,19 +6,19 @@ import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
 @OptIn(ExperimentalUuidApi::class)
-fun toTaskStateEntity(taskState: TaskStateDto): TaskState {
+fun TaskStateDto.toTaskStateEntity(): TaskState {
     return TaskState(
-        id = Uuid.parse(taskState.id),
-        name = taskState.name,
-        projectId = Uuid.parse(taskState.projectId)
+        id = Uuid.parse(this.id),
+        name = this.name,
+        projectId = Uuid.parse(this.projectId)
     )
 }
 
 @OptIn(ExperimentalUuidApi::class)
-fun toTaskStateDto(taskState: TaskState): TaskStateDto {
+fun TaskState.toTaskStateDto(): TaskStateDto {
     return TaskStateDto(
-        id = taskState.id.toString(),
-        name = taskState.name,
-        projectId = taskState.projectId.toString()
+        id = this.id.toString(),
+        name = this.name,
+        projectId = this.projectId.toString()
     )
 }

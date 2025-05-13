@@ -8,30 +8,30 @@ import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
 @OptIn(ExperimentalUuidApi::class)
-fun toAuditEntity(audit: AuditDto): Audit {
+fun AuditDto.toAuditEntity(): Audit {
     return Audit(
-        id = Uuid.parse(audit.id),
-        userRole = UserRole.valueOf(audit.userRole),
-        userName = audit.userName,
-        entityId = audit.entityId,
-        entityType = Audit.EntityType.valueOf(audit.entityType),
-        actionDetails = audit.actionDetails,
-        timeStamp = LocalDateTime.parse(audit.timeStamp),
-        action = Audit.ActionType.valueOf(audit.action)
+        id = Uuid.parse(this.id),
+        userRole = UserRole.valueOf(this.userRole),
+        userName = this.userName,
+        entityId = this.entityId,
+        entityType = Audit.EntityType.valueOf(this.entityType),
+        actionDetails = this.actionDetails,
+        timeStamp = LocalDateTime.parse(this.timeStamp),
+        action = Audit.ActionType.valueOf(this.action)
     )
 }
 
 @OptIn(ExperimentalUuidApi::class)
-fun toAuditDTO(audit: Audit): AuditDto {
+fun Audit.toAuditDto(): AuditDto {
     return AuditDto(
-        id = audit.id.toString(),
-        userRole = audit.userRole.toString(),
-        userName = audit.userName,
-        entityId = audit.entityId,
-        entityType = audit.entityType.toString(),
-        action = audit.action.toString(),
-        actionDetails = audit.actionDetails,
-        timeStamp = audit.timeStamp.toString()
+        id = this.id.toString(),
+        userRole = this.userRole.toString(),
+        userName = this.userName,
+        entityId = this.entityId,
+        entityType = this.entityType.toString(),
+        action = this.action.toString(),
+        actionDetails = this.actionDetails,
+        timeStamp = this.timeStamp.toString()
     )
 }
 
