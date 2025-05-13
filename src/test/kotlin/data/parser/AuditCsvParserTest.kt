@@ -31,6 +31,28 @@ class AuditCsvParserTest {
     }
 
     @Test
+    fun `should serialize Audit object into correct CSV line`() {
+        // Given
+        val fixedId = Uuid.parse("123e4567-e89b-12d3-a456-426614174000")
+        val fixedTime = LocalDateTime.parse("2024-04-01T00:00")
+        val audit = createAudit(
+            userRole = UserRole.ADMIN,
+            userName = "Ahmed",
+            entityId = "task-1",
+            entityType = Audit.EntityType.TASK,
+            action = Audit.ActionType.CREATE,
+            actionDetails = "new",
+            timeStamp = fixedTime
+        ).copy(id = fixedId)
+
+        // When
+        val result = parser.serializer(audit)
+
+        // Then
+        assertThat(result).isEqualTo("123e4567-e89b-12d3-a456-426614174000,ADMIN,Ahmed,task-1,TASK,CREATE,new,2024-04-01")
+    }
+
+    @Test
     fun `should deserialize correct CSV line into Audit object`() {
         // Given
         val line = "123e4567-e89b-12d3-a456-426614174000,ADMIN,Ahmed,task-95,TASK,CREATE,,new,2024-04-01T00:00"
