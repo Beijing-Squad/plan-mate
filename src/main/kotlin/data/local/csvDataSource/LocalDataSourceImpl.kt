@@ -1,7 +1,10 @@
 package data.local.csvDataSource
 
 import data.local.csvDataSource.csv.CsvDataSourceImpl
+import data.remote.mongoDataSource.dto.TaskStateDto
 import data.repository.localDataSource.LocalDataSource
+import data.repository.mapper.toTaskStateDto
+import data.repository.mapper.toTaskStateEntity
 import data.utils.hashPassword
 import logic.entities.*
 import logic.entities.type.UserRole
@@ -16,7 +19,6 @@ class LocalDataSourceImpl(
     private val taskCsvDataSource: CsvDataSourceImpl<Task>,
     private val taskStateCsvDataSource: CsvDataSourceImpl<TaskState>
 ) : LocalDataSource {
-    private val states = getAllTaskStates().toMutableList()
 
     //region authentication
     override fun saveUser(username: String, password: String, role: UserRole): Boolean {
@@ -91,56 +93,50 @@ class LocalDataSourceImpl(
     override fun getProjectById(projectId: String): Project = projectCsvDataSource.getById(projectId)
     //endregion
 
-    //region task state
-    override fun addTaskState(taskState: TaskState): Boolean {
+    //region taskState
+    override fun addTaskState(taskState: TaskStateDto): Boolean {
         return try {
-            taskStateCsvDataSource.appendToFile(taskState)
+            taskStateCsvDataSource.appendToFile(toTaskStateEntity(taskState))
             true
-        } catch (e: StateException) {
+        } catch (e: Exception) {
             false
         }
     }
 
     @OptIn(ExperimentalUuidApi::class)
-    override fun deleteTaskState(taskState: TaskState): Boolean {
+    override fun deleteTaskState(taskStateId: String): Boolean {
         return try {
-            taskStateCsvDataSource.deleteById(taskState.id.toString())
+            taskStateCsvDataSource.deleteById(taskStateId)
             true
-        } catch (e: StateException) {
+        } catch (e: Exception) {
             false
         }
     }
 
-    override fun getAllTaskStates(): List<TaskState> {
+    override fun getAllTaskStates(): List<TaskStateDto> {
         return taskStateCsvDataSource.loadAllDataFromFile()
+            .map { toTaskStateDto(it) }
     }
 
     @OptIn(ExperimentalUuidApi::class)
-    override fun getTaskStateById(stateId: String): TaskState {
+    override fun getTaskStateById(taskStateId: String): TaskStateDto {
         return getAllTaskStates()
-            .find { it.id.toString() == stateId }
+            .find { it.id == taskStateId }
             ?: throw StateNotFoundException()
     }
 
     @OptIn(ExperimentalUuidApi::class)
-    override fun getTaskStatesByProjectId(projectId: String): List<TaskState> {
+    override fun getTaskStatesByProjectId(projectId: String): List<TaskStateDto> {
         return getAllTaskStates()
-            .filter { it.projectId.toString() == projectId }
+            .filter { it.projectId == projectId }
     }
 
     @OptIn(ExperimentalUuidApi::class)
-    override fun updateTaskState(taskState: TaskState): TaskState {
-        return getTaskStateById(taskState.id.toString()).let { currentState ->
-            val updatedState = currentState.copy(
-                name = taskState.name,
-                projectId = taskState.projectId
-            )
-            val updatedStates = states.map { if (it == currentState) updatedState else it }
-            taskStateCsvDataSource.updateFile(updatedStates)
-            updatedState
-        }
+    override fun updateTaskState(taskState: TaskStateDto): Boolean {
+        taskStateCsvDataSource.updateItem(toTaskStateEntity(taskState))
+        return true
     }
-    //endregion
+//endregion
 
     //region task
     override fun getAllTasks(): List<Task> {
@@ -173,7 +169,7 @@ class LocalDataSourceImpl(
         taskCsvDataSource.updateFile(tasks)
         return updatedTask
     }
-    //endregion
+//endregion
 
     //region user
     override fun getAllUsers(): List<User> {
@@ -204,5 +200,5 @@ class LocalDataSourceImpl(
         userCsvDataSource.updateItem(updatedUser)
         return updatedUser
     }
-    //endregion
+//endregion
 }
