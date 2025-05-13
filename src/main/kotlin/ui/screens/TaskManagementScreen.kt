@@ -231,6 +231,7 @@ class TaskManagementScreen(
         }
     }
 
+
     fun updateTaskById() {
         consoleIO.showWithLine("\n\u001B[36m🔄 Update Task\u001B[0m")
         consoleIO.show("Enter Task ID to update: ")
@@ -276,14 +277,16 @@ class TaskManagementScreen(
 
         try {
             showAnimation("Updating task...") {
+                val existingTask = getTaskByIdUseCase.getTaskById(uuid.toString())
+
                 val updatedTask = Task(
                     id = uuid,
-                    projectId = "default-project-id",
+                    projectId = existingTask.projectId,
                     title = newTitle,
                     description = newDescription,
-                    createdBy = "default-user",
+                    createdBy = existingTask.createdBy,
                     stateId = newStateId,
-                    createdAt = now,
+                    createdAt = existingTask.createdAt,
                     updatedAt = now
                 )
 
