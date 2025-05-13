@@ -1,8 +1,8 @@
 package ui.screens
 
-import logic.useCases.audit.GetAuditLogsByProjectIdUseCase
 import logic.entity.Audit
 import logic.useCases.audit.GetAllAuditLogsUseCase
+import logic.useCases.audit.GetAuditLogsByProjectIdUseCase
 import logic.useCases.audit.GetAuditLogsByTaskIdUseCase
 import ui.enums.AuditBoardOption
 import ui.main.BaseScreen
@@ -32,12 +32,15 @@ class AuditScreen(
     }
 
     override fun handleFeatureChoice() {
-        when (getInput()) {
-            "1" -> onClickGetAllAuditLogs()
-            "2" -> onClickGetAuditLogsForProject()
-            "3" -> onClickGetAuditLogsForTask()
-            "0" -> return
-            else -> consoleIO.showWithLine("❌ Invalid Option")
+        while (true) {
+            when (getInput()) {
+                "1" -> onClickGetAllAuditLogs()
+                "2" -> onClickGetAuditLogsForProject()
+                "3" -> onClickGetAuditLogsForTask()
+                "0" -> return
+                else -> consoleIO.showWithLine("❌ Invalid Option")
+            }
+            showOptionService()
         }
     }
 
