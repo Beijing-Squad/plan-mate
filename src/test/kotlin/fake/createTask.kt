@@ -1,8 +1,7 @@
 package fake
 
-import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
-import logic.entities.Task
+import logic.entity.Task
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 

@@ -5,8 +5,8 @@ import data.local.csvDataSource.csv.CsvDataSourceImpl
 import fake.*
 import io.mockk.*
 import kotlinx.datetime.LocalDateTime
-import logic.entities.*
-import logic.entities.type.UserRole
+import logic.entity.*
+import logic.entity.type.UserRole
 import logic.exceptions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
