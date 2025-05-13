@@ -4,7 +4,6 @@ import data.remote.mongoDataSource.dto.UserDto
 import logic.entity.User
 import kotlin.uuid.ExperimentalUuidApi
 
-
 @OptIn(ExperimentalUuidApi::class)
 fun User.toUserDto(): UserDto {
     return UserDto(

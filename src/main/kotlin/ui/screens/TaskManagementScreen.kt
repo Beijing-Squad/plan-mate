@@ -3,7 +3,7 @@ package ui.screens
 import data.remote.mongoDataSource.dto.TaskDto
 import data.repository.mapper.toTaskDto
 import data.repository.mapper.toTaskEntity
-import format
+import ui.main.format
 import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
@@ -243,7 +243,7 @@ class TaskManagementScreen(
         val uuid = try {
             Uuid.parse(idInput)
         } catch (_: IllegalArgumentException) {
-            consoleIO.showWithLine("❌ Invalid UUID format.")
+            consoleIO.showWithLine("❌ Invalid UUID ui.main.format.")
             return
         }
         val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())

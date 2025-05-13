@@ -12,7 +12,6 @@ import logic.repository.AuditRepository
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import kotlin.uuid.ExperimentalUuidApi
 
 class GetAuditLogsByTaskIdUseCaseTest {
 
@@ -24,8 +23,6 @@ class GetAuditLogsByTaskIdUseCaseTest {
         auditRepository = mockk(relaxed = true)
         getAuditLogsByTaskIdUseCase = GetAuditLogsByTaskIdUseCase(auditRepository)
     }
-
-    @OptIn(ExperimentalUuidApi::class)
     @Test
     fun `should return audit logs when a valid task ID is provided`() = runTest {
         val taskId = "task-123"
@@ -63,7 +60,6 @@ class GetAuditLogsByTaskIdUseCaseTest {
         assertThat(result).isEmpty()
     }
 
-    @OptIn(ExperimentalUuidApi::class)
     @Test
     fun `should return audit logs with different action types for the same task when provided`() = runTest {
         val taskId = "task-789"
@@ -102,7 +98,6 @@ class GetAuditLogsByTaskIdUseCaseTest {
         assertThat(result.all { it.entityId == taskId }).isTrue()
     }
 
-    @OptIn(ExperimentalUuidApi::class)
     @Test
     fun `should return only audit logs for the specified task ID when provided`() = runTest {
         val taskId = "task-123"

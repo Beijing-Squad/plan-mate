@@ -1,6 +1,5 @@
 package logic.useCases.audit
 
-import GetAuditLogsByProjectIdUseCase
 import com.google.common.truth.Truth.assertThat
 import fake.createAudit
 import io.mockk.coEvery

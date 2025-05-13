@@ -10,7 +10,6 @@ import logic.entity.type.UserRole
 import logic.repository.AuditRepository
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import kotlin.uuid.ExperimentalUuidApi
 
 class GetAllAuditLogsUseCaseTest {
 
@@ -23,7 +22,6 @@ class GetAllAuditLogsUseCaseTest {
         getAllAuditLogsUseCase = GetAllAuditLogsUseCase(auditRepository)
     }
 
-    @OptIn(ExperimentalUuidApi::class)
     @Test
     fun `should return all audit logs when called`() = runTest {
         // Given
@@ -47,7 +45,6 @@ class GetAllAuditLogsUseCaseTest {
         assertThat(result.size).isEqualTo(2)
     }
 
-    @OptIn(ExperimentalUuidApi::class)
     @Test
     fun `should return empty list when audit repo is empty`() = runTest {
         // Given
@@ -60,7 +57,6 @@ class GetAllAuditLogsUseCaseTest {
         assertThat(result).isEmpty()
     }
 
-    @OptIn(ExperimentalUuidApi::class)
     @Test
     fun `should return audit logs when different action types is provided`() = runTest {
         // Given
@@ -97,7 +93,6 @@ class GetAllAuditLogsUseCaseTest {
         )
     }
 
-    @OptIn(ExperimentalUuidApi::class)
     @Test
     fun `should return audit logs for both project and task entities when they exist`() = runTest {
         // Given

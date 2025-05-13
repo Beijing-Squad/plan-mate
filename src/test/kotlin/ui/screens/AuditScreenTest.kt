@@ -1,6 +1,6 @@
 package ui.screens
 
-import GetAuditLogsByProjectIdUseCase
+import logic.useCases.audit.GetAuditLogsByProjectIdUseCase
 import fake.createAudit
 import io.mockk.*
 import kotlinx.coroutines.runBlocking

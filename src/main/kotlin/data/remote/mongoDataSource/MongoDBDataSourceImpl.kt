@@ -1,6 +1,5 @@
 package data.remote.mongoDataSource
 
-import com.mongodb.client.model.Filters
 import com.mongodb.client.model.Filters.and
 import com.mongodb.client.model.Filters.eq
 import com.mongodb.client.model.Updates.combine
@@ -52,7 +51,7 @@ class MongoDBDataSourceImpl(
     }
 
     override suspend fun getAuthenticatedUser(username: String, password: String): UserDto {
-        val query = Filters.and(
+        val query = and(
             eq("userName", username), eq(
                 "password",
                 hashPassword(password)
@@ -74,8 +73,8 @@ class MongoDBDataSourceImpl(
     override suspend fun getAuditLogsByProjectId(projectId: String): List<AuditDto> {
         return auditsCollection.find(
             and(
-                eq<String>("entityId", projectId),
-                eq<String>("entityType", Audit.EntityType.PROJECT.name)
+                eq("entityId", projectId),
+                eq("entityType", Audit.EntityType.PROJECT.name)
             )
         ).toList()
     }

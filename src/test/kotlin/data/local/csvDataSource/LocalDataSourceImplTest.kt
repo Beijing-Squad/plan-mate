@@ -517,7 +517,7 @@ class LocalDataSourceImplTest {
     fun `should throw TaskNotFoundException when getTaskById is called with invalid ID`() {
         // Given
         every { taskCsvDataSource.loadAllDataFromFile() } returns emptyList()
-        val invalidTaskId = kotlin.uuid.Uuid.random().toString()
+        val invalidTaskId = Uuid.random().toString()
 
         // When & Then
         assertFailsWith<TaskNotFoundException> {
@@ -695,7 +695,7 @@ class LocalDataSourceImplTest {
         every { taskStateCsvDataSource.loadAllDataFromFile() } returns listOf(state)
 
         // When & Then
-        val exception = kotlin.test.assertFailsWith<StateNotFoundException> {
+        val exception = assertFailsWith<StateNotFoundException> {
             localDataSourceImpl.getTaskStateById("non-existing-id")
         }
         assertThat(exception).isInstanceOf(StateNotFoundException::class.java)

@@ -340,8 +340,8 @@ class TaskManagementScreenTest {
     @Test
     fun `should handle invalid task ID format`() = runTest {
         // Given
-        coEvery { consoleIO.read() } returns "invalid-id-format"
-        coEvery { getTaskByIdUseCase.getTaskById("invalid-id-format") } throws TaskException("Invalid task ID format")
+        coEvery { consoleIO.read() } returns "invalid-id-ui.main.format"
+        coEvery { getTaskByIdUseCase.getTaskById("invalid-id-ui.main.format") } throws TaskException("Invalid task ID ui.main.format")
 
         // When
         screen.onClickGetTaskById()

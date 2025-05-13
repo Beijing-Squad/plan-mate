@@ -3,7 +3,6 @@ package logic.useCases.project
 import logic.entity.Project
 import logic.repository.ProjectsRepository
 
-
 class AddProjectUseCase(
     private val projectsRepository: ProjectsRepository
 ) {

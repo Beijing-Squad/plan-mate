@@ -32,8 +32,8 @@ class TaskStatesRepositoryImpl(
             .map { it.toTaskStateEntity() }
     }
 
-    override suspend fun getTaskStateById(taskstateId: Uuid): TaskState {
-        return taskStateDataSource.getTaskStateById(taskstateId.toString()).toTaskStateEntity()
+    override suspend fun getTaskStateById(taskStateId: Uuid): TaskState {
+        return taskStateDataSource.getTaskStateById(taskStateId.toString()).toTaskStateEntity()
     }
 
     override suspend fun updateTaskState(taskState: TaskState): Boolean {

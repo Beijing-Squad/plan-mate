@@ -38,6 +38,7 @@ class AddAuditLogUseCaseTest {
 
         coEvery { sessionManagerUseCase.getCurrentUser() } returns mockk {
             every { role } returns auditLog.userRole
+            every { userName } returns auditLog.userName
         }
 
         addAuditLogUseCase.addAuditLog(auditLog)
@@ -64,6 +65,7 @@ class AddAuditLogUseCaseTest {
 
         coEvery { sessionManagerUseCase.getCurrentUser() } returns mockk {
             every { role } returns auditLog.userRole
+            every { userName } returns auditLog.userName
         }
 
         addAuditLogUseCase.addAuditLog(auditLog)
@@ -90,6 +92,7 @@ class AddAuditLogUseCaseTest {
 
         coEvery { sessionManagerUseCase.getCurrentUser() } returns mockk {
             every { role } returns auditLog.userRole
+            every { userName } returns auditLog.userName
         }
 
         addAuditLogUseCase.addAuditLog(auditLog)
@@ -122,8 +125,14 @@ class AddAuditLogUseCaseTest {
         )
 
         coEvery { sessionManagerUseCase.getCurrentUser() } returnsMany listOf(
-            mockk { every { role } returns auditLog1.userRole },
-            mockk { every { role } returns auditLog2.userRole }
+            mockk {
+                every { role } returns auditLog1.userRole
+                every { userName } returns auditLog1.userName
+            },
+            mockk {
+                every { role } returns auditLog2.userRole
+                every { userName } returns auditLog2.userName
+            }
         )
 
         addAuditLogUseCase.addAuditLog(auditLog1)
@@ -153,6 +162,7 @@ class AddAuditLogUseCaseTest {
 
         coEvery { sessionManagerUseCase.getCurrentUser() } returns mockk {
             every { role } returns auditLog.userRole
+            every { userName } returns auditLog.userName
         }
 
         addAuditLogUseCase.addAuditLog(auditLog)

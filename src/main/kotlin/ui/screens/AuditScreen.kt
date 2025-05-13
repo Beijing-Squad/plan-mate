@@ -1,6 +1,6 @@
 package ui.screens
 
-import GetAuditLogsByProjectIdUseCase
+import logic.useCases.audit.GetAuditLogsByProjectIdUseCase
 import kotlinx.coroutines.runBlocking
 import logic.entity.Audit
 import logic.useCases.audit.GetAllAuditLogsUseCase

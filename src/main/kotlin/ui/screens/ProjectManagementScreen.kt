@@ -1,6 +1,6 @@
 package ui.screens
 
-import format
+import ui.main.format
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
