@@ -38,8 +38,6 @@ class UserScreen(
             consoleIO
         )
     }
-
-    @OptIn(ExperimentalUuidApi::class)
     override fun handleFeatureChoice() {
         while (true){
             when (getInput()) {

@@ -51,12 +51,12 @@ class TaskStateScreen(
     override fun handleFeatureChoice() {
         while (true) {
             when (getInput()) {
-                "1" -> onChooseAddState()
-                "2" -> onChooseDeleteState()
-                "3" -> onChooseUpdateState()
-                "4" -> onChooseGetAllStates()
-                "5" -> onChooseGetStateById()
-                "6" -> onChooseGetStatesByProjectId()
+                "1" -> onClickAddState()
+                "2" -> onClickDeleteState()
+                "3" -> onClickUpdateState()
+                "4" -> onClickGetAllState()
+                "5" -> onClickGetStateById()
+                "6" -> onClickGetStatesByProjectId()
                 "0" -> return
                 else -> {
                     consoleIO.showWithLine("❌ Invalid Option")
@@ -66,7 +66,7 @@ class TaskStateScreen(
         }
     }
 
-    private fun onChooseAddState() {
+    private fun onClickAddState() {
         try {
             val name = getInputWithLabel("📛 Enter State Name: ")
             val projectId = Uuid.parse(getInputWithLabel("📁 Enter Project ID: "))
@@ -107,7 +107,7 @@ class TaskStateScreen(
         }
     }
 
-    private fun onChooseDeleteState() {
+    private fun onClickDeleteState() {
         try {
             val id = Uuid.parse(getInputWithLabel("🆔 Enter State ID to delete: "))
             showAnimation("Deleting State ") {
@@ -119,7 +119,7 @@ class TaskStateScreen(
         }
     }
 
-    private fun onChooseUpdateState() {
+    private fun onClickUpdateState() {
         try {
 
             val id = Uuid.parse(getInputWithLabel("🆔 Enter State ID to update: "))
@@ -155,7 +155,7 @@ class TaskStateScreen(
         }
     }
 
-    private fun onChooseGetAllStates() {
+    private fun onClickGetAllState() {
         try {
             showAnimation("Getting All State ") {
                 val states = getAllStates.getAllTaskStates()
@@ -172,7 +172,7 @@ class TaskStateScreen(
         }
     }
 
-    private fun onChooseGetStateById() {
+    private fun onClickGetStateById() {
         try {
             val id = Uuid.parse(getInputWithLabel("🆔 Enter State ID: "))
             showAnimation("Getting State by ID ") {
@@ -184,7 +184,7 @@ class TaskStateScreen(
         }
     }
 
-    private fun onChooseGetStatesByProjectId() {
+    private fun onClickGetStatesByProjectId() {
         try {
             val projectId = Uuid.parse(getInputWithLabel("📁 Enter Project ID: "))
             showAnimation("Getting States by Project ID ") {

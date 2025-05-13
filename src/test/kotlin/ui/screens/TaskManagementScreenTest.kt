@@ -60,7 +60,7 @@ class TaskManagementScreenTest {
         coEvery { getAllTaskStatesUseCase.getAllTaskStates() } returns states
 
         // When
-        screen.showTasksInSwimlanes()
+        screen.onClickShowTasksInSwimlanes()
 
         // Then
         coVerify { swimlanesRenderer.render(tasks, states) }
@@ -72,7 +72,7 @@ class TaskManagementScreenTest {
         coEvery { getAllTasksUseCase.getAllTasks() } returns emptyList()
 
         // When
-        screen.showAllTasksList()
+        screen.onClickShowAllTasksList()
 
         // Then
         coVerify { consoleIO.showWithLine("⚠️ No tasks available.") }
@@ -86,7 +86,7 @@ class TaskManagementScreenTest {
         coEvery { getTaskByIdUseCase.getTaskById(task.id.toString()) } returns task
 
         // When
-        screen.getTaskById()
+        screen.onClickGetTaskById()
 
         // Then
         coVerify { consoleIO.showWithLine(match { it.contains("Test Task") }) }
@@ -99,7 +99,7 @@ class TaskManagementScreenTest {
         coEvery { getTaskByIdUseCase.getTaskById("non-existent-id") } throws TaskNotFoundException("Task not found")
 
         // When
-        screen.getTaskById()
+        screen.onClickGetTaskById()
 
         // Then
         coVerify { consoleIO.showWithLine(match { it.contains("❌ Task not found") }) }
@@ -111,7 +111,7 @@ class TaskManagementScreenTest {
         coEvery { sessionManagerUseCase.getCurrentUser() } returns null
 
         // When
-        screen.addTask()
+        screen.onClickAddTask()
 
         // Then
         coVerify { consoleIO.showWithLine("❌ No user is currently logged in.") }
@@ -128,7 +128,7 @@ class TaskManagementScreenTest {
         coEvery { consoleIO.read() } returnsMany listOf("", "", "", "")
 
         // When
-        screen.addTask()
+        screen.onClickAddTask()
 
         // Then
         coVerify { consoleIO.showWithLine("❌ Title, State ID, and Project ID are required.") }
@@ -146,7 +146,7 @@ class TaskManagementScreenTest {
         coEvery { addTaskUseCase.addTask(any()) } throws TaskAlreadyExistsException("Task already exists")
 
         // When
-        screen.addTask()
+        screen.onClickAddTask()
 
         // Then
         coVerify { consoleIO.showWithLine(match { it.contains("❌ Task already exists") }) }
@@ -158,7 +158,7 @@ class TaskManagementScreenTest {
         coEvery { consoleIO.read() } returns ""
 
         // When
-        screen.deleteTaskById()
+        screen.onClickDeleteTaskById()
 
         // Then
         coVerify { consoleIO.showWithLine("❌ Task ID is required.") }
@@ -173,7 +173,7 @@ class TaskManagementScreenTest {
         coEvery { deleteTaskUseCase.deleteTask(task.id.toString()) } throws TaskException("Cannot delete task with dependencies")
 
         // When
-        screen.deleteTaskById()
+        screen.onClickDeleteTaskById()
 
         // Then
         coVerify { consoleIO.showWithLine(match { it.contains("❌ Error deleting task") }) }
@@ -190,7 +190,7 @@ class TaskManagementScreenTest {
         coEvery { getAllTasksUseCase.getAllTasks() } returns tasks
 
         // When
-        screen.showAllTasksList()
+        screen.onClickShowAllTasksList()
 
         // Then
         coVerify { 
@@ -209,7 +209,7 @@ class TaskManagementScreenTest {
         coEvery { getTaskByIdUseCase.getTaskById(task.id.toString()) } returns task
 
         // When
-        screen.getTaskById()
+        screen.onClickGetTaskById()
 
         // Then
         coVerify { 
@@ -235,7 +235,7 @@ class TaskManagementScreenTest {
         coEvery { getAllTaskStatesUseCase.getAllTaskStates() } returns states
 
         // When
-        screen.showTasksInSwimlanes()
+        screen.onClickShowTasksInSwimlanes()
 
         // Then
         coVerify { swimlanesRenderer.render(tasks, states) }
@@ -256,7 +256,7 @@ class TaskManagementScreenTest {
         coEvery { addTaskUseCase.addTask(capture(taskSlot)) } returns Unit
 
         // When
-        screen.addTask()
+        screen.onClickAddTask()
 
         // Then
         coVerify { 
@@ -292,7 +292,7 @@ class TaskManagementScreenTest {
         )
 
         // When
-        screen.updateTaskById()
+        screen.onClickUpdateTaskById()
 
         // Then
         coVerify { 
@@ -317,7 +317,7 @@ class TaskManagementScreenTest {
         coEvery { consoleIO.read() } returnsMany listOf("   ", "   ", "   ", "   ")
 
         // When
-        screen.addTask()
+        screen.onClickAddTask()
 
         // Then
         coVerify { consoleIO.showWithLine("❌ Title, State ID, and Project ID are required.") }
@@ -331,7 +331,7 @@ class TaskManagementScreenTest {
         coEvery { getAllTaskStatesUseCase.getAllTaskStates() } throws TaskException("Failed to load states")
 
         // When
-        screen.showTasksInSwimlanes()
+        screen.onClickShowTasksInSwimlanes()
 
         // Then
         coVerify { consoleIO.showWithLine(match { it.contains("❌ Failed to load tasks") }) }
@@ -344,7 +344,7 @@ class TaskManagementScreenTest {
         coEvery { getTaskByIdUseCase.getTaskById("invalid-id-format") } throws TaskException("Invalid task ID format")
 
         // When
-        screen.getTaskById()
+        screen.onClickGetTaskById()
 
         // Then
         coVerify { consoleIO.showWithLine(match { it.contains("❌ Error retrieving task") }) }

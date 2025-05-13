@@ -52,11 +52,11 @@ class ProjectManagementScreen(
         while (true) {
             showOptionService()
             when (getInput()) {
-                "1" -> listAllProjects()
-                "2" -> findProjectById()
-                "3" -> updateProject()
-                "4" -> addProject()
-                "5" -> deleteProject()
+                "1" -> onClickShowListAllProjects()
+                "2" -> onClickFindProjectById()
+                "3" -> onClickUpdateProject()
+                "4" -> onClickAddProject()
+                "5" -> onClickDeleteProject()
                 "0" -> {
                     consoleIO.showWithLine("\u001B[34m🔙 Returning to Main Menu...\u001B[0m")
                     break
@@ -68,7 +68,7 @@ class ProjectManagementScreen(
         }
     }
 
-    private fun listAllProjects() = runBlocking{
+    private fun onClickShowListAllProjects() = runBlocking{
         try {
             val projects = getAllProjectsUseCase.getAllProjects()
             if (projects.isEmpty()) {
@@ -83,7 +83,7 @@ class ProjectManagementScreen(
         }
     }
 
-    private fun findProjectById() = runBlocking{
+    private fun onClickFindProjectById() = runBlocking{
         try {
             consoleIO.show("\u001B[32mEnter project ID: \u001B[0m")
             val id = getInput() ?: return@runBlocking
@@ -94,7 +94,7 @@ class ProjectManagementScreen(
         }
     }
 
-    private fun updateProject() = runBlocking{
+    private fun onClickUpdateProject() = runBlocking{
         try {
             consoleIO.show("\u001B[32mEnter project ID to update: \u001B[0m")
             val id = getInput() ?: return@runBlocking
@@ -134,7 +134,7 @@ class ProjectManagementScreen(
         }
     }
 
-    private fun addProject()  = runBlocking{
+    private fun onClickAddProject()  = runBlocking{
         try {
             consoleIO.show("\u001B[32mEnter project name: \u001B[0m")
             val name = getInput() ?: return@runBlocking
@@ -174,7 +174,7 @@ class ProjectManagementScreen(
         }
     }
 
-    private fun deleteProject()= runBlocking {
+    private fun onClickDeleteProject()= runBlocking {
         try {
             consoleIO.show("\u001B[32mEnter project ID to delete: \u001B[0m")
             val id = getInput() ?: return@runBlocking
