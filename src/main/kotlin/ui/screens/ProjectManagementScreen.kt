@@ -44,7 +44,6 @@ class ProjectManagementScreen(
             consoleIO
         )
     }
-
     override fun handleFeatureChoice() {
         while (true) {
             when (getInput()) {
@@ -64,7 +63,6 @@ class ProjectManagementScreen(
             showOptionService()
         }
     }
-
     private fun listAllProjects() {
         try {
             showAnimation("list all project...") {
@@ -96,30 +94,31 @@ class ProjectManagementScreen(
             consoleIO.showWithLine("\u001B[31m❌ ${e.message}\u001B[0m")
         }
     }
-
     private fun updateProject() {
         try {
             consoleIO.show("\u001B[32mEnter project ID to update: \u001B[0m")
             val id = getInput() ?: return
-            showAnimation("update project...") {
+            consoleIO.show("\u001B[32mEnter new name: \u001B[0m")
+            val name = getInput() ?: return
+
+            consoleIO.show("\u001B[32mEnter new description: \u001B[0m")
+            val desc = getInput() ?: return
+
+            showAnimation("Updating project...") {
                 consoleIO.showWithLine("")
                 val project = getProjectByIdUseCase.getProjectById(id)
-                consoleIO.show("\u001B[32mEnter new name: \u001B[0m")
-                val name = getInput() ?: return@showAnimation
-                consoleIO.show("\u001B[32mEnter new description: \u001B[0m")
-                val desc = getInput() ?: return@showAnimation
-
-                val updated = project.copy(
+                val updatedProject = project.copy(
                     name = name,
                     description = desc,
                     updatedAt = now
                 )
+                updateProjectUseCase.updateProject(updatedProject)
 
-                updateProjectUseCase.updateProject(updated)
                 consoleIO.showWithLine("\u001B[32m✅ Project updated successfully.\u001B[0m")
+
                 sessionManager.getCurrentUser()?.let { user ->
                     val actionDetails =
-                        "Admin ${user.userName} updated project ${updated.id} with name '$name' at ${now.format()}"
+                        "Admin ${user.userName} updated project ${updatedProject.id} with name '$name' at ${now.format()}"
                     addAudit.addAuditLog(
                         Audit(
                             id = user.id,
@@ -127,7 +126,7 @@ class ProjectManagementScreen(
                             userName = user.userName,
                             action = Audit.ActionType.UPDATE,
                             entityType = Audit.EntityType.PROJECT,
-                            entityId = updated.id.toString(),
+                            entityId = updatedProject.id.toString(),
                             actionDetails = actionDetails,
                             timeStamp = now
                         )
@@ -138,7 +137,6 @@ class ProjectManagementScreen(
             consoleIO.showWithLine("\u001B[31m❌ ${e.message}\u001B[0m")
         }
     }
-
     private fun addProject() {
         try {
             consoleIO.show("\u001B[32mEnter project name: \u001B[0m")
@@ -177,7 +175,6 @@ class ProjectManagementScreen(
             consoleIO.showWithLine("\u001B[31m❌ ${e.message}\u001B[0m")
         }
     }
-
     private fun deleteProject() {
         try {
             consoleIO.show("\u001B[32mEnter project ID to delete: \u001B[0m")
@@ -207,7 +204,6 @@ class ProjectManagementScreen(
             consoleIO.showWithLine("\u001B[31m❌ ${e.message}\u001B[0m")
         }
     }
-
     private fun showProjectInfo(project: Project) {
         consoleIO.showWithLine(
             """
