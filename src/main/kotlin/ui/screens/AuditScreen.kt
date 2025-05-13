@@ -1,7 +1,8 @@
 package ui.screens
 
 import GetAuditLogsByProjectIdUseCase
-import logic.entities.Audit
+import kotlinx.coroutines.runBlocking
+import logic.entity.Audit
 import logic.useCases.audit.GetAllAuditLogsUseCase
 import logic.useCases.audit.GetAuditLogsByTaskIdUseCase
 import ui.enums.AuditBoardOption
@@ -32,6 +33,7 @@ class AuditScreen(
             consoleIO
         )
     }
+
     override fun handleFeatureChoice() {
         when (getInput()) {
             "1" -> onClickGetAllAuditLogs()
@@ -41,53 +43,71 @@ class AuditScreen(
             else -> consoleIO.showWithLine("❌ Invalid Option")
         }
     }
+
     private fun onClickGetAllAuditLogs() {
-        showAnimation("Fetching all audit logs...") {
-            val allAudits = getAllAudits.getAllAuditLogs()
-            if (allAudits.isEmpty()) {
-                consoleIO.showWithLine("❌ No Audit Logs Found")
-            } else {
-                consoleIO.showWithLine("\n📋 All Audit Logs:\n")
-                allAudits.forEach { audit ->
+        runBlocking {
+            showAnimation("Fetching all audit logs...") {
+                val allAudits = getAllAudits.getAllAuditLogs()
+                if (allAudits.isEmpty()) {
+                    consoleIO.showWithLine("❌ No Audit Logs Found")
+                } else {
+                    consoleIO.showWithLine("\n📋 All Audit Logs:\n")
+                    allAudits.forEach { audit ->
+                        consoleIO.showWithLine(formatAuditLog(audit))
+                    }
+                }
+            }
+        }
+    }
+
+
+    private fun onClickGetAuditLogsForProject() {
+        runBlocking {
+            showAnimation("Fetching project audit logs...") {
+                val projectId = getIdInput()
+
+                if (projectId.isBlank()) {
+                    consoleIO.showWithLine("❌ Error: ID shouldn't be blank")
+                    return@showAnimation
+                }
+
+                val auditLogs = getAuditLogsByProjectId.getAuditLogsByProjectId(projectId)
+
+                if (auditLogs.isNullOrEmpty()) {
+                    consoleIO.showWithLine("❌ No Audit Logs Found")
+                    return@showAnimation
+                }
+
+                consoleIO.showWithLine("\n🔍 Audit Logs For Project ID: $projectId\n")
+                auditLogs.forEach { audit ->
                     consoleIO.showWithLine(formatAuditLog(audit))
                 }
             }
         }
     }
-    private fun onClickGetAuditLogsForProject() {
-        val projectId = getIdInput()
-        if (projectId.isBlank()) {
-            consoleIO.showWithLine("❌ Error: ID shouldn't be blank")
-            return
-        }
-        showAnimation("Fetching project audit logs...") {
-            val auditLogs = getAuditLogsByProjectId.getAuditLogsByProjectId(projectId)
-            if (auditLogs.isNullOrEmpty()) {
-                consoleIO.showWithLine("❌ No Audit Logs Found")
-                return@showAnimation
-            }
-            consoleIO.showWithLine("\n🔍 Audit Logs For Project ID: $projectId\n")
-            auditLogs.forEach { audit ->
-                consoleIO.showWithLine(formatAuditLog(audit))
-            }
-        }
-    }
+
 
     private fun onClickGetAuditLogsForTask() {
-        val taskId = getIdInput()
-        if (taskId.isBlank()) {
-            consoleIO.showWithLine("❌ Error: ID shouldn't be blank")
-            return
-        }
-        showAnimation("Fetching task audit logs...") {
-            val auditLogs = getAuditLogsByTaskId.getAuditLogsByTaskId(taskId)
-            if (auditLogs.isEmpty()) {
-                consoleIO.showWithLine("❌ No Audit Logs Found")
-                return@showAnimation
-            }
-            consoleIO.showWithLine("\n🔍 Audit Logs For Task ID: $taskId\n")
-            auditLogs.forEach { audit ->
-                consoleIO.showWithLine(formatAuditLog(audit))
+        runBlocking {
+            showAnimation("Fetching task audit logs...") {
+                val taskId = getIdInput()
+
+                if (taskId.isBlank()) {
+                    consoleIO.showWithLine("❌ Error: ID shouldn't be blank")
+                    return@showAnimation
+                }
+
+                val auditLogs = getAuditLogsByTaskId.getAuditLogsByTaskId(taskId)
+
+                if (auditLogs.isEmpty()) {
+                    consoleIO.showWithLine("❌ No Audit Logs Found")
+                    return@showAnimation
+                }
+
+                consoleIO.showWithLine("\n🔍 Audit Logs For Task ID: $taskId\n")
+                auditLogs.forEach { audit ->
+                    consoleIO.showWithLine(formatAuditLog(audit))
+                }
             }
         }
     }

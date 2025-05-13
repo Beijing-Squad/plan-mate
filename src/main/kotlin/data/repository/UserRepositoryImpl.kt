@@ -3,7 +3,7 @@ package data.repository
 import data.repository.mapper.toUserDto
 import data.repository.mapper.toUserEntity
 import data.repository.remoteDataSource.RemoteDataSource
-import logic.entities.User
+import logic.entity.User
 import logic.repository.UserRepository
 
 class UserRepositoryImpl(

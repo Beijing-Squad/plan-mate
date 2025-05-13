@@ -4,8 +4,8 @@ import GetAuditLogsByProjectIdUseCase
 import fake.createAudit
 import io.mockk.*
 import kotlinx.coroutines.runBlocking
-import logic.entities.Audit
-import logic.entities.type.UserRole
+import logic.entity.Audit
+import logic.entity.type.UserRole
 import logic.useCases.audit.GetAllAuditLogsUseCase
 import logic.useCases.audit.GetAuditLogsByTaskIdUseCase
 import ui.main.consoleIO.ConsoleIO

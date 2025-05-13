@@ -1,8 +1,7 @@
 package ui.screens
 
 import kotlinx.coroutines.runBlocking
-import logic.entities.User
-import logic.entities.type.UserRole
+import logic.entity.User
 import logic.exceptions.InvalidPasswordException
 import logic.exceptions.InvalidUserNameException
 import logic.exceptions.UnauthorizedUserException

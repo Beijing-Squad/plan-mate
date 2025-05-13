@@ -3,8 +3,8 @@ package data.local.csvDataSource
 import data.local.csvDataSource.csv.CsvDataSourceImpl
 import data.repository.localDataSource.LocalDataSource
 import data.utils.hashPassword
-import logic.entities.*
-import logic.entities.type.UserRole
+import logic.entity.*
+import logic.entity.type.UserRole
 import logic.exceptions.*
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid

@@ -5,8 +5,8 @@ import fake.createAudit
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
-import logic.entities.Audit
-import logic.entities.type.UserRole
+import logic.entity.Audit
+import logic.entity.type.UserRole
 import logic.exceptions.InvalidInputException
 import logic.repository.AuditRepository
 import org.junit.jupiter.api.BeforeEach

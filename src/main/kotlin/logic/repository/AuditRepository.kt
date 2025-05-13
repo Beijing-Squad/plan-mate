@@ -1,6 +1,6 @@
 package logic.repository
 
-import logic.entities.Audit
+import logic.entity.Audit
 
 interface AuditRepository{
     suspend fun getAllAuditLogs(): List<Audit>

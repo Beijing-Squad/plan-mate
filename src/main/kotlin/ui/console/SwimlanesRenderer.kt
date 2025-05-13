@@ -1,7 +1,7 @@
 package ui.console
 
-import logic.entities.TaskState
-import logic.entities.Task
+import logic.entity.TaskState
+import logic.entity.Task
 import ui.main.consoleIO.ConsoleIO
 import kotlin.uuid.ExperimentalUuidApi
 

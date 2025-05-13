@@ -8,8 +8,8 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import logic.entities.Audit
-import logic.entities.Task
+import logic.entity.Audit
+import logic.entity.Task
 import logic.exceptions.TaskAlreadyExistsException
 import logic.exceptions.TaskNotFoundException
 import logic.exceptions.TaskException

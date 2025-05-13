@@ -2,8 +2,8 @@ package data.repository.mapper
 
 import data.remote.mongoDataSource.dto.AuditDto
 import kotlinx.datetime.LocalDateTime
-import logic.entities.Audit
-import logic.entities.type.UserRole
+import logic.entity.Audit
+import logic.entity.type.UserRole
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 

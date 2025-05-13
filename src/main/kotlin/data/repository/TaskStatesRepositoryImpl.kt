@@ -3,7 +3,7 @@ package data.repository
 import data.repository.mapper.toTaskStateDto
 import data.repository.mapper.toTaskStateEntity
 import data.repository.remoteDataSource.RemoteDataSource
-import logic.entities.TaskState
+import logic.entity.TaskState
 import logic.repository.StatesRepository
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid

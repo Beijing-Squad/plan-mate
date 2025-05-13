@@ -1,7 +1,7 @@
 package data.repository.mapper
 
 import data.remote.mongoDataSource.dto.UserDto
-import logic.entities.User
+import logic.entity.User
 import kotlin.uuid.ExperimentalUuidApi
 
 

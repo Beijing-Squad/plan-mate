@@ -1,11 +1,13 @@
 package ui.screens
 
 import format
+import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import logic.entities.Audit
-import logic.entities.Project
+import logic.entity.Audit
+import logic.entity.Project
+import logic.entity.type.UserRole
 import logic.useCases.audit.AddAuditLogUseCase
 import logic.useCases.authentication.SessionManagerUseCase
 import logic.useCases.project.*
@@ -14,6 +16,7 @@ import ui.main.BaseScreen
 import ui.main.MenuRenderer
 import ui.main.consoleIO.ConsoleIO
 import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
 @OptIn(ExperimentalUuidApi::class)
 class ProjectManagementScreen(
@@ -44,8 +47,10 @@ class ProjectManagementScreen(
             consoleIO
         )
     }
+
     override fun handleFeatureChoice() {
         while (true) {
+            showOptionService()
             when (getInput()) {
                 "1" -> listAllProjects()
                 "2" -> findProjectById()
@@ -60,20 +65,17 @@ class ProjectManagementScreen(
                 else -> consoleIO.showWithLine("\u001B[31m❌ Invalid Option\u001B[0m")
 
             }
-            showOptionService()
         }
     }
-    private fun listAllProjects() {
+
+    private fun listAllProjects() = runBlocking{
         try {
-            showAnimation("list all project...") {
-                val projects = getAllProjectsUseCase.getAllProjects()
-                if (projects.isEmpty()) {
-                    consoleIO.showWithLine("\u001B[33m⚠️ No projects found.\u001B[0m")
-                } else {
-                    projects.forEach { project ->
-                        consoleIO.showWithLine("")
-                        showProjectInfo(project)
-                    }
+            val projects = getAllProjectsUseCase.getAllProjects()
+            if (projects.isEmpty()) {
+                consoleIO.showWithLine("\u001B[33m⚠️ No projects found.\u001B[0m")
+            } else {
+                projects.forEach { project ->
+                    showProjectInfo(project)
                 }
             }
         } catch (e: Exception) {
@@ -81,134 +83,136 @@ class ProjectManagementScreen(
         }
     }
 
-    private fun findProjectById() {
+    private fun findProjectById() = runBlocking{
         try {
             consoleIO.show("\u001B[32mEnter project ID: \u001B[0m")
-            val id = getInput() ?: return
-            showAnimation("find project by id...") {
-                val project = getProjectByIdUseCase.getProjectById(id)
-                showProjectInfo(project)
-            }
+            val id = getInput() ?: return@runBlocking
+            val project = getProjectByIdUseCase.getProjectById(id)
+            showProjectInfo(project)
         } catch (e: Exception) {
             consoleIO.showWithLine("\u001B[31m❌ ${e.message}\u001B[0m")
         }
     }
-    private fun updateProject() {
+
+    private fun updateProject() = runBlocking{
         try {
             consoleIO.show("\u001B[32mEnter project ID to update: \u001B[0m")
-            val id = getInput() ?: return
+            val id = getInput() ?: return@runBlocking
+            val project = getProjectByIdUseCase.getProjectById(id)
+
             consoleIO.show("\u001B[32mEnter new name: \u001B[0m")
-            val name = getInput() ?: return
-
+            val name = getInput() ?: return@runBlocking
             consoleIO.show("\u001B[32mEnter new description: \u001B[0m")
-            val desc = getInput() ?: return
+            val desc = getInput() ?: return@runBlocking
 
-            showAnimation("Updating project...") {
-                val project = getProjectByIdUseCase.getProjectById(id)
-                val updatedProject = project.copy(
-                    name = name,
-                    description = desc,
-                    updatedAt = now
-                )
-                updateProjectUseCase.updateProject(updatedProject)
+            val updated = project.copy(
+                name = name,
+                description = desc,
+                updatedAt = now
+            )
 
-                consoleIO.showWithLine("\u001B[32m✅ Project updated successfully.\u001B[0m")
+            updateProjectUseCase.updateProject(updated)
+            consoleIO.showWithLine("\u001B[32m✅ Project updated successfully.\u001B[0m")
 
-                sessionManager.getCurrentUser()?.let { user ->
-                    val actionDetails =
-                        "Admin ${user.userName} updated project ${updatedProject.id} with name '$name' at ${now.format()}"
-                    addAudit.addAuditLog(
-                        Audit(
-                            userRole = user.role,
-                            userName = user.userName,
-                            action = Audit.ActionType.UPDATE,
-                            entityType = Audit.EntityType.PROJECT,
-                            entityId = updatedProject.id.toString(),
-                            actionDetails = actionDetails,
-                            timeStamp = now
-                        )
+            sessionManager.getCurrentUser()?.let { user ->
+                val actionDetails = "Admin ${user.userName} updated project ${updated.id} with name '$name' at ${now.format()}"
+                addAudit.addAuditLog(
+                    Audit(
+                        id = Uuid.random(),
+                        userRole = user.role,
+                        userName = user.userName,
+                        action = Audit.ActionType.UPDATE,
+                        entityType = Audit.EntityType.PROJECT,
+                        entityId = updated.id.toString(),
+                        actionDetails = actionDetails,
+                        timeStamp = now
                     )
-                }
+                )
             }
         } catch (e: Exception) {
             consoleIO.showWithLine("\u001B[31m❌ ${e.message}\u001B[0m")
         }
     }
-    private fun addProject() {
+
+    private fun addProject()  = runBlocking{
         try {
             consoleIO.show("\u001B[32mEnter project name: \u001B[0m")
-            val name = getInput() ?: return
+            val name = getInput() ?: return@runBlocking
             consoleIO.show("\u001B[32mEnter description: \u001B[0m")
-            val desc = getInput() ?: return
+            val desc = getInput() ?: return@runBlocking
+            consoleIO.show("\u001B[32mEnter created by (user ID): \u001B[0m")
+            val createdBy = getInput() ?: return@runBlocking
+            val newProject = Project(
+                name = name,
+                description = desc,
+                createdBy = createdBy,
+                createdAt = now,
+                updatedAt = now
+            )
+
+            addProjectUseCase.addProject(newProject)
+            consoleIO.showWithLine("\u001B[32m✅ Project added successfully.\u001B[0m")
             sessionManager.getCurrentUser()?.let { user ->
-                val newProject = Project(
-                    name = name,
-                    description = desc,
-                    createdBy = user.id.toString(),
-                    createdAt = now,
-                    updatedAt = now
-                )
-                showAnimation("add project...") {
-                    addProjectUseCase.addProject(newProject)
-                    consoleIO.showWithLine("\u001B[32m✅ Project added successfully.\u001B[0m")
-                    val actionDetails =
-                        "Admin ${user.userName} created project ${newProject.id} with name '$name' at ${now.format()}"
-                    addAudit.addAuditLog(
-                        Audit(
-                            userRole = user.role,
-                            userName = user.userName,
-                            action = Audit.ActionType.CREATE,
-                            entityType = Audit.EntityType.PROJECT,
-                            entityId = newProject.id.toString(),
-                            actionDetails = actionDetails,
-                            timeStamp = now
-                        )
+                val actionDetails =
+                    "Admin ${user.userName} created project ${newProject.id} with name '$name' at ${now.format()}"
+
+                addAudit.addAuditLog(
+                    Audit(
+                        id = Uuid.random(),
+                        userRole = user.role,
+                        userName = user.userName,
+                        action = Audit.ActionType.CREATE,
+                        entityType = Audit.EntityType.PROJECT,
+                        entityId = newProject.id.toString(),
+                        actionDetails = actionDetails,
+                        timeStamp = now
                     )
-                }
+                )
             }
         } catch (e: Exception) {
             consoleIO.showWithLine("\u001B[31m❌ ${e.message}\u001B[0m")
         }
     }
-    private fun deleteProject() {
+
+    private fun deleteProject()= runBlocking {
         try {
             consoleIO.show("\u001B[32mEnter project ID to delete: \u001B[0m")
-            val id = getInput() ?: return
+            val id = getInput() ?: return@runBlocking
             val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
-            showAnimation("delete project...") {
-                deleteProjectUseCase.deleteProject(id)
-                consoleIO.showWithLine("\u001B[32m✅ Project deleted successfully.\u001B[0m")
-                sessionManager.getCurrentUser()?.let { user ->
-                    val actionDetails = "Admin ${user.userName} deleted project with name '$name' at ${now.format()}"
-                    addAudit.addAuditLog(
-                        Audit(
-                            userRole = user.role,
-                            userName = user.userName,
-                            action = Audit.ActionType.DELETE,
-                            entityType = Audit.EntityType.PROJECT,
-                            entityId = id,
-                            actionDetails = actionDetails,
-                            timeStamp = now
-                        )
+            deleteProjectUseCase.deleteProject(id)
+            consoleIO.showWithLine("\u001B[32m✅ Project deleted successfully.\u001B[0m")
+            sessionManager.getCurrentUser()?.userName?.let { userName ->
+                val actionDetails = "Admin $userName deleted project $id with name '$name' at ${now.format()}"
+                addAudit.addAuditLog(
+                    Audit(
+                        id = Uuid.random(),
+                        userRole = UserRole.ADMIN,
+                        userName = userName,
+                        action = Audit.ActionType.DELETE,
+                        entityType = Audit.EntityType.PROJECT,
+                        entityId = id,
+                        actionDetails = actionDetails,
+                        timeStamp = now
                     )
-                }
+                )
             }
         } catch (e: Exception) {
             consoleIO.showWithLine("\u001B[31m❌ ${e.message}\u001B[0m")
         }
     }
+
     private fun showProjectInfo(project: Project) {
         consoleIO.showWithLine(
             """
-        ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-        ┃   ID          : ${project.id}
-        ┃  ️  Name        : ${project.name}
-        ┃   Description : ${project.description}
-        ┃   Created By  : ${project.createdBy}
-        ┃   Created At  : ${project.createdAt}
-        ┃   Updated At  : ${project.updatedAt}
-        ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-        """.trimIndent()
+            \u001B[36m╭────────────────────────────╮
+            │ ID: ${project.id}
+            │ Name: ${project.name}
+            │ Description: ${project.description}
+            │ Created By: ${project.createdBy}
+            │ Created At: ${project.createdAt}
+            │ Updated At: ${project.updatedAt}
+            ╰────────────────────────────╯\u001B[0m
+            """.trimIndent()
         )
     }
 }

@@ -1,7 +1,7 @@
 package data.repository.localDataSource
 
-import logic.entities.*
-import logic.entities.type.UserRole
+import logic.entity.*
+import logic.entity.type.UserRole
 
 interface LocalDataSource {
 

@@ -3,7 +3,7 @@ package data.parser
 import com.google.common.truth.Truth.assertThat
 import data.local.csvDataSource.parser.TaskStateCsvParser
 import fake.createState
-import logic.entities.TaskState
+import logic.entity.TaskState
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import kotlin.uuid.ExperimentalUuidApi

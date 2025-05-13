@@ -1,10 +1,9 @@
 package data.repository
 
-import data.remote.mongoDataSource.MongoDBDataSourceImpl
 import data.repository.mapper.toAuditDTO
 import data.repository.mapper.toAuditEntity
 import data.repository.remoteDataSource.RemoteDataSource
-import logic.entities.Audit
+import logic.entity.Audit
 import logic.repository.AuditRepository
 
 class AuditRepositoryImpl(

@@ -4,9 +4,9 @@ import format
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import logic.entities.Audit
-import logic.entities.TaskState
-import logic.entities.type.UserRole
+import logic.entity.Audit
+import logic.entity.TaskState
+import logic.entity.type.UserRole
 import logic.exceptions.InvalidStateNameException
 import logic.exceptions.ProjectNotFoundException
 import logic.exceptions.StateAlreadyExistException

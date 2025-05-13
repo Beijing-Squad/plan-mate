@@ -1,7 +1,7 @@
 package data.repository.mapper
 
 import data.remote.mongoDataSource.dto.TaskStateDto
-import logic.entities.TaskState
+import logic.entity.TaskState
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 

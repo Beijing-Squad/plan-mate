@@ -1,6 +1,6 @@
 package logic.useCases.user
 
-import logic.entities.User
+import logic.entity.User
 import logic.repository.UserRepository
 import kotlin.uuid.ExperimentalUuidApi
 

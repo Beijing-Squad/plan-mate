@@ -1,4 +1,4 @@
-package logic.entities.type
+package logic.entity.type
 
 enum class UserRole {
     ADMIN,

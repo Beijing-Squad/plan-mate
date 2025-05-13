@@ -1,7 +1,7 @@
 package data.local.csvDataSource.parser
 
 import data.local.csvDataSource.csv.CsvParser
-import logic.entities.TaskState
+import logic.entity.TaskState
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 

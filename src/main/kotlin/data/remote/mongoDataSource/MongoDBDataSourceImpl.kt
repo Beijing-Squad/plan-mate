@@ -1,11 +1,8 @@
 package data.remote.mongoDataSource
 
-import com.mongodb.MongoTimeoutException
-import com.mongodb.MongoWriteException
 import com.mongodb.client.model.Filters
 import com.mongodb.client.model.Filters.and
 import com.mongodb.client.model.Filters.eq
-import com.mongodb.client.model.Updates
 import com.mongodb.client.model.Updates.combine
 import com.mongodb.client.model.Updates.set
 import com.mongodb.kotlin.client.coroutine.MongoDatabase
@@ -20,12 +17,8 @@ import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.withContext
 import logic.exceptions.InvalidLoginException
 import logic.exceptions.StateNotFoundException
-import logic.exceptions.TaskAlreadyExistsException
-import logic.exceptions.TaskException
-import logic.exceptions.TaskNotFoundException
 import logic.exceptions.UserNotFoundException
-import logic.entities.Audit
-import logic.entities.Task
+import logic.entity.Audit
 import logic.exceptions.*
 import org.bson.conversions.Bson
 import kotlin.uuid.ExperimentalUuidApi

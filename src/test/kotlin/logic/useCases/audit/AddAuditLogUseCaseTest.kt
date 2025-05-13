@@ -6,8 +6,8 @@ import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
-import logic.entities.Audit
-import logic.entities.type.UserRole
+import logic.entity.Audit
+import logic.entity.type.UserRole
 import logic.repository.AuditRepository
 import logic.useCases.authentication.SessionManagerUseCase
 import org.junit.jupiter.api.BeforeEach

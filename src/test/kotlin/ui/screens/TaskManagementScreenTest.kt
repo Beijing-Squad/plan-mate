@@ -5,8 +5,8 @@ import fake.createState
 import fake.createTask
 import io.mockk.*
 import kotlinx.coroutines.test.runTest
-import logic.entities.*
-import logic.entities.type.UserRole
+import logic.entity.*
+import logic.entity.type.UserRole
 import logic.exceptions.TaskNotFoundException
 import logic.exceptions.TaskAlreadyExistsException
 import logic.exceptions.TaskException
