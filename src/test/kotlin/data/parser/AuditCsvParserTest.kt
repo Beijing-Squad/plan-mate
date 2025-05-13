@@ -4,8 +4,8 @@ import com.google.common.truth.Truth.assertThat
 import data.local.csvDataSource.parser.AuditCsvParser
 import fake.createAudit
 import kotlinx.datetime.LocalDateTime
-import logic.entities.Audit
-import logic.entities.type.UserRole
+import logic.entity.Audit
+import logic.entity.type.UserRole
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -41,6 +41,7 @@ class AuditCsvParserTest {
             entityId = "task-1",
             entityType = Audit.EntityType.TASK,
             action = Audit.ActionType.CREATE,
+            actionDetails = "new",
             timeStamp = fixedTime
         ).copy(id = fixedId)
 
@@ -48,7 +49,7 @@ class AuditCsvParserTest {
         val result = parser.serializer(audit)
 
         // Then
-        assertThat(result).isEqualTo("123e4567-e89b-12d3-a456-426614174000,ADMIN,Ahmed,task-1,TASK,CREATE,,new,2024-04-01")
+        assertThat(result).isEqualTo("123e4567-e89b-12d3-a456-426614174000,ADMIN,Ahmed,task-1,TASK,CREATE,new,2024-04-01")
     }
 
     @Test

@@ -23,12 +23,12 @@ interface RemoteDataSource {
     suspend fun deleteTask(taskId: String)
     suspend fun updateTask(updatedTask: TaskDto): TaskDto
 
-    suspend fun getAllStates(): List<TaskStateDto>
-    suspend fun getTaskStatesByProjectId(projectId: String): List<TaskStateDto>
-    suspend fun getTaskStateById(stateId: String): TaskStateDto?
     suspend fun addTaskState(taskState: TaskStateDto): Boolean
-    suspend fun updateTaskState(taskState: TaskStateDto): TaskStateDto
-    suspend fun deleteTaskState(taskState: TaskStateDto): Boolean
+    suspend fun deleteTaskState(taskStateId: String): Boolean
+    suspend fun getAllTaskStates(): List<TaskStateDto>
+    suspend fun getTaskStateById(taskStateId: String): TaskStateDto
+    suspend fun getTaskStatesByProjectId(projectId: String): List<TaskStateDto>
+    suspend fun updateTaskState(taskState: TaskStateDto): Boolean
 
     suspend fun getAllUsers(): List<UserDto>
     suspend fun getUserByUserId(userId: String): UserDto

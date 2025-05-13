@@ -2,8 +2,8 @@ package data.local.csvDataSource.parser
 
 import data.local.csvDataSource.csv.CsvParser
 import kotlinx.datetime.LocalDateTime
-import logic.entities.Audit
-import logic.entities.type.UserRole
+import logic.entity.Audit
+import logic.entity.type.UserRole
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 

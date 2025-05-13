@@ -1,18 +1,21 @@
 package logic.repository
 
-import logic.entities.TaskState
+import logic.entity.TaskState
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
+@OptIn(ExperimentalUuidApi::class)
 interface StatesRepository{
-    suspend fun getAllStates(): List<TaskState>
+    suspend fun addTaskState(taskState: TaskState): Boolean
 
-    suspend fun getStatesByProjectId(projectId: String): List<TaskState>
+    suspend fun deleteTaskState(taskStateId: Uuid): Boolean
 
-    suspend fun getStateById(stateId: String): TaskState
+    suspend fun getAllTaskStates(): List<TaskState>
 
-    suspend fun addState(taskState: TaskState): Boolean
+    suspend fun getTaskStatesByProjectId(projectId: Uuid): List<TaskState>
 
-    suspend fun updateState(taskState: TaskState): TaskState
+    suspend fun getTaskStateById(taskStateId: Uuid): TaskState
 
-    suspend fun deleteState(taskState: TaskState): Boolean
+    suspend fun updateTaskState(taskState: TaskState): Boolean
 
 }

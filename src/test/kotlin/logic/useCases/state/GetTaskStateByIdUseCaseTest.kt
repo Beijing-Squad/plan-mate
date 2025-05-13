@@ -1,6 +1,7 @@
 package logic.useCases.state
 
 import com.google.common.truth.Truth.assertThat
+import fake.createProject
 import fake.createState
 import io.mockk.coEvery
 import io.mockk.mockk
@@ -13,6 +14,7 @@ import kotlin.test.Test
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
+@OptIn(ExperimentalUuidApi::class)
 class GetTaskStateByIdUseCaseTest {
     private lateinit var statesRepository: StatesRepository
     private lateinit var getTaskStateByIdUseCase: GetTaskStateByIdUseCase
@@ -23,24 +25,25 @@ class GetTaskStateByIdUseCaseTest {
         getTaskStateByIdUseCase = GetTaskStateByIdUseCase(statesRepository)
     }
 
-    @OptIn(ExperimentalUuidApi::class)
     @Test
     fun `should return state when id exists`() {
         runTest {
             // Given
-            val expectedState = createState(name = "Review", projectId = "550e8400-e29b-41d4-a716-446655440000")
+            val project = listOf(
+                createProject(name = "PlanMate Core Features", createdBy = "adminUser01")
+            )
+            val expectedState = createState(name = "Review", projectId = project[0].id)
 
-            coEvery { statesRepository.getStateById(expectedState.id.toString()) } returns expectedState
+            coEvery { statesRepository.getTaskStateById(expectedState.id) } returns expectedState
 
             // When
-            val result = getTaskStateByIdUseCase.getStateById(expectedState.id.toString())
+            val result = getTaskStateByIdUseCase.getTaskStateById(expectedState.id)
 
             // Then
             assertThat(result).isEqualTo(expectedState)
         }
     }
 
-    @OptIn(ExperimentalUuidApi::class)
     @Test
     fun `should throw exception when state id does not exist`() {
         runTest {
@@ -50,12 +53,12 @@ class GetTaskStateByIdUseCaseTest {
                 createState()
             )
 
-            coEvery { statesRepository.getAllStates() } returns states
-            coEvery { statesRepository.getStateById(state.id.toString()) } throws StateNotFoundException()
+            coEvery { statesRepository.getAllTaskStates() } returns states
+            coEvery { statesRepository.getTaskStateById(state.id) } throws StateNotFoundException()
 
             // When & Then
             assertThrows<StateNotFoundException> {
-                getTaskStateByIdUseCase.getStateById(state.id.toString())
+                getTaskStateByIdUseCase.getTaskStateById(state.id)
             }
         }
     }

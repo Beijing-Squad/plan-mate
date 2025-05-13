@@ -6,10 +6,11 @@ import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
 @OptIn(ExperimentalUuidApi::class)
-class GetTaskStateByIdUseCase(
+class GetTaskStatesByProjectIdUseCase(
     private val statesRepository: StatesRepository
 ) {
-    suspend fun getTaskStateById(taskStateId: Uuid): TaskState {
-        return statesRepository.getTaskStateById(taskStateId)
+    suspend fun getTaskStatesByProjectId(projectId: Uuid): List<TaskState> {
+
+        return statesRepository.getTaskStatesByProjectId(projectId)
     }
 }

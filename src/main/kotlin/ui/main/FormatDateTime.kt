@@ -1,3 +1,5 @@
+package ui.main
+
 import kotlinx.datetime.LocalDateTime
 
 fun LocalDateTime.format(): String {

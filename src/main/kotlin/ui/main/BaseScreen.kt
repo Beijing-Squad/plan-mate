@@ -33,7 +33,7 @@ abstract class BaseScreen(
             var i = 0
             while (isActive) {
                 val frame = frames[i % frames.size]
-                consoleIO.showWithLine("\r\u001B[36m$frame $message\u001B[0m")
+                consoleIO.show("\r\u001B[36m$frame $message\u001B[0m")
                 i++
                 delay(100)
             }
@@ -41,10 +41,11 @@ abstract class BaseScreen(
 
         runBlocking {
             try {
+                delay(2000)
                 operation()
             } finally {
                 loadingJob.cancel()
-                consoleIO.show("\r" + " ".repeat(message.length + 10) + "\r") // Clear the loading line
+                consoleIO.show("\r" + " ".repeat(message.length + 10) + "\r")
             }
         }
     }

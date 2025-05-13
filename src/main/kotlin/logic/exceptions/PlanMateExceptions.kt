@@ -8,10 +8,7 @@ class InvalidLoginException(message: String = "Invalid login credentials") : Aut
 class UserExistsException(message: String = "User already exists") : AuthenticationException(message)
 
 open class ProjectException(message: String) : PlanMateException(message)
-class ProjectAlreadyExistsException(message: String = "Project already exists") : ProjectException(message)
 class ProjectNotFoundException(message: String = "Project not found") : ProjectException(message)
-class ProjectNameIsEmptyException(message: String = "Project name cannot be empty") : ProjectException(message)
-class ProjectUnauthorizedUserException(message: String = "User Not Authorized") : ProjectException(message)
 
 open class TaskException(message: String = "Task operation failed") : PlanMateException(message)
 class TaskAlreadyExistsException(message: String = "Task already exists") : TaskException(message)
@@ -28,7 +25,6 @@ class InvalidInputException(message: String) : ValidationException(message)
 class InvalidUserNameException(message: String = "Invalid username") : ValidationException(message)
 class InvalidPasswordException(message: String = "Invalid password") : ValidationException(message)
 class UnauthorizedUserException(message: String = "User is not authorized") : ValidationException(message)
-class MateUnauthorizedException(message: String = "User should be admin") : ValidationException(message)
 
 class DataAccessException(message: String) : PlanMateException(message)
 

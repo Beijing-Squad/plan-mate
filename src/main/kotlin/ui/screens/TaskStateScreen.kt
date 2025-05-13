@@ -1,10 +1,12 @@
 package ui.screens
 
-import kotlinx.coroutines.runBlocking
+import ui.main.format
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import logic.entities.TaskState
+import logic.entity.Audit
+import logic.entity.TaskState
+import logic.entity.type.UserRole
 import logic.exceptions.InvalidStateNameException
 import logic.exceptions.ProjectNotFoundException
 import logic.exceptions.StateAlreadyExistException
@@ -18,13 +20,14 @@ import ui.main.consoleIO.ConsoleIO
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
+@OptIn(ExperimentalUuidApi::class)
 class TaskStateScreen(
     private val addTaskStateUseCase: AddTaskStateUseCase,
     private val deleteTaskStateUseCase: DeleteTaskStateUseCase,
     private val updateTaskStateUseCase: UpdateTaskStateUseCase,
     private val getAllStates: GetAllTaskStatesUseCase,
     private val getStateById: GetTaskStateByIdUseCase,
-    private val getStatesByProjectId: GetStatesByProjectIdUseCase,
+    private val getStatesByProjectId: GetTaskStatesByProjectIdUseCase,
     private val addAudit: AddAuditLogUseCase,
     private val consoleIO: ConsoleIO,
     private val sessionManagerUseCase: SessionManagerUseCase
@@ -48,12 +51,12 @@ class TaskStateScreen(
     override fun handleFeatureChoice() {
         while (true) {
             when (getInput()) {
-                "1" -> onChooseAddState()
-                "2" -> onChooseDeleteState()
-                "3" -> onChooseUpdateState()
-                "4" -> onChooseGetAllStates()
-                "5" -> onChooseGetStateById()
-                "6" -> onChooseGetStatesByProjectId()
+                "1" -> onClickAddState()
+                "2" -> onClickDeleteState()
+                "3" -> onClickUpdateState()
+                "4" -> onClickGetAllState()
+                "5" -> onClickGetStateById()
+                "6" -> onClickGetStatesByProjectId()
                 "0" -> return
                 else -> {
                     consoleIO.showWithLine("❌ Invalid Option")
@@ -63,136 +66,140 @@ class TaskStateScreen(
         }
     }
 
-    @OptIn(ExperimentalUuidApi::class)
-    private fun onChooseAddState() {
-        runBlocking {
-            try {
-                val name = getInputWithLabel("📛 Enter State Name: ")
-                val projectId = Uuid.parse(getInputWithLabel("📁 Enter Project ID: "))
-                val taskState = TaskState(name = name, projectId = projectId)
-                val result = addTaskStateUseCase.addState(taskState)
+    private fun onClickAddState() {
+        try {
+            val name = getInputWithLabel("📛 Enter State Name: ")
+            val projectId = Uuid.parse(getInputWithLabel("📁 Enter Project ID: "))
+            val taskState = TaskState(name = name, projectId = projectId)
+
+            showAnimation("Adding new State to Project ") {
+                val result = addTaskStateUseCase.addTaskState(taskState)
                 val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
 
-//                sessionManagerUseCase.getCurrentUser()?.userName?.let { userName ->
-//                    val actionDetails =
-//                        "Admin $userName added new state ${taskState.id} with name '$name' at ${now.format()}"
-//
-//                    addAudit.addAuditLog(
-//                        Audit(
-//                            id = Uuid.random(),
-//                            userRole = UserRole.ADMIN,
-//                            userName = sessionManagerUseCase.getCurrentUser()!!.userName,
-//                            action = ActionType.UPDATE,
-//                            entityType = EntityType.PROJECT,
-//                            entityId = projectId.toString(),
-//                            actionDetails = actionDetails,
-//                            timeStamp = now
-//                        )
-//                    )
-//                }
+                sessionManagerUseCase.getCurrentUser()?.userName?.let { userName ->
+                    val actionDetails =
+                        "Admin $userName added new state ${taskState.id} with name '$name' at ${now.format()}"
 
-                showResult(result, "added")
-            } catch (e: StateAlreadyExistException) {
-                consoleIO.showWithLine("⚠️ ${e.message}")
-            } catch (e: InvalidStateNameException) {
-                consoleIO.showWithLine("⚠️ ${e.message}")
-            } catch (e: ProjectNotFoundException) {
-                consoleIO.showWithLine("⚠️ ${e.message}")
-            } catch (e: Exception) {
-                consoleIO.showWithLine("❌ Unexpected error: ${e.message}")
+                    addAudit.addAuditLog(
+                        Audit(
+                            id = Uuid.random(),
+                            userRole = UserRole.ADMIN,
+                            userName = sessionManagerUseCase.getCurrentUser()!!.userName,
+                            action = Audit.ActionType.UPDATE,
+                            entityType = Audit.EntityType.PROJECT,
+                            entityId = projectId.toString(),
+                            actionDetails = actionDetails,
+                            timeStamp = now
+                        )
+                    )
+                }
+                showResult(result, "adding")
             }
+
+        } catch (e: StateAlreadyExistException) {
+            consoleIO.showWithLine("⚠️ ${e.message}")
+        } catch (e: InvalidStateNameException) {
+            consoleIO.showWithLine("⚠️ ${e.message}")
+        } catch (e: ProjectNotFoundException) {
+            consoleIO.showWithLine("⚠️ ${e.message}")
+        } catch (e: Exception) {
+            consoleIO.showWithLine("❌ Unexpected error: ${e.message}")
         }
     }
 
-    @OptIn(ExperimentalUuidApi::class)
-    private fun onChooseDeleteState() {
-        runBlocking {
-            try {
-                val id = Uuid.parse(getInputWithLabel("🆔 Enter State ID to delete: "))
-//                val taskState = TaskState(id = id, name = "", projectId = Uuid.parse(""))
-                val result = deleteTaskStateUseCase.deleteState(id)
+    private fun onClickDeleteState() {
+        try {
+            val id = Uuid.parse(getInputWithLabel("🆔 Enter State ID to delete: "))
+            showAnimation("Deleting State ") {
+                val result = deleteTaskStateUseCase.deleteTaskState(id)
                 showResult(result, "deleted")
-            } catch (e: Exception) {
-                consoleIO.showWithLine("❌ ${e.message}")
             }
+        } catch (e: Exception) {
+            consoleIO.showWithLine("❌ ${e.message}")
         }
     }
 
-    @OptIn(ExperimentalUuidApi::class)
-    private fun onChooseUpdateState() {
-        runBlocking {
-            try {
-                val id = Uuid.parse(getInputWithLabel("🆔 Enter State ID to update: "))
-                val name = getInputWithLabel("📛 Enter New State Name: ")
-                val projectId = Uuid.parse(getInputWithLabel("📁 Enter New Project ID: "))
-                val taskState = TaskState(id = id, name = name, projectId = projectId)
-                val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
-                val updated = updateTaskStateUseCase.updateState(taskState)
-//                sessionManagerUseCase.getCurrentUser()?.userName?.let { userName ->
-//                    val actionDetails =
-//                        "Admin $userName updated state ${taskState.id} with name '$name' at ${now.format()}"
-//                    addAudit.addAuditLog(
-//                        Audit(
-//                            id = Uuid.random(),
-//                            userRole = UserRole.ADMIN,
-//                            userName = sessionManagerUseCase.getCurrentUser()!!.userName,
-//                            action = ActionType.UPDATE,
-//                            entityType = EntityType.PROJECT,
-//                            entityId = projectId.toString(),
-//                            actionDetails = actionDetails,
-//                            timeStamp = now
-//                        )
-//                    )
-//                }
-                consoleIO.showWithLine("✅ State updated:\n${formatState(updated)}")
-            } catch (e: Exception) {
-                consoleIO.showWithLine("❌ ${e.message}")
+    private fun onClickUpdateState() {
+        try {
+
+            val id = Uuid.parse(getInputWithLabel("🆔 Enter State ID to update: "))
+            val name = getInputWithLabel("📛 Enter New State Name: ").also {
+                if (it.isBlank()) throw InvalidStateNameException("State name cannot be blank")
             }
+            val projectId = Uuid.parse(getInputWithLabel("📁 Enter New Project ID: "))
+            val taskState = TaskState(id = id, name = name, projectId = projectId)
+            val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+
+            showAnimation("Updating State ") {
+                val result = updateTaskStateUseCase.updateTaskState(taskState)
+                sessionManagerUseCase.getCurrentUser()?.userName?.let { userName ->
+                    val actionDetails =
+                        "Admin $userName updated state ${taskState.id} with name '$name' at ${now.format()}"
+                    addAudit.addAuditLog(
+                        Audit(
+                            id = Uuid.random(),
+                            userRole = UserRole.ADMIN,
+                            userName = sessionManagerUseCase.getCurrentUser()!!.userName,
+                            action = Audit.ActionType.UPDATE,
+                            entityType = Audit.EntityType.PROJECT,
+                            entityId = projectId.toString(),
+                            actionDetails = actionDetails,
+                            timeStamp = now
+                        )
+                    )
+                }
+                showResult(result, "updated")
+            }
+        } catch (e: Exception) {
+            consoleIO.showWithLine("❌ ${e.message}")
         }
     }
 
-    private fun onChooseGetAllStates() {
-        runBlocking {
-            try {
-                val states = getAllStates.getAllStates()
+    private fun onClickGetAllState() {
+        try {
+            showAnimation("Getting All State ") {
+                val states = getAllStates.getAllTaskStates()
                 if (states.isEmpty()) {
                     consoleIO.showWithLine("❌ No states found")
                 } else {
                     consoleIO.showWithLine("\n📋 All States:\n")
                     states.forEach { consoleIO.showWithLine(formatState(it)) }
                 }
-            } catch (e: Exception) {
-                consoleIO.showWithLine("❌ ${e.message}")
             }
+
+        } catch (e: Exception) {
+            consoleIO.showWithLine("❌ ${e.message}")
         }
     }
 
-    private fun onChooseGetStateById() {
-        runBlocking {
-            try {
-                val id = getInputWithLabel("🆔 Enter State ID: ")
-                val state = getStateById.getStateById(id)
+    private fun onClickGetStateById() {
+        try {
+            val id = Uuid.parse(getInputWithLabel("🆔 Enter State ID: "))
+            showAnimation("Getting State by ID ") {
+                val state = getStateById.getTaskStateById(id)
                 consoleIO.showWithLine("✅ State found:\n${formatState(state)}")
-            } catch (e: Exception) {
-                consoleIO.showWithLine("❌ ${e.message}")
             }
+        } catch (e: Exception) {
+            consoleIO.showWithLine("❌ ${e.message}")
         }
     }
 
-    private fun onChooseGetStatesByProjectId() {
-        runBlocking {
-            try {
-                val projectId = getInputWithLabel("📁 Enter Project ID: ")
-                val states = getStatesByProjectId.getStatesByProjectId(projectId)
+    private fun onClickGetStatesByProjectId() {
+        try {
+            val projectId = Uuid.parse(getInputWithLabel("📁 Enter Project ID: "))
+            showAnimation("Getting States by Project ID ") {
+                val states = getStatesByProjectId.getTaskStatesByProjectId(projectId)
+
                 if (states.isEmpty()) {
                     consoleIO.showWithLine("❌ No states found for this project.")
                 } else {
                     consoleIO.showWithLine("\n📁 States in project:\n")
                     states.forEach { consoleIO.showWithLine(formatState(it)) }
                 }
-            } catch (e: Exception) {
-                consoleIO.showWithLine("❌ ${e.message}")
             }
+
+        } catch (e: Exception) {
+            consoleIO.showWithLine("❌ ${e.message}")
         }
     }
 
@@ -203,13 +210,12 @@ class TaskStateScreen(
 
     private fun showResult(result: Boolean, action: String) {
         if (result) {
-            consoleIO.showWithLine("✅ State $action successfully!")
+            consoleIO.showWithLine("✅ successfully!")
         } else {
             consoleIO.showWithLine("❌ Failed to $action state.")
         }
     }
 
-    @OptIn(ExperimentalUuidApi::class)
     private fun formatState(taskState: TaskState): String {
         return """
             ╔═══════════════════════════════════════════════════════╗

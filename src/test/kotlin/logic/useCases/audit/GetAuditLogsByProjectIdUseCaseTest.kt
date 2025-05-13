@@ -5,14 +5,11 @@ import fake.createAudit
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
-import logic.entities.Audit
-import logic.entities.type.UserRole
-import logic.exceptions.InvalidInputException
-import logic.exceptions.ProjectNotFoundException
+import logic.entity.Audit
+import logic.entity.type.UserRole
 import logic.repository.AuditRepository
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 
 class GetAuditLogsByProjectIdUseCaseTest {
 
@@ -72,7 +69,7 @@ class GetAuditLogsByProjectIdUseCaseTest {
         val result = getAuditLogsByProjectIdUseCase.getAuditLogsByProjectId(givenId)
 
         // Then
-        assertThat(result.size).isEqualTo(2)
+        assertThat(result?.size).isEqualTo(2)
     }
 
     @Test
@@ -82,11 +79,13 @@ class GetAuditLogsByProjectIdUseCaseTest {
         coEvery { auditRepository.getAllAuditLogs() } returns allAudit
         coEvery { auditRepository.getAuditLogsByProjectId(givenId) } returns emptyList()
 
-        // When && Then
-        assertThrows<ProjectNotFoundException> {
-            getAuditLogsByProjectIdUseCase.getAuditLogsByProjectId(givenId)
-        }
+        // When
+        val result = getAuditLogsByProjectIdUseCase.getAuditLogsByProjectId(givenId)
+
+        // Then
+        assertThat(result).isNull()
     }
+
 
     @Test
     fun `should throw InvalidInputException when project id is blank`() = runTest {
@@ -94,9 +93,10 @@ class GetAuditLogsByProjectIdUseCaseTest {
         val givenId = " "
         coEvery { auditRepository.getAllAuditLogs() } returns allAudit
 
-        // When && Then
-        assertThrows<InvalidInputException> {
-            getAuditLogsByProjectIdUseCase.getAuditLogsByProjectId(givenId)
-        }
+        // When
+        val result = getAuditLogsByProjectIdUseCase.getAuditLogsByProjectId(givenId)
+
+        // Then
+        assertThat(result).isNull()
     }
 }

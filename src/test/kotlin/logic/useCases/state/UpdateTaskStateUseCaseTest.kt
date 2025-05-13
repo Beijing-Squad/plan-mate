@@ -13,22 +13,19 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import kotlin.uuid.ExperimentalUuidApi
 
+@OptIn(ExperimentalUuidApi::class)
 class UpdateTaskStateUseCaseTest {
     private lateinit var statesRepository: StatesRepository
-    private lateinit var getTaskStateByIdUseCase: GetTaskStateByIdUseCase
     private lateinit var updateTaskStateUseCase: UpdateTaskStateUseCase
 
     @BeforeEach
     fun setup() {
         statesRepository = mockk(relaxed = true)
-        getTaskStateByIdUseCase = GetTaskStateByIdUseCase(statesRepository)
         updateTaskStateUseCase = UpdateTaskStateUseCase(
-            statesRepository,
-            getTaskStateByIdUseCase
+            statesRepository
         )
     }
 
-    @OptIn(ExperimentalUuidApi::class)
     @Test
     fun `should update state when state is exist`() {
         runTest {
@@ -36,37 +33,34 @@ class UpdateTaskStateUseCaseTest {
             val project = createProject()
             val state = createState(
                 name = "in progress",
-                projectId = project.id.toString()
+                projectId = project.id
             )
             val newState = createState(
                 id = state.id,
                 name = "done",
-                projectId = state.projectId.toString()
+                projectId = state.projectId
             )
 
-            coEvery { getTaskStateByIdUseCase.getStateById(newState.id.toString()) } returns state
-            coEvery { statesRepository.updateState(newState) } returns newState
+            coEvery { statesRepository.updateTaskState(newState) } returns true
 
             // when
-            val result = updateTaskStateUseCase.updateState(newState)
+            val result = updateTaskStateUseCase.updateTaskState(newState)
 
             //Then
-            assertThat(result).isEqualTo(newState)
+            assertThat(result).isTrue()
         }
     }
 
-    @OptIn(ExperimentalUuidApi::class)
     @Test
-    fun `should throw exception when not found state with this state id`() {
+    fun `should throw exception when id of new state not found`() {
         runTest {
-            // Given
-            val newState = createState()
+            //Given
+            val taskState = createState()
+            coEvery { statesRepository.updateTaskState(taskState) } throws StateNotFoundException()
 
-            coEvery { statesRepository.getStateById(newState.id.toString()) } throws StateNotFoundException()
-
-            // When & Then
+            //When & Then
             assertThrows<StateNotFoundException> {
-                updateTaskStateUseCase.updateState(newState)
+                updateTaskStateUseCase.updateTaskState(taskState)
             }
         }
     }

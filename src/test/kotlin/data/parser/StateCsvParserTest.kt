@@ -3,7 +3,7 @@ package data.parser
 import com.google.common.truth.Truth.assertThat
 import data.local.csvDataSource.parser.TaskStateCsvParser
 import fake.createState
-import logic.entities.TaskState
+import logic.entity.TaskState
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import kotlin.uuid.ExperimentalUuidApi
@@ -30,7 +30,7 @@ class StateCsvParserTest {
         // Given
         val id = "123e4567-e89b-12d3-a456-426614174000"
         val name = "TODO"
-        val projectId = "project-001"
+        val projectId = "123e4567-e89b-12d3-a456-426614174001"
         val line = "$id,$name,$projectId"
 
         // When
@@ -40,7 +40,7 @@ class StateCsvParserTest {
         with(result) {
             assertThat(this.id).isEqualTo(Uuid.parse(id))
             assertThat(this.name).isEqualTo(name)
-            assertThat(this.projectId).isEqualTo(projectId)
+            assertThat(this.projectId).isEqualTo(Uuid.parse(projectId))
         }
     }
 
@@ -63,14 +63,16 @@ class StateCsvParserTest {
         val state = createState(
             id = Uuid.parse("11111111-1111-1111-1111-111111111111"),
             name = "InProgress",
-            projectId = "project-123"
+            projectId = Uuid.parse("21111111-1111-1111-1111-111111111111")
         )
 
         // When
         val csv = parser.serializer(state)
 
         // Then
-        assertThat(csv).isEqualTo("11111111-1111-1111-1111-111111111111,InProgress,project-123")
+        assertThat(csv).isEqualTo(
+            "11111111-1111-1111-1111-111111111111,InProgress,21111111-1111-1111-1111-111111111111"
+        )
     }
 
     @Test
@@ -79,7 +81,7 @@ class StateCsvParserTest {
         val original = createState(
             id = Uuid.parse("22222222-2222-2222-2222-222222222222"),
             name = "Review",
-            projectId = "project-456"
+            projectId = Uuid.parse("21111111-1111-1111-1111-111111111111")
         )
 
         // When

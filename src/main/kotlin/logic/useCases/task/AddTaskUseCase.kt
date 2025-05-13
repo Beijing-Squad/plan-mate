@@ -1,6 +1,6 @@
 package logic.useCases.task
 
-import logic.entities.Task
+import logic.entity.Task
 import logic.repository.TasksRepository
 
 class AddTaskUseCase(

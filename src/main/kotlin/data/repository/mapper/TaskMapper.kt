@@ -2,33 +2,34 @@ package data.repository.mapper
 
 import data.remote.mongoDataSource.dto.TaskDto
 import kotlinx.datetime.LocalDateTime
-import logic.entities.Task
+import logic.entity.Task
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
 @OptIn(ExperimentalUuidApi::class)
-fun toTaskEntity(taskDTO: TaskDto): Task {
+fun TaskDto.toTaskEntity(): Task {
     return Task(
-        id = Uuid.parse(taskDTO.id),
-        projectId = taskDTO.projectId,
-        title = taskDTO.title,
-        description = taskDTO.description,
-        createdBy = taskDTO.createdBy,
-        stateId = taskDTO.stateId,
-        createdAt = LocalDateTime.parse(taskDTO.createdAt),
-        updatedAt = LocalDateTime.parse(taskDTO.updatedAt)
+        id = Uuid.parse(this.id),
+        projectId = this.projectId,
+        title = this.title,
+        description = this.description,
+        createdBy = this.createdBy,
+        stateId = this.stateId,
+        createdAt = LocalDateTime.parse(this.createdAt),
+        updatedAt = LocalDateTime.parse(this.updatedAt)
     )
 }
+
 @OptIn(ExperimentalUuidApi::class)
-fun toTaskDTO(task: Task): TaskDto {
+fun Task.toTaskDto(): TaskDto {
     return TaskDto(
-        id = task.id.toString(),
-        projectId = task.projectId,
-        title = task.title,
-        description = task.description,
-        createdBy = task.createdBy,
-        stateId = task.stateId,
-        createdAt = task.createdAt.toString(),
-        updatedAt = task.updatedAt.toString()
+        id = this.id.toString(),
+        projectId = this.projectId,
+        title = this.title,
+        description = this.description,
+        createdBy = this.createdBy,
+        stateId = this.stateId,
+        createdAt = this.createdAt.toString(),
+        updatedAt = this.updatedAt.toString()
     )
 }

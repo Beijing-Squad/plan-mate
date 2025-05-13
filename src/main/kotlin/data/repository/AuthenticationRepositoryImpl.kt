@@ -2,8 +2,8 @@ package data.repository
 
 import data.repository.mapper.toUserEntity
 import data.repository.remoteDataSource.RemoteDataSource
-import logic.entities.User
-import logic.entities.type.UserRole
+import logic.entity.User
+import logic.entity.type.UserRole
 import logic.repository.AuthenticationRepository
 
 class AuthenticationRepositoryImpl(
@@ -14,5 +14,5 @@ class AuthenticationRepositoryImpl(
         dataSource.saveUser(username, password, role.name)
 
     override suspend fun loginUser(username: String, password: String): User =
-        toUserEntity(dataSource.getAuthenticatedUser(username, password))
+        dataSource.getAuthenticatedUser(username, password).toUserEntity()
 }

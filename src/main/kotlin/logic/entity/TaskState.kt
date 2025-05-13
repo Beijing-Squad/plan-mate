@@ -1,4 +1,4 @@
-package logic.entities
+package logic.entity
 
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid

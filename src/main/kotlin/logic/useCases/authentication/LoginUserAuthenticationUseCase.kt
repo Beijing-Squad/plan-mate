@@ -1,6 +1,6 @@
 package logic.useCases.authentication
 
-import logic.entities.User
+import logic.entity.User
 import logic.repository.AuthenticationRepository
 
 class LoginUserAuthenticationUseCase(
