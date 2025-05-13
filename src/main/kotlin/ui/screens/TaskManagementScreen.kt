@@ -276,14 +276,16 @@ class TaskManagementScreen(
 
         try {
             showAnimation("Updating task...") {
+                val existingTask = getTaskByIdUseCase.getTaskById(uuid.toString())
+
                 val updatedTask = Task(
                     id = uuid,
-                    projectId = "default-project-id",
+                    projectId = existingTask.projectId,
                     title = newTitle,
                     description = newDescription,
-                    createdBy = "default-user",
+                    createdBy = existingTask.createdBy,
                     stateId = newStateId,
-                    createdAt = now,
+                    createdAt = existingTask.createdAt,
                     updatedAt = now
                 )
 
