@@ -60,14 +60,12 @@ class AuditScreen(
 
 
     private fun onClickGetAuditLogsForProject() {
+        val projectId = getIdInput()
+        if (projectId.isBlank()) {
+            consoleIO.showWithLine("❌ Error: ID shouldn't be blank")
+            return
+        }
         showAnimation("Fetching project audit logs...") {
-            val projectId = getIdInput()
-
-            if (projectId.isBlank()) {
-                consoleIO.showWithLine("❌ Error: ID shouldn't be blank")
-                return@showAnimation
-            }
-
             val auditLogs = getAuditLogsByProjectId.getAuditLogsByProjectId(projectId)
 
             if (auditLogs.isNullOrEmpty()) {
@@ -84,14 +82,13 @@ class AuditScreen(
 
 
     private fun onClickGetAuditLogsForTask() {
+        val taskId = getIdInput()
+
+        if (taskId.isBlank()) {
+            consoleIO.showWithLine("❌ Error: ID shouldn't be blank")
+            return
+        }
         showAnimation("Fetching task audit logs...") {
-            val taskId = getIdInput()
-
-            if (taskId.isBlank()) {
-                consoleIO.showWithLine("❌ Error: ID shouldn't be blank")
-                return@showAnimation
-            }
-
             val auditLogs = getAuditLogsByTaskId.getAuditLogsByTaskId(taskId)
 
             if (auditLogs.isEmpty()) {
