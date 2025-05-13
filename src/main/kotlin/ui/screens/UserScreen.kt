@@ -44,15 +44,7 @@ class UserScreen(
     override fun handleFeatureChoice() {
         while (true){
             when (getInput()) {
-                "1" -> {
-                    val currentUser = sessionManagerUseCase.getCurrentUser()
-                    if (currentUser?.role == UserRole.ADMIN) {
-                        onClickGetAllUsers()
-                    } else {
-                        consoleIO.showWithLine("\u001B[31m❌ You don't have permission\u001B[0m")
-                    }
-                }
-
+                "1" -> onClickGetAllUsers()
                 "2" -> onClickGetUserByID()
                 "3" -> onClickUpdateUser()
                 "0" -> return

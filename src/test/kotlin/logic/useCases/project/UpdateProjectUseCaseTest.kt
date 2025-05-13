@@ -26,6 +26,7 @@ class UpdateProjectUseCaseTest {
         updateProjectUseCase = UpdateProjectUseCase(projectRepository)
     }
 
+    @OptIn(ExperimentalUuidApi::class)
     @Test
     fun `should update project successfully`() {
         runTest {
@@ -43,6 +44,7 @@ class UpdateProjectUseCaseTest {
     }
 
 
+    @OptIn(ExperimentalUuidApi::class)
     @Test
     fun `should throw ProjectNotFoundException when project does not exist`() {
         runTest {
@@ -60,6 +62,7 @@ class UpdateProjectUseCaseTest {
         }
     }
 
+    @OptIn(ExperimentalUuidApi::class)
     @Test
     fun `should handle exceptions thrown by repository`() {
         runTest {

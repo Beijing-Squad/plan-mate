@@ -1,5 +1,7 @@
 package data.remote.mongoDataSource
 
+import com.mongodb.MongoTimeoutException
+import com.mongodb.MongoWriteException
 import com.mongodb.client.model.Filters
 import com.mongodb.client.model.Filters.and
 import com.mongodb.client.model.Filters.eq
@@ -9,7 +11,6 @@ import com.mongodb.client.model.Updates.set
 import com.mongodb.kotlin.client.coroutine.MongoDatabase
 import data.remote.mongoDataSource.dto.*
 import data.remote.mongoDataSource.mongoConnection.MongoConnection
-import data.repository.mapper.toTaskDTO
 import data.repository.remoteDataSource.RemoteDataSource
 import data.utils.hashPassword
 import kotlinx.coroutines.Dispatchers
@@ -17,6 +18,12 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.withContext
+import logic.exceptions.InvalidLoginException
+import logic.exceptions.StateNotFoundException
+import logic.exceptions.TaskAlreadyExistsException
+import logic.exceptions.TaskException
+import logic.exceptions.TaskNotFoundException
+import logic.exceptions.UserNotFoundException
 import logic.entities.Audit
 import logic.entities.Task
 import logic.exceptions.*
@@ -122,42 +129,21 @@ class MongoDBDataSourceImpl(
     }
 
     override suspend fun getTaskById(taskId: String): TaskDto {
-
-        val taskIdFilter = Filters.eq("_id", taskId)
-        val task = taskCollection.find<Task>(taskIdFilter).limit(1).firstOrNull()
-            ?: throw TaskNotFoundException("Task with id $taskId not found")
-        return toTaskDTO(task)
+        val taskIdFilter = eq("_id", taskId)
+        return taskCollection.find<TaskDto>(taskIdFilter).first()
     }
 
     override suspend fun addTask(task: TaskDto) {
-        try {
-            taskCollection.insertOne(task)
-        } catch (e: Exception) {
-            throw RuntimeException("Failed to add task: ${e.message}", e)
-        }
+        taskCollection.insertOne(task)
     }
-
     override suspend fun deleteTask(taskId: String) {
-        val taskIdFilter = Filters.eq("_id", taskId)
+        val taskIdFilter = eq("_id", taskId)
         taskCollection.findOneAndDelete(taskIdFilter)
-            ?: throw TaskNotFoundException("Task with id $taskId not found")
     }
 
     override suspend fun updateTask(updatedTask: TaskDto): TaskDto {
-        val taskIdFilter = Filters.eq("_id", updatedTask.id)
-        val updateTask = Updates.combine(
-            Updates.set("project_id", updatedTask.projectId),
-            Updates.set("title", updatedTask.title),
-            Updates.set("description", updatedTask.description),
-            Updates.set("created_by", updatedTask.createdBy),
-            Updates.set("state_id", updatedTask.stateId),
-            Updates.set("created_at", updatedTask.createdAt),
-            Updates.set("updated_at", updatedTask.updatedAt)
-        )
-        val result = taskCollection.updateOne(taskIdFilter, updateTask)
-        if (result.matchedCount == 0L) {
-            throw TaskNotFoundException("Task with id ${updatedTask.id} not found")
-        }
+        val taskIdFilter = eq("_id", updatedTask.id)
+        taskCollection.replaceOne(taskIdFilter, updatedTask)
         return updatedTask
     }
     //endregion

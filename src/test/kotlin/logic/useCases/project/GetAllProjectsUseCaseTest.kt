@@ -24,6 +24,7 @@ class GetAllProjectsUseCaseTest {
         getAllProjectsUseCase = GetAllProjectsUseCase(projectRepository)
     }
 
+    @OptIn(ExperimentalUuidApi::class)
     @Test
     fun `should return projects when there is projects in repository`() {
         runTest {
