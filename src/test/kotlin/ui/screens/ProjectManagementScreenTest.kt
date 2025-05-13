@@ -1,10 +1,10 @@
 package ui.screens
 
+import logic.entity.Audit
 import fake.createProject
 import fake.createUser
 import io.mockk.*
 import kotlinx.coroutines.test.runTest
-import logic.entities.Audit
 import logic.useCases.audit.AddAuditLogUseCase
 import logic.useCases.authentication.SessionManagerUseCase
 import logic.useCases.project.*

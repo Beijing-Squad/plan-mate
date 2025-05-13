@@ -1,6 +1,6 @@
 package logic.repository
 
-import logic.entities.Project
+import logic.entity.Project
 
 interface ProjectsRepository {
     suspend fun getAllProjects(): List<Project>

@@ -4,7 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import fake.createUser
 import io.mockk.*
 import kotlinx.coroutines.test.runTest
-import logic.entities.type.UserRole
+import logic.entity.type.UserRole
 import logic.exceptions.InvalidUserNameException
 import logic.exceptions.UserNotFoundException
 import logic.repository.AuthenticationRepository

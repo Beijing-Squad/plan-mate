@@ -3,13 +3,13 @@ package ui.screens
 import data.remote.mongoDataSource.dto.TaskDto
 import data.repository.mapper.toTaskDto
 import data.repository.mapper.toTaskEntity
-import format
+import ui.main.format
 import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import logic.entities.Audit
-import logic.entities.Task
+import logic.entity.Audit
+import logic.entity.Task
 import logic.exceptions.TaskAlreadyExistsException
 import logic.exceptions.TaskNotFoundException
 import logic.exceptions.TaskException
@@ -57,12 +57,12 @@ class TaskManagementScreen(
     override fun handleFeatureChoice() {
         while (true) {
             when (getInput()) {
-                "1" -> showTasksInSwimlanes()
-                "2" -> addTask()
-                "3" -> getTaskById()
-                "4" -> deleteTaskById()
-                "5" -> showAllTasksList()
-                "6" -> updateTaskById()
+                "1" -> onClickShowTasksInSwimlanes()
+                "2" -> onClickAddTask()
+                "3" -> onClickGetTaskById()
+                "4" -> onClickDeleteTaskById()
+                "5" -> onClickShowAllTasksList()
+                "6" -> onClickUpdateTaskById()
                 "0" -> return
                 else -> consoleIO.showWithLine("\u001B[31m❌ Invalid option\u001B[0m")
             }
@@ -70,7 +70,7 @@ class TaskManagementScreen(
         }
     }
 
-    fun showTasksInSwimlanes() {
+    fun onClickShowTasksInSwimlanes() {
         consoleIO.showWithLine("\n\u001B[36m📋 All Tasks (Swimlanes View):\u001B[0m")
         showAnimation("Loading tasks...") {
             try {
@@ -87,7 +87,7 @@ class TaskManagementScreen(
         }
     }
 
-    fun showAllTasksList() {
+    fun onClickShowAllTasksList() {
         consoleIO.showWithLine("\n\u001B[36m📋 All Tasks (List View):\u001B[0m")
         showAnimation("Fetching task list...") {
             try {
@@ -128,7 +128,7 @@ class TaskManagementScreen(
         }
     }
 
-    fun getTaskById() {
+    fun onClickGetTaskById() {
         consoleIO.showWithLine("\n\u001B[36m🔍 Find Task by ID\u001B[0m")
         consoleIO.show("\u001B[32mEnter Task ID: \u001B[0m")
         val id = consoleIO.read()?.trim()
@@ -163,7 +163,7 @@ class TaskManagementScreen(
         }
     }
 
-    fun addTask() {
+    fun onClickAddTask() {
         consoleIO.showWithLine("\n\u001B[36m➕ Add New Task\u001B[0m")
         val currentUser = sessionManagerUseCase.getCurrentUser()
 
@@ -231,8 +231,7 @@ class TaskManagementScreen(
         }
     }
 
-
-    fun updateTaskById() {
+    fun onClickUpdateTaskById() {
         consoleIO.showWithLine("\n\u001B[36m🔄 Update Task\u001B[0m")
         consoleIO.show("Enter Task ID to update: ")
         val idInput = consoleIO.read()?.trim()
@@ -244,7 +243,7 @@ class TaskManagementScreen(
         val uuid = try {
             Uuid.parse(idInput)
         } catch (_: IllegalArgumentException) {
-            consoleIO.showWithLine("❌ Invalid UUID format.")
+            consoleIO.showWithLine("❌ Invalid UUID ui.main.format.")
             return
         }
         val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
@@ -320,7 +319,7 @@ class TaskManagementScreen(
     }
 
 
-    fun deleteTaskById() {
+    fun onClickDeleteTaskById() {
         consoleIO.showWithLine("\n\u001B[36m🗑️ Delete Task\u001B[0m")
         consoleIO.show("\u001B[32mEnter Task ID to delete: \u001B[0m")
         val id = consoleIO.read()?.trim()

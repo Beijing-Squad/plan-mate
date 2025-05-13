@@ -1,6 +1,6 @@
 package logic.useCases.authentication
 
-import logic.entities.User
+import logic.entity.User
 
 class SessionManagerUseCase {
     private var currentUser: User? = null

@@ -3,7 +3,7 @@ package data.repository
 import data.repository.mapper.toTaskDto
 import data.repository.mapper.toTaskEntity
 import data.repository.remoteDataSource.RemoteDataSource
-import logic.entities.Task
+import logic.entity.Task
 import logic.repository.TasksRepository
 
 class TasksRepositoryImpl(

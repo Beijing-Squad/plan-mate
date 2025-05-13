@@ -1,15 +1,17 @@
-package logic.entities
+package logic.entity
 
 import kotlinx.datetime.LocalDateTime
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
 @OptIn(ExperimentalUuidApi::class)
-data class Project(
+data class Task(
     val id: Uuid = Uuid.random(),
-    val name: String,
+    val projectId: String,
+    val title: String,
     val description: String,
     val createdBy: String,
+    val stateId: String,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime
 )

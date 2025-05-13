@@ -2,7 +2,7 @@ package data.local.csvDataSource.parser
 
 import data.local.csvDataSource.csv.CsvParser
 import kotlinx.datetime.LocalDateTime
-import logic.entities.Task
+import logic.entity.Task
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 

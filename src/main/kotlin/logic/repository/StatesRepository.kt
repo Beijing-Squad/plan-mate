@@ -1,6 +1,6 @@
 package logic.repository
 
-import logic.entities.TaskState
+import logic.entity.TaskState
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 

@@ -2,12 +2,11 @@ package data.local.csvDataSource
 
 import com.google.common.truth.Truth.assertThat
 import data.local.csvDataSource.csv.CsvDataSourceImpl
-import data.repository.mapper.toTaskStateDto
 import fake.*
 import io.mockk.*
 import kotlinx.datetime.LocalDateTime
-import logic.entities.*
-import logic.entities.type.UserRole
+import logic.entity.*
+import logic.entity.type.UserRole
 import logic.exceptions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -596,7 +595,7 @@ class LocalDataSourceImplTest {
     }
     //endregion
 
-    //region taskState
+    //region task state
     @Test
     fun `should add a new state to the data source`() {
         // Given
@@ -615,7 +614,7 @@ class LocalDataSourceImplTest {
 
         taskStateCsvDataSource.appendToFile(newState)
         // When
-        val result = localDataSourceImpl.addTaskState(toTaskStateDto(newState))
+        val result = localDataSourceImpl.addTaskState(newState)
 
         // Then
         assertThat(result).isTrue()
@@ -647,7 +646,7 @@ class LocalDataSourceImplTest {
         val result = localDataSourceImpl.getTaskStatesByProjectId("964801c9-49f6-4e7b-899b-113337a91848")
 
         // Then
-        assertThat(result).containsExactly(toTaskStateDto(state1), toTaskStateDto(state2))
+        assertThat(result).containsExactly(state1, state2)
     }
 
     @Test
@@ -671,7 +670,7 @@ class LocalDataSourceImplTest {
         val result = localDataSourceImpl.getTaskStateById("964801c9-49f6-4e7b-899b-113337a91848")
 
         // Then
-        assertThat(result).isEqualTo(toTaskStateDto(state))
+        assertThat(result).isEqualTo(state)
     }
 
     @Test
@@ -713,14 +712,14 @@ class LocalDataSourceImplTest {
         every { taskStateCsvDataSource.loadAllDataFromFile() } returns stateList
 
         // When
-        val result = localDataSourceImpl.deleteTaskState(state.id.toString())
+        val result = localDataSourceImpl.deleteTaskState(state)
 
         // Then
         assertEquals(true, result)
     }
 
     @Test
-    fun `should return true when updated an existed state`() {
+    fun `should update an existing state`() {
         // Given
         val project = createProject(
             id = Uuid.parse("964801c9-49f6-4e7b-899b-113337a91848"),
@@ -733,13 +732,30 @@ class LocalDataSourceImplTest {
             projectId = project.id
         )
         val updatedState = existingState.copy(name = "InProgress")
+        every { taskStateCsvDataSource.loadAllDataFromFile() } returns listOf(existingState)
+        every { taskStateCsvDataSource.updateFile(any()) } returns Unit
 
         // When
-        taskStateCsvDataSource.updateItem(updatedState)
-        val result = localDataSourceImpl.updateTaskState(toTaskStateDto(updatedState))
+        val result = localDataSourceImpl.updateTaskState(updatedState)
 
         // Then
-        assertThat(result).isTrue()
+        assertThat(result).isEqualTo(updatedState)
+    }
+
+    @Test
+    fun `should throw exception when updating a non-existent state`() {
+        // Given
+        val nonExistentState = createState(
+            id = Uuid.parse("123e4567-e89b-12d3-a456-426614174000"),
+            name = "Done",
+            projectId = Uuid.random()
+        )
+        every { taskStateCsvDataSource.loadAllDataFromFile() } returns emptyList()
+
+        // When & Then
+        assertThrows<StateNotFoundException> {
+            localDataSourceImpl.updateTaskState(nonExistentState)
+        }
     }
     //endregion
 

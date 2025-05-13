@@ -4,7 +4,7 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import logic.entities.Project
+import logic.entity.Project
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 

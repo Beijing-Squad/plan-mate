@@ -4,8 +4,8 @@ import com.google.common.truth.Truth.assertThat
 import data.local.csvDataSource.parser.AuditCsvParser
 import fake.createAudit
 import kotlinx.datetime.LocalDateTime
-import logic.entities.Audit
-import logic.entities.type.UserRole
+import logic.entity.Audit
+import logic.entity.type.UserRole
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
