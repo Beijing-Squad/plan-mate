@@ -12,7 +12,7 @@ class AddAuditLogUseCase(
 
     @OptIn(ExperimentalUuidApi::class)
     suspend fun addAuditLog(audit: Audit) {
-        sessionManagerUseCase.getCurrentUser()?.let { audit.copy(userRole = it.role) }
+        sessionManagerUseCase.getCurrentUser()?.let { audit.copy(userRole = it.role, userName = it.userName) }
             ?.let { auditRepository.addAuditLog(it) }
     }
 }
