@@ -86,7 +86,6 @@ class ProjectManagementScreen(
             consoleIO.show("\u001B[32mEnter project ID: \u001B[0m")
             val id = getInput() ?: return
             showAnimation("find project by id...") {
-                consoleIO.showWithLine("")
                 val project = getProjectByIdUseCase.getProjectById(id)
                 showProjectInfo(project)
             }
@@ -105,7 +104,6 @@ class ProjectManagementScreen(
             val desc = getInput() ?: return
 
             showAnimation("Updating project...") {
-                consoleIO.showWithLine("")
                 val project = getProjectByIdUseCase.getProjectById(id)
                 val updatedProject = project.copy(
                     name = name,
@@ -121,7 +119,6 @@ class ProjectManagementScreen(
                         "Admin ${user.userName} updated project ${updatedProject.id} with name '$name' at ${now.format()}"
                     addAudit.addAuditLog(
                         Audit(
-                            id = user.id,
                             userRole = user.role,
                             userName = user.userName,
                             action = Audit.ActionType.UPDATE,
@@ -152,14 +149,12 @@ class ProjectManagementScreen(
                     updatedAt = now
                 )
                 showAnimation("add project...") {
-                    consoleIO.showWithLine("")
                     addProjectUseCase.addProject(newProject)
                     consoleIO.showWithLine("\u001B[32m✅ Project added successfully.\u001B[0m")
                     val actionDetails =
                         "Admin ${user.userName} created project ${newProject.id} with name '$name' at ${now.format()}"
                     addAudit.addAuditLog(
                         Audit(
-                            id = user.id,
                             userRole = user.role,
                             userName = user.userName,
                             action = Audit.ActionType.CREATE,
@@ -181,14 +176,12 @@ class ProjectManagementScreen(
             val id = getInput() ?: return
             val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
             showAnimation("delete project...") {
-                consoleIO.showWithLine("")
                 deleteProjectUseCase.deleteProject(id)
                 consoleIO.showWithLine("\u001B[32m✅ Project deleted successfully.\u001B[0m")
                 sessionManager.getCurrentUser()?.let { user ->
                     val actionDetails = "Admin ${user.userName} deleted project with name '$name' at ${now.format()}"
                     addAudit.addAuditLog(
                         Audit(
-                            id = user.id,
                             userRole = user.role,
                             userName = user.userName,
                             action = Audit.ActionType.DELETE,
