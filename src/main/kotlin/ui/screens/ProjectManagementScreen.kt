@@ -1,5 +1,6 @@
 package ui.screens
 
+import format
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -12,7 +13,6 @@ import ui.enums.ProjectBoardOption
 import ui.main.BaseScreen
 import ui.main.MenuRenderer
 import ui.main.consoleIO.ConsoleIO
-import ui.main.format
 import kotlin.uuid.ExperimentalUuidApi
 
 @OptIn(ExperimentalUuidApi::class)
