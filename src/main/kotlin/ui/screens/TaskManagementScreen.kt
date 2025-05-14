@@ -1,8 +1,5 @@
 package ui.screens
 
-import data.remote.mongoDataSource.dto.TaskDto
-import data.repository.mapper.toTaskDto
-import data.repository.mapper.toTaskEntity
 import format
 import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDateTime
@@ -96,26 +93,19 @@ class TaskManagementScreen(
                     consoleIO.showWithLine("⚠️ No tasks available.")
                 }
                 tasks.forEach { task ->
-                    val taskDTO = task.toTaskDto()
-                    val createdAt = try {
-                        LocalDateTime.parse(taskDTO.createdAt).format()
-                    } catch (_: Exception) {
-                        taskDTO.createdAt
-                    }
-                    val updatedAt = try {
-                        LocalDateTime.parse(taskDTO.updatedAt).format()
-                    } catch (_: Exception) {
-                        taskDTO.updatedAt
-                    }
+                    val createdAt = LocalDateTime.parse(task.createdAt.toString()).format()
+
+                    val updatedAt = LocalDateTime.parse(task.updatedAt.toString()).format()
+
                     consoleIO.showWithLine("")
                     consoleIO.showWithLine(
                         """
                         ╭────────────────────────────────────────╮
-                        │ ID: ${taskDTO.id}
-                        │ Title: ${taskDTO.title}
-                        │ Description: ${taskDTO.description}
-                        │ State ID: ${taskDTO.stateId}
-                        │ Created By: ${taskDTO.createdBy}
+                        │ ID: ${task.id}
+                        │ Title: ${task.title}
+                        │ Description: ${task.description}
+                        │ State ID: ${task.stateId}
+                        │ Created By: ${task.createdBy}
                         │ Created At: $createdAt
                         │ Updated At: $updatedAt
                         ╰────────────────────────────────────────╯
@@ -140,18 +130,18 @@ class TaskManagementScreen(
 
         showAnimation("Finding task...") {
             try {
-                val taskDTO = getTaskByIdUseCase.getTaskById(id)
+                val task = getTaskByIdUseCase.getTaskById(id)
                 consoleIO.showWithLine("")
                 consoleIO.showWithLine(
                     """
                     ╭─────────────────────────────────────────╮
-                    │ ID: ${taskDTO.id}
-                    │ Title: ${taskDTO.title}
-                    │ Description: ${taskDTO.description}
-                    │ State ID: ${taskDTO.stateId}
-                    │ Created By: ${taskDTO.createdBy}
-                    │ Created At: ${taskDTO.createdAt.format()}
-                    │ Updated At: ${taskDTO.updatedAt.format()}
+                    │ ID: ${task.id}
+                    │ Title: ${task.title}
+                    │ Description: ${task.description}
+                    │ State ID: ${task.stateId}
+                    │ Created By: ${task.createdBy}
+                    │ Created At: ${task.createdAt.format()}
+                    │ Updated At: ${task.updatedAt.format()}
                     ╰─────────────────────────────────────────╯
                     """.trimIndent()
                 )
@@ -191,20 +181,19 @@ class TaskManagementScreen(
 
         val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
 
-        val taskDTO = TaskDto(
-            id = Uuid.random().toString(),
+        val task = Task(
+            id = Uuid.random(),
             projectId = projectId,
             title = title,
             description = description ?: "",
             createdBy = currentUser.userName,
             stateId = stateId,
-            createdAt = now.toString(),
-            updatedAt = now.toString()
+            createdAt = now,
+            updatedAt = now
         )
 
         showAnimation("Adding task...") {
             try {
-                val task = taskDTO.toTaskEntity()
                 addTaskUseCase.addTask(task)
                 consoleIO.showWithLine("✅ Task added successfully.")
 
