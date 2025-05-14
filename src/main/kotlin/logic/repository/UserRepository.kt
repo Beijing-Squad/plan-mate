@@ -1,6 +1,6 @@
 package logic.repository
 
-import logic.entities.User
+import logic.entity.User
 
 interface UserRepository{
     suspend fun getAllUsers(): List<User>

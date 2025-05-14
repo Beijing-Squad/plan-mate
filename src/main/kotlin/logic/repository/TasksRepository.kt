@@ -1,6 +1,6 @@
 package logic.repository
 
-import logic.entities.Task
+import logic.entity.Task
 
 interface TasksRepository{
     suspend fun getAllTasks(): List<Task>

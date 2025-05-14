@@ -1,13 +1,10 @@
 package data.local.csvDataSource
 
 import data.local.csvDataSource.csv.CsvDataSourceImpl
-import data.remote.mongoDataSource.dto.TaskStateDto
 import data.repository.localDataSource.LocalDataSource
-import data.repository.mapper.toTaskStateDto
-import data.repository.mapper.toTaskStateEntity
 import data.utils.hashPassword
-import logic.entities.*
-import logic.entities.type.UserRole
+import logic.entity.*
+import logic.entity.type.UserRole
 import logic.exceptions.*
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
@@ -19,6 +16,7 @@ class LocalDataSourceImpl(
     private val taskCsvDataSource: CsvDataSourceImpl<Task>,
     private val taskStateCsvDataSource: CsvDataSourceImpl<TaskState>
 ) : LocalDataSource {
+    private val states = getAllTaskStates().toMutableList()
 
     //region authentication
     override fun saveUser(username: String, password: String, role: UserRole): Boolean {
@@ -93,50 +91,56 @@ class LocalDataSourceImpl(
     override fun getProjectById(projectId: String): Project = projectCsvDataSource.getById(projectId)
     //endregion
 
-    //region taskState
-    override fun addTaskState(taskState: TaskStateDto): Boolean {
+    //region task state
+    override fun addTaskState(taskState: TaskState): Boolean {
         return try {
-            taskStateCsvDataSource.appendToFile(toTaskStateEntity(taskState))
+            taskStateCsvDataSource.appendToFile(taskState)
             true
-        } catch (e: Exception) {
+        } catch (e: StateException) {
             false
         }
     }
 
     @OptIn(ExperimentalUuidApi::class)
-    override fun deleteTaskState(taskStateId: String): Boolean {
+    override fun deleteTaskState(taskState: TaskState): Boolean {
         return try {
-            taskStateCsvDataSource.deleteById(taskStateId)
+            taskStateCsvDataSource.deleteById(taskState.id.toString())
             true
-        } catch (e: Exception) {
+        } catch (e: StateException) {
             false
         }
     }
 
-    override fun getAllTaskStates(): List<TaskStateDto> {
+    override fun getAllTaskStates(): List<TaskState> {
         return taskStateCsvDataSource.loadAllDataFromFile()
-            .map { toTaskStateDto(it) }
     }
 
     @OptIn(ExperimentalUuidApi::class)
-    override fun getTaskStateById(taskStateId: String): TaskStateDto {
+    override fun getTaskStateById(stateId: String): TaskState {
         return getAllTaskStates()
-            .find { it.id == taskStateId }
+            .find { it.id.toString() == stateId }
             ?: throw StateNotFoundException()
     }
 
     @OptIn(ExperimentalUuidApi::class)
-    override fun getTaskStatesByProjectId(projectId: String): List<TaskStateDto> {
+    override fun getTaskStatesByProjectId(projectId: String): List<TaskState> {
         return getAllTaskStates()
-            .filter { it.projectId == projectId }
+            .filter { it.projectId.toString() == projectId }
     }
 
     @OptIn(ExperimentalUuidApi::class)
-    override fun updateTaskState(taskState: TaskStateDto): Boolean {
-        taskStateCsvDataSource.updateItem(toTaskStateEntity(taskState))
-        return true
+    override fun updateTaskState(taskState: TaskState): TaskState {
+        return getTaskStateById(taskState.id.toString()).let { currentState ->
+            val updatedState = currentState.copy(
+                name = taskState.name,
+                projectId = taskState.projectId
+            )
+            val updatedStates = states.map { if (it == currentState) updatedState else it }
+            taskStateCsvDataSource.updateFile(updatedStates)
+            updatedState
+        }
     }
-//endregion
+    //endregion
 
     //region task
     override fun getAllTasks(): List<Task> {
@@ -169,7 +173,7 @@ class LocalDataSourceImpl(
         taskCsvDataSource.updateFile(tasks)
         return updatedTask
     }
-//endregion
+    //endregion
 
     //region user
     override fun getAllUsers(): List<User> {
@@ -200,5 +204,5 @@ class LocalDataSourceImpl(
         userCsvDataSource.updateItem(updatedUser)
         return updatedUser
     }
-//endregion
+    //endregion
 }

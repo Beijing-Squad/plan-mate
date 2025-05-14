@@ -3,7 +3,7 @@ package data.repository
 import data.repository.mapper.toProjectDto
 import data.repository.mapper.toProjectEntity
 import data.repository.remoteDataSource.RemoteDataSource
-import logic.entities.Project
+import logic.entity.Project
 import logic.repository.ProjectsRepository
 
 class ProjectsRepositoryImpl(

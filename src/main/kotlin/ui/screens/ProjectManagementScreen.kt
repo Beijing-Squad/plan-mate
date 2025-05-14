@@ -1,11 +1,11 @@
 package ui.screens
 
-import format
+import ui.main.format
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import logic.entities.Audit
-import logic.entities.Project
+import logic.entity.Audit
+import logic.entity.Project
 import logic.useCases.audit.AddAuditLogUseCase
 import logic.useCases.authentication.SessionManagerUseCase
 import logic.useCases.project.*
@@ -47,11 +47,11 @@ class ProjectManagementScreen(
     override fun handleFeatureChoice() {
         while (true) {
             when (getInput()) {
-                "1" -> listAllProjects()
-                "2" -> findProjectById()
-                "3" -> updateProject()
-                "4" -> addProject()
-                "5" -> deleteProject()
+                "1" -> onClickShowListAllProjects()
+                "2" -> onClickFindProjectById()
+                "3" -> onClickUpdateProject()
+                "4" -> onClickAddProject()
+                "5" -> onClickDeleteProject()
                 "0" -> {
                     consoleIO.showWithLine("\u001B[34m🔙 Returning to Main Menu...\u001B[0m")
                     break
@@ -63,7 +63,7 @@ class ProjectManagementScreen(
             showOptionService()
         }
     }
-    private fun listAllProjects() {
+    private fun onClickShowListAllProjects() {
         try {
             showAnimation("list all project...") {
                 val projects = getAllProjectsUseCase.getAllProjects()
@@ -81,7 +81,7 @@ class ProjectManagementScreen(
         }
     }
 
-    private fun findProjectById() {
+    private fun onClickFindProjectById() {
         try {
             consoleIO.show("\u001B[32mEnter project ID: \u001B[0m")
             val id = getInput() ?: return
@@ -93,7 +93,7 @@ class ProjectManagementScreen(
             consoleIO.showWithLine("\u001B[31m❌ ${e.message}\u001B[0m")
         }
     }
-    private fun updateProject() {
+    private fun onClickUpdateProject() {
         try {
             consoleIO.show("\u001B[32mEnter project ID to update: \u001B[0m")
             val id = getInput() ?: return
@@ -134,7 +134,7 @@ class ProjectManagementScreen(
             consoleIO.showWithLine("\u001B[31m❌ ${e.message}\u001B[0m")
         }
     }
-    private fun addProject() {
+    private fun onClickAddProject() {
         try {
             consoleIO.show("\u001B[32mEnter project name: \u001B[0m")
             val name = getInput() ?: return
@@ -170,7 +170,7 @@ class ProjectManagementScreen(
             consoleIO.showWithLine("\u001B[31m❌ ${e.message}\u001B[0m")
         }
     }
-    private fun deleteProject() {
+    private fun onClickDeleteProject() {
         try {
             consoleIO.show("\u001B[32mEnter project ID to delete: \u001B[0m")
             val id = getInput() ?: return

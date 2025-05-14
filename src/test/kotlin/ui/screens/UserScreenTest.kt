@@ -2,8 +2,8 @@ package ui.screens
 
 import fake.createUser
 import io.mockk.*
-import logic.entities.User
-import logic.entities.type.UserRole
+import logic.entity.User
+import logic.entity.type.UserRole
 import logic.exceptions.InvalidPasswordException
 import logic.exceptions.InvalidUserNameException
 import logic.useCases.authentication.SessionManagerUseCase

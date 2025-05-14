@@ -1,6 +1,6 @@
 package di
 
-import GetAuditLogsByProjectIdUseCase
+import logic.useCases.audit.GetAuditLogsByProjectIdUseCase
 import logic.useCases.audit.AddAuditLogUseCase
 import logic.useCases.audit.GetAllAuditLogsUseCase
 import logic.useCases.audit.GetAuditLogsByTaskIdUseCase

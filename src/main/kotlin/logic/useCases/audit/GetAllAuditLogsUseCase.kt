@@ -1,6 +1,6 @@
 package logic.useCases.audit
 
-import logic.entities.Audit
+import logic.entity.Audit
 import logic.repository.AuditRepository
 
 class GetAllAuditLogsUseCase(

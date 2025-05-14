@@ -4,7 +4,7 @@ import data.local.csvDataSource.LocalDataSourceImpl
 import data.local.csvDataSource.csv.CsvDataSourceImpl
 import data.local.csvDataSource.parser.*
 import data.repository.localDataSource.LocalDataSource
-import logic.entities.*
+import logic.entity.*
 import org.koin.core.qualifier.named
 import org.koin.dsl.bind
 import org.koin.dsl.module

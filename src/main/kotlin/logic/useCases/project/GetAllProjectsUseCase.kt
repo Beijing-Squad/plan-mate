@@ -1,6 +1,6 @@
 package logic.useCases.project
 
-import logic.entities.Project
+import logic.entity.Project
 import logic.repository.ProjectsRepository
 
 class GetAllProjectsUseCase(

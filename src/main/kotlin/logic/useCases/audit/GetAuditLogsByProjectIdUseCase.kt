@@ -1,5 +1,6 @@
+package logic.useCases.audit
 
-import logic.entities.Audit
+import logic.entity.Audit
 import logic.repository.AuditRepository
 
 class GetAuditLogsByProjectIdUseCase(
@@ -11,8 +12,4 @@ class GetAuditLogsByProjectIdUseCase(
             .takeIf { it.isNotEmpty() }
             ?.sortedByDescending { it.timeStamp }
     }
-}
-
-private fun String?.isValidProjectId(): Boolean {
-    return !this.isNullOrBlank()
 }

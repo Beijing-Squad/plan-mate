@@ -1,10 +1,9 @@
 package data.repository
 
-import data.remote.mongoDataSource.MongoDBDataSourceImpl
-import data.repository.mapper.toAuditDTO
+import data.repository.mapper.toAuditDto
 import data.repository.mapper.toAuditEntity
 import data.repository.remoteDataSource.RemoteDataSource
-import logic.entities.Audit
+import logic.entity.Audit
 import logic.repository.AuditRepository
 
 class AuditRepositoryImpl(
@@ -12,18 +11,18 @@ class AuditRepositoryImpl(
 ) : AuditRepository {
 
     override suspend fun getAllAuditLogs(): List<Audit> {
-        return remoteDataSource.getAllAuditLogs().map { toAuditEntity(it) }
+        return remoteDataSource.getAllAuditLogs().map { it.toAuditEntity() }
     }
 
     override suspend fun addAuditLog(audit: Audit) {
-        remoteDataSource.addAuditLog(toAuditDTO(audit))
+        remoteDataSource.addAuditLog(audit.toAuditDto())
     }
 
     override suspend fun getAuditLogsByProjectId(projectId: String): List<Audit> {
-        return remoteDataSource.getAuditLogsByProjectId(projectId).map { toAuditEntity(it) }
+        return remoteDataSource.getAuditLogsByProjectId(projectId).map { it.toAuditEntity() }
     }
 
     override suspend fun getAuditLogsByTaskId(taskId: String): List<Audit> {
-        return remoteDataSource.getAuditLogsByTaskId(taskId).map { toAuditEntity(it) }
+        return remoteDataSource.getAuditLogsByTaskId(taskId).map { it.toAuditEntity() }
     }
 }

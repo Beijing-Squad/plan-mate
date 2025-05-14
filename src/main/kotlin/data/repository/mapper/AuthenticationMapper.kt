@@ -1,8 +1,8 @@
 package data.repository.mapper
 
 import data.remote.mongoDataSource.dto.UserDto
-import logic.entities.User
-import logic.entities.type.UserRole
+import logic.entity.User
+import logic.entity.type.UserRole
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 

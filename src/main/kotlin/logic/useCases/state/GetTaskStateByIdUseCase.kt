@@ -1,6 +1,6 @@
 package logic.useCases.state
 
-import logic.entities.TaskState
+import logic.entity.TaskState
 import logic.repository.StatesRepository
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
